@@ -1,0 +1,20 @@
+﻿@page "{id:int}"
+@model PasearPorPasear.Pages.Posts.DetailsModel
+
+<h2>@Model.Post.Titulo</h2>
+
+<p><strong>Fecha del Evento:</strong> @Model.Post.FechaEvento.ToString("dd/MM/yyyy")</p>
+
+<div class="content">
+    <p>@Model.Post.Desarrollo</p>
+</div>
+
+<a asp-page="./Index" class="btn btn-primary">Volver a la Lista</a>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a asp-page="./Edit" asp-route-id="@Model.Post.Id" class="btn btn-warning">Editar</a>
+    <form method="post" asp-page-handler="Delete" asp-route-id="@Model.Post.Id" style="display:inline">
+        <button type="submit" class="btn btn-danger" onclick="return confirm('¿Estás seguro de que deseas eliminar esta publicación?');">Eliminar</button>
+    </form>
+}

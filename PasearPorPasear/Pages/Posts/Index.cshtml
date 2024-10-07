@@ -1,0 +1,43 @@
+﻿@page
+@model PasearPorPasear.Pages.Posts.IndexModel
+
+<h2>Lista de Publicaciones</h2>
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Fecha del Evento</th>
+            @if (User.Identity.IsAuthenticated)
+            {
+                <th>Acciones</th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+    @foreach (var post in Model.Posts)
+    {
+        <tr>
+            <td>
+                <a asp-page="./Details" asp-route-id="@post.Id">@post.Titulo</a>
+            </td>
+            <td>@post.FechaEvento.ToString("dd/MM/yyyy")</td>
+            
+            @if (User.Identity.IsAuthenticated)
+            {
+                <td>
+                    <a asp-page="./Edit" asp-route-id="@post.Id" class="btn btn-warning btn-sm">Editar</a>
+                    <form method="post" asp-page-handler="Delete" asp-route-id="@post.Id" style="display:inline">
+                        <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('¿Estás seguro de que deseas eliminar esta publicación?');">Eliminar</button>
+                    </form>
+                </td>
+            }
+        </tr>
+    }
+    </tbody>
+</table>
+
+@if (User.Identity.IsAuthenticated)
+{
+    <a class="btn btn-primary" asp-page="Create">Nueva publicación</a>
+}

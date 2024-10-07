@@ -1,0 +1,34 @@
+﻿1 - "ConnectionStrings": {
+  "DefaultConnection": "Server=(LocalDb)\\MSSQLLocalDB;Database=ProyectoPruebaIdentityDB;Trusted_Connection=True;MultipleActiveResultSets=true"
+}
+
+2 - Iniciar la aplicación
+
+3 - Crear la carpeta Models y adentro la clase Publicaciones.cs
+
+4 - Agregar la clase publicaciones en  ApplicationDbContext.cs: public DbSet<Publicaciones> Posts { get; set; }
+
+5 - Crear las razor pages vacias del CRUD: Creá una nueva carpeta llamada Posts dentro de la carpeta Pages y agregá las siguientes Razor Pages: Index, Create, Edit, Delete. 
+
+6 - RequireConfirmedAccount = false
+
+7 - Crear un usuario. Link: localhost:7252/Identity/Account/Register
+
+8 - Desactivar la opción de registro editando los archivos con scaffolding dentro de la carpeta Areas/Identity/Pages. Hacer clic derecho sobre el proyecto y seleccioná: Agregar -> Nuevo Scaffold. Seleccioná Identity en el menú de la izquierda y hacé clic en Agregar. Aparecerá un cuadro de diálogo donde podés elegir las páginas que querés sobrescribir. Seleccioná las páginas que te interesa editar, como Register, Login, o ambas, dependiendo de qué formulario querés modificar. También deberás seleccionar el ApplicationDbContext para asegurar que la configuración de Identity use tu contexto de base de datos actual. Luego, hacé clic en Agregar.
+
+9 - Utilizar [Authorize] para que solamente el usuario logueado pueda crear y modificar las publicaciones
+
+10 - Modificar el archivo Index.cshtml para condicionar la visibilidad del botón: En el archivo Index.cshtml de la página de Publicaciones, agregá la siguiente lógica para que el botón solo se muestre si el usuario está logueado.
+
+    @if (User.Identity.IsAuthenticated) // Mostrar botón solo si el usuario está autenticado
+    {
+    <a class="btn btn-primary" asp-page="Create">Crear nueva publicación</a>
+    }
+
+10 - Designar la página de publicaciónes como la de inicio
+
+11 - Crear la razor pages vacia Details para ver una publicación
+
+12 - Add-Migration InitialCreate, Update-Database
+
+13 - Modificar la barra de navegación para agregar los links de las páginas

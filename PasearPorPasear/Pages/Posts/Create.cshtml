@@ -1,0 +1,44 @@
+﻿@page
+@model PasearPorPasear.Pages.Posts.CreateModel
+
+<h2>Crear Nueva Publicación</h2>
+
+<form method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="Titulo">Título</label>
+        <input type="text" asp-for="Post.Titulo" class="form-control" />
+        <span asp-validation-for="Post.Titulo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="Desarrollo">Desarrollo del Texto</label>
+        <textarea asp-for="Post.Desarrollo" class="form-control"></textarea>
+        <span asp-validation-for="Post.Desarrollo" class="text-danger"></span>
+    </div>
+
+    <div class="form-group">
+        <label for="FechaEvento">Fecha del Evento</label>
+        <input type="date" asp-for="Post.FechaEvento" class="form-control" />
+        <span asp-validation-for="Post.FechaEvento" class="text-danger"></span>
+    </div>
+
+    <button type="submit" class="btn btn-primary">Crear Publicación</button>
+</form>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert alert-danger">
+        <ul>
+            @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+            {
+                <li>@error.ErrorMessage</li>
+            }
+        </ul>
+    </div>
+}

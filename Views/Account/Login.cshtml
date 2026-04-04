@@ -1,0 +1,35 @@
+@{
+    ViewData["Title"] = "Login";
+    Layout = "_Layout";
+}
+
+<div class="login-page">
+    <div class="login-card">
+        <h1>Pasear por Pasear</h1>
+        <p class="subtitle">Panel de Administración</p>
+
+        @if (ViewBag.Error is string error)
+        {
+            <div class="alert alert-error">@error</div>
+        }
+
+        <form asp-controller="Account" asp-action="Login" method="post">
+            <input type="hidden" name="returnUrl" value="@ViewBag.ReturnUrl" />
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" name="email" class="form-control" placeholder="admin@email.com" required autofocus>
+            </div>
+            <div class="form-group">
+                <label>Contraseña</label>
+                <input type="password" name="password" class="form-control" placeholder="••••••••" required>
+            </div>
+            <button type="submit" class="btn btn-teal" style="width:100%;justify-content:center;margin-top:8px">
+                Ingresar
+            </button>
+        </form>
+
+        <p style="text-align:center;margin-top:24px;font-size:var(--fs-xs);color:var(--ink-40)">
+            <a href="/" style="color:var(--ink-40)">← Volver al sitio</a>
+        </p>
+    </div>
+</div>

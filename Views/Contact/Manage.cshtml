@@ -1,0 +1,57 @@
+@model List<ContactMessage>
+@{
+    ViewData["Title"] = "Mensajes";
+    ViewData["AdminTitle"] = "Mensajes de Contacto";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h3 style="font-family:var(--font-display);margin-bottom:24px">@Model.Count mensajes</h3>
+
+@if (!Model.Any())
+{
+    <div style="text-align:center;padding:48px;color:var(--ink-40)">
+        <p>No hay mensajes aún.</p>
+    </div>
+}
+else
+{
+    <div style="display:flex;flex-direction:column;gap:16px">
+        @foreach (var msg in Model)
+        {
+            <div style="background:var(--bg-card);border:1px solid @(msg.IsRead ? "var(--ink-10)" : "var(--yellow)");border-radius:var(--radius-lg);padding:24px;position:relative">
+                @if (!msg.IsRead)
+                {
+                    <span style="position:absolute;top:16px;right:16px;width:8px;height:8px;border-radius:50%;background:var(--yellow)"></span>
+                }
+                <div style="display:flex;justify-content:space-between;align-items:start;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+                    <div>
+                        <strong style="font-size:var(--fs-md)">@msg.Name</strong>
+                        <span style="font-size:var(--fs-sm);color:var(--ink-40);margin-left:8px">@msg.SentAt.ToString("dd/MM/yyyy HH:mm")</span>
+                    </div>
+                    <div style="display:flex;gap:6px">
+                        @if (!msg.IsRead)
+                        {
+                            <form asp-controller="Contact" asp-action="MarkRead" method="post" style="display:inline">
+                                <input type="hidden" name="id" value="@msg.Id" />
+                                <button type="submit" class="btn btn-outline btn-xs">Marcar leído</button>
+                            </form>
+                        }
+                        <a href="mailto:@msg.Email?subject=Re: @msg.Subject" class="btn btn-outline btn-xs">Responder</a>
+                        <form asp-controller="Contact" asp-action="DeleteMessage" method="post" id="del-msg-@msg.Id" style="display:inline">
+                            <input type="hidden" name="id" value="@msg.Id" />
+                            <button type="button" onclick="confirmDelete('del-msg-@msg.Id','¿Eliminar este mensaje?')" class="btn btn-danger btn-xs">Eliminar</button>
+                        </form>
+                    </div>
+                </div>
+                <div style="font-size:var(--fs-sm);color:var(--ink-60);margin-bottom:4px">
+                    📧 <a href="mailto:@msg.Email" style="color:var(--info)">@msg.Email</a>
+                    @if (!string.IsNullOrEmpty(msg.Subject))
+                    {
+                        <span> · @msg.Subject</span>
+                    }
+                </div>
+                <p style="color:var(--ink-80);line-height:1.7;margin-top:12px;padding-top:12px;border-top:1px solid var(--ink-10)">@msg.Message</p>
+            </div>
+        }
+    </div>
+}

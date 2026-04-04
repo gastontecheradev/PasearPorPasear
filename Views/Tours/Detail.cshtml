@@ -1,0 +1,101 @@
+@model Tour
+@{
+    ViewData["Title"] = Model.Name;
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+    var reservation = ViewBag.Reservation as TourReservation ?? new TourReservation { TourId = Model.Id };
+}
+
+<section class="content-page">
+    <div class="container">
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@(isPt ? Model.NamePt : isEn ? Model.NameEn : Model.Name)" class="content-hero-img">
+        }
+
+        <h1 class="content-title">@(isPt ? Model.NamePt : isEn ? Model.NameEn : Model.Name)</h1>
+
+        <div class="tour-info-grid">
+            @if (!string.IsNullOrEmpty(Model.Duration))
+            {
+                <div class="tour-info-item">
+                    <div class="tour-info-label">@(isPt ? "Duração" : isEn ? "Duration" : "Duración")</div>
+                    <div class="tour-info-value">@(isPt ? Model.DurationPt : isEn ? Model.DurationEn : Model.Duration)</div>
+                </div>
+            }
+            @if (Model.Price.HasValue)
+            {
+                <div class="tour-info-item">
+                    <div class="tour-info-label">@(isPt ? "Preço" : isEn ? "Price" : "Precio")</div>
+                    <div class="tour-info-value">$@Model.Price.Value.ToString("N0") UYU</div>
+                </div>
+            }
+            <div class="tour-info-item">
+                <div class="tour-info-label">@(isPt ? "Grupo Máx" : isEn ? "Max Group" : "Grupo Máx")</div>
+                <div class="tour-info-value">@Model.MaxParticipants @(isPt ? "pessoas" : isEn ? "people" : "personas")</div>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.MeetingPoint))
+            {
+                <div class="tour-info-item">
+                    <div class="tour-info-label">@(isPt ? "Ponto de Encontro" : isEn ? "Meeting Point" : "Punto de Encuentro")</div>
+                    <div class="tour-info-value" style="font-size:var(--fs-sm)">@(isPt ? Model.MeetingPointPt : isEn ? Model.MeetingPointEn : Model.MeetingPoint)</div>
+                </div>
+            }
+        </div>
+
+        <div class="content-body">
+            @Html.Raw(isPt ? Model.DescriptionPt : isEn ? Model.DescriptionEn : Model.Description)
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
+        {
+            <iframe src="@Model.MapEmbedUrl" class="content-map" allowfullscreen="" loading="lazy"></iframe>
+        }
+
+        <!-- ═══ RESERVATION FORM ═══ -->
+        <div class="reservation-form" id="reservar">
+            <h3>@(isPt ? "Reservar Este Tour" : isEn ? "Book This Tour" : "Reservar Este Tour")</h3>
+            <form asp-controller="Tours" asp-action="Reserve" method="post">
+                <input type="hidden" name="TourId" value="@Model.Id" />
+
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                    <div class="form-group">
+                        <label>@(isPt ? "Nome Completo" : isEn ? "Full Name" : "Nombre Completo") *</label>
+                        <input type="text" name="FullName" class="form-control" value="@reservation.FullName" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input type="email" name="Email" class="form-control" value="@reservation.Email" required>
+                    </div>
+                </div>
+                <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+                    <div class="form-group">
+                        <label>@(isPt ? "Telefone" : isEn ? "Phone" : "Teléfono")</label>
+                        <input type="tel" name="Phone" class="form-control" value="@reservation.Phone">
+                    </div>
+                    <div class="form-group">
+                        <label>@(isPt ? "Data" : isEn ? "Date" : "Fecha") *</label>
+                        <input type="date" name="ReservationDate" class="form-control" value="@reservation.ReservationDate.ToString("yyyy-MM-dd")" required min="@DateTime.Today.ToString("yyyy-MM-dd")">
+                    </div>
+                    <div class="form-group">
+                        <label>@(isPt ? "Pessoas" : isEn ? "People" : "Personas") *</label>
+                        <input type="number" name="NumberOfPeople" class="form-control" value="@reservation.NumberOfPeople" min="1" max="@Model.MaxParticipants" required>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label>@(isPt ? "Comentários" : isEn ? "Comments" : "Comentarios")</label>
+                    <textarea name="Comments" class="form-control" rows="3" placeholder="@(isEn ? "Any special requests or questions..." : "Alguna solicitud especial o consulta...")">@reservation.Comments</textarea>
+                </div>
+                <button type="submit" class="btn btn-yellow">
+                    @(isPt ? "Enviar Reserva" : isEn ? "Send Reservation" : "Enviar Reserva")
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                </button>
+            </form>
+        </div>
+
+        <div style="margin-top:40px">
+            <a href="/Tours" class="btn btn-outline">← @(isPt ? "Todos os Tours" : isEn ? "All Tours" : "Todos los Tours")</a>
+        </div>
+    </div>
+</section>

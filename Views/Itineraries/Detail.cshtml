@@ -1,0 +1,43 @@
+@model Itinerary
+@{
+    ViewData["Title"] = Model.Title;
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="content-page">
+    <div class="container">
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)" class="content-hero-img">
+        }
+
+        <div class="content-meta">
+            @if (!string.IsNullOrEmpty(Model.Duration))
+            {
+                <span>⏱ @(isPt ? Model.DurationPt : isEn ? Model.DurationEn : Model.Duration)</span>
+            }
+            @if (!string.IsNullOrEmpty(Model.Distance))
+            {
+                <span>📏 @Model.Distance</span>
+            }
+        </div>
+
+        <h1 class="content-title">@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)</h1>
+        <p style="font-size:var(--fs-md);color:var(--ink-60);margin-bottom:32px;line-height:1.8">@(isPt ? Model.DescriptionPt : isEn ? Model.DescriptionEn : Model.Description)</p>
+
+        <div class="content-body">
+            @Html.Raw(isPt ? Model?.ContentPt : isEn ? Model?.ContentEn : Model?.Content)
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
+        {
+            <iframe src="@Model.MapEmbedUrl" class="content-map" allowfullscreen="" loading="lazy"></iframe>
+        }
+
+        <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--ink-10)">
+            <a href="/Itineraries" class="btn btn-outline">← @(isPt ? "Todos os Itinerários" : isEn ? "All Itineraries" : "Todos los Itinerarios")</a>
+        </div>
+    </div>
+</section>

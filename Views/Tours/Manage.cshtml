@@ -1,0 +1,50 @@
+@model List<Tour>
+@{
+    ViewData["Title"] = "Gestionar Tours";
+    ViewData["AdminTitle"] = "Gestionar Tours";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <h3 style="font-family:var(--font-display)">@Model.Count tours</h3>
+    <a href="/Tours/Create" class="btn btn-teal btn-sm">+ Nuevo Tour</a>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Tour</th>
+            <th>Precio</th>
+            <th>Duración</th>
+            <th>Máx.</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var tour in Model)
+        {
+            <tr>
+                <td><strong>@tour.Name</strong></td>
+                <td>@(tour.Price.HasValue ? $"${tour.Price.Value:N0}" : "—")</td>
+                <td>@tour.Duration</td>
+                <td>@tour.MaxParticipants</td>
+                <td>
+                    <span class="badge @(tour.IsActive ? "badge-confirmed" : "badge-cancelled")">
+                        @(tour.IsActive ? "Activo" : "Inactivo")
+                    </span>
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <a href="/Tours/Detail/@tour.Slug" class="btn btn-outline btn-xs" target="_blank">Ver</a>
+                        <a href="/Tours/Edit/@tour.Id" class="btn btn-outline btn-xs">Editar</a>
+                        <form asp-controller="Tours" asp-action="Delete" method="post" id="del-tour-@tour.Id" style="display:inline">
+                            <input type="hidden" name="id" value="@tour.Id" />
+                            <button type="button" onclick="confirmDelete('del-tour-@tour.Id','¿Eliminar este tour y todas sus reservas?')" class="btn btn-danger btn-xs">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

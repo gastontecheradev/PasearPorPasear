@@ -1,0 +1,56 @@
+@model List<BlogPost>
+@{
+    ViewData["Title"] = "Blog";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+    var currentPage = (int)ViewBag.CurrentPage;
+    var totalPages = (int)ViewBag.TotalPages;
+}
+
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-label">Blog</span>
+            <h2 class="section-title">@(isPt ? "Histórias da Caminhada" : isEn ? "Stories from the Walk" : "Historias del Camino")</h2>
+            <p class="section-subtitle">@(isEn ? "Each neighborhood tells a story. Here we share ours." : "Cada barrio cuenta una historia. Acá compartimos las nuestras.")</p>
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var post in Model)
+            {
+                <a href="/Blog/Post/@post.Slug" class="card reveal">
+                    <div class="card-img-wrap">
+                        <img src="@(post.ImagePath ?? "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=600")" alt="@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)" class="card-img" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <span class="card-tag">@(isEn ? post.LocationNameEn ?? "Montevideo" : post.LocationName ?? "Montevideo")</span>
+                        <h3 class="card-title">@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)</h3>
+                        <p class="card-text">@(isPt ? post.ExcerptPt : isEn ? post.ExcerptEn : post.Excerpt)</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-date">@post.PublishDate.ToString("dd MMM yyyy")</span>
+                        <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
+                    </div>
+                </a>
+            }
+        </div>
+
+        @if (totalPages > 1)
+        {
+            <div class="pagination">
+                @for (int i = 1; i <= totalPages; i++)
+                {
+                    if (i == currentPage)
+                    {
+                        <span class="active">@i</span>
+                    }
+                    else
+                    {
+                        <a href="/Blog?page=@i">@i</a>
+                    }
+                }
+            </div>
+        }
+    </div>
+</section>

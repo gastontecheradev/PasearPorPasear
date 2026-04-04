@@ -1,0 +1,33 @@
+@inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var culture = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName ?? "es";
+    var isEn = culture == "en";
+    Layout = "_Layout";
+}
+
+<div class="admin-header">
+    <div class="container">
+        <h1>@ViewData["AdminTitle"]</h1>
+        <div class="breadcrumb">
+            <a href="/Admin/Dashboard">Admin</a> / @ViewData["AdminTitle"]
+        </div>
+    </div>
+</div>
+
+<div class="container" style="padding-bottom:var(--space-section)">
+    <nav class="admin-nav">
+        <a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Dashboard" ? "active" : "")">Dashboard</a>
+        <a href="/Blog/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a>
+        <a href="/Tours/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" && ViewContext.RouteData.Values["action"]?.ToString() != "Reservations" ? "active" : "")">Tours</a>
+        <a href="/Tours/Reservations" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Reservations" ? "active" : "")">@(isEn ? "Reservations" : "Reservas")</a>
+        <a href="/Itineraries/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Itineraries" ? "active" : "")">@(isEn ? "Itineraries" : "Itinerarios")</a>
+        <a href="/ClubDePaseo/Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">Club</a>
+        <a href="/About/Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">@(isEn ? "About" : "Sobre Mí")</a>
+        <a href="/Newsletter/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a>
+        <a href="/Contact/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" && ViewContext.RouteData.Values["action"]?.ToString() == "Manage" ? "active" : "")">@(isEn ? "Messages" : "Mensajes")</a>
+        <a href="/Admin/Settings" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Settings" ? "active" : "")">@(isEn ? "Settings" : "Config")</a>
+    </nav>
+
+    @RenderBody()
+</div>

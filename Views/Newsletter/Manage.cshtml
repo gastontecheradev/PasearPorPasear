@@ -1,0 +1,67 @@
+@model List<NewsletterSubscriber>
+@{
+    ViewData["Title"] = "Gestionar Newsletter";
+    ViewData["AdminTitle"] = "Newsletter & Suscriptores";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var mailchimpUrl = ViewBag.MailchimpUrl as string;
+}
+
+<!-- Mailchimp config -->
+<div style="background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg);padding:24px;margin-bottom:32px">
+    <h4 style="font-family:var(--font-display);margin-bottom:16px">Integración Mailchimp</h4>
+    <p style="font-size:var(--fs-sm);color:var(--ink-60);margin-bottom:16px">
+        Pegá la URL del formulario embebido de Mailchimp. Si se deja vacío, el sitio usa el formulario local interno.
+    </p>
+    <form asp-controller="Newsletter" asp-action="UpdateMailchimp" method="post">
+        <div style="display:flex;gap:12px">
+            <input type="text" name="mailchimpUrl" class="form-control" value="@mailchimpUrl" placeholder="https://gmail.us21.list-manage.com/subscribe/post?u=...">
+            <button type="submit" class="btn btn-teal btn-sm" style="white-space:nowrap">Guardar URL</button>
+        </div>
+        <p class="form-hint" style="margin-top:8px">
+            En Mailchimp: Audience → Signup forms → Embedded forms → copiar la URL del action del formulario.
+        </p>
+    </form>
+</div>
+
+<!-- Subscribers table -->
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <h3 style="font-family:var(--font-display)">@Model.Count suscriptores locales</h3>
+</div>
+
+@if (!Model.Any())
+{
+    <div style="text-align:center;padding:48px;color:var(--ink-40)">
+        <p>No hay suscriptores locales aún.</p>
+    </div>
+}
+else
+{
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Email</th>
+                <th>Nombre</th>
+                <th>Fecha</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var sub in Model)
+            {
+                <tr>
+                    <td><a href="mailto:@sub.Email" style="color:var(--info)">@sub.Email</a></td>
+                    <td>@(sub.Name ?? "—")</td>
+                    <td>@sub.SubscribedAt.ToString("dd/MM/yyyy")</td>
+                    <td><span class="badge @(sub.IsActive ? "badge-confirmed" : "badge-cancelled")">@(sub.IsActive ? "Activo" : "Inactivo")</span></td>
+                    <td>
+                        <form asp-controller="Newsletter" asp-action="RemoveSubscriber" method="post" id="del-sub-@sub.Id" style="display:inline">
+                            <input type="hidden" name="id" value="@sub.Id" />
+                            <button type="button" onclick="confirmDelete('del-sub-@sub.Id','¿Eliminar este suscriptor?')" class="btn btn-danger btn-xs">Eliminar</button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

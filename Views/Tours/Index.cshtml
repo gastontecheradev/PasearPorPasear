@@ -1,0 +1,40 @@
+@model List<Tour>
+@{
+    ViewData["Title"] = "Tours";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-label">Tours</span>
+            <h2 class="section-title">@(isPt ? "Tours a Pé por Montevidéu" : isEn ? "Walking Tours in Montevideo" : "Tours a Pie por Montevideo")</h2>
+            <p class="section-subtitle">@(isEn ? "Explore the city with a local guide. Small groups, authentic experiences." : "Explorá la ciudad con una guía local. Grupos pequeños, experiencias auténticas.")</p>
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var tour in Model)
+            {
+                <a href="/Tours/Detail/@tour.Slug" class="card reveal">
+                    <div class="card-img-wrap">
+                        <img src="@(tour.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)" class="card-img" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <span class="card-tag">@(isPt ? tour.DurationPt : isEn ? tour.DurationEn : tour.Duration) · @tour.MaxParticipants @(isPt ? "máx" : isEn ? "max" : "máx")</span>
+                        <h3 class="card-title">@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)</h3>
+                        <p class="card-text">@(isPt ? tour.DescriptionPt : isEn ? tour.DescriptionEn : tour.Description)</p>
+                    </div>
+                    <div class="card-footer">
+                        @if (tour.Price.HasValue)
+                        {
+                            <span style="font-weight:700;color:var(--ink)">$@tour.Price.Value.ToString("N0") UYU</span>
+                        }
+                        <span class="card-link">@(isPt ? "Detalhes e Reservar" : isEn ? "Details & Book" : "Detalles y Reservar") →</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>

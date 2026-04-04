@@ -1,0 +1,54 @@
+@model List<BlogPost>
+@{
+    ViewData["Title"] = "Gestionar Blog";
+    ViewData["AdminTitle"] = "Gestionar Blog";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
+    <h3 style="font-family:var(--font-display)">@Model.Count publicaciones</h3>
+    <a href="/Blog/Create" class="btn btn-teal btn-sm">+ Nueva Publicación</a>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Fecha</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var post in Model)
+        {
+            <tr>
+                <td>
+                    <strong>@post.Title</strong>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-40)">/@post.Slug</div>
+                </td>
+                <td>@post.PublishDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @if (post.IsPublished)
+                    {
+                        <span class="badge badge-confirmed">Publicado</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-pending">Borrador</span>
+                    }
+                </td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <a href="/Blog/Post/@post.Slug" class="btn btn-outline btn-xs" target="_blank">Ver</a>
+                        <a href="/Blog/Edit/@post.Id" class="btn btn-outline btn-xs">Editar</a>
+                        <form asp-controller="Blog" asp-action="Delete" method="post" id="del-blog-@post.Id" style="display:inline">
+                            <input type="hidden" name="id" value="@post.Id" />
+                            <button type="button" onclick="confirmDelete('del-blog-@post.Id','¿Eliminar esta publicación?')" class="btn btn-danger btn-xs">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

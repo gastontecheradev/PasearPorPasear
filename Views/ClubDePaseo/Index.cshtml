@@ -1,0 +1,35 @@
+@model ClubDePaseoPage
+@{
+    ViewData["Title"] = "Club de Paseo";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="content-page">
+    <div class="container">
+        @if (!string.IsNullOrEmpty(Model?.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)" class="content-hero-img">
+        }
+
+        <h1 class="content-title">@(isEn ? Model?.TitleEn : Model?.Title)</h1>
+
+        <div class="content-body">
+            @Html.Raw(isEn ? Model?.ContentEn : Model?.Content)
+        </div>
+
+        <div style="margin-top:48px;text-align:center;padding:40px;background:var(--yellow-light);border-radius:var(--radius-lg)">
+            <h3 style="font-family:var(--font-display);margin-bottom:12px">@(isPt ? "Junte-se ao Clube!" : isEn ? "Join the Club!" : "¡Unite al Club!")</h3>
+            <p style="color:var(--ink-60);margin-bottom:20px">@(isEn ? "Subscribe to the newsletter and receive the dates for each walk." : "Suscribite a la newsletter y recibí las fechas de cada paseo.")</p>
+            <a href="/Newsletter" class="btn btn-yellow">@(isPt ? "Inscrever-me" : isEn ? "Subscribe" : "Suscribirme")</a>
+        </div>
+    </div>
+</section>
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="container" style="margin-top:24px;margin-bottom:48px">
+        <a href="/ClubDePaseo/Edit" class="btn btn-outline btn-sm">✏️ @(isPt ? "Editar Página" : isEn ? "Edit Page" : "Editar Página")</a>
+    </div>
+}

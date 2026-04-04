@@ -1,0 +1,129 @@
+@{
+    ViewData["Title"] = "Inicio";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var culture = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName ?? "es";
+    var isEn = culture == "en"; var isPt = culture == "pt";
+    var settings = ViewBag.Settings as Dictionary<string, SiteSetting> ?? new Dictionary<string, SiteSetting>();
+    var posts = ViewBag.LatestPosts as List<BlogPost> ?? new List<BlogPost>();
+    var tours = ViewBag.Tours as List<Tour> ?? new List<Tour>();
+    string S(string key) => settings.TryGetValue(key, out var s) ? (isPt ? s.ValuePt : isEn ? s.ValueEn : s.Value) : "";
+}
+
+<!-- ═══ HERO ═══ -->
+<section class="hero">
+    <div class="hero-content">
+        @* <div class="hero-label fade-up">@(isPt ? "Blog de passeios por Montevidéu" : isEn ? "Montevideo Walking Blog" : "Blog de paseos por Montevideo")</div> *@
+        <h1 class="hero-title fade-up fade-up-d1">
+            @* Pasear<span class="brand-dot"></span>por<br>Pasear *@
+            Pasear Por Pasear
+        </h1>
+        <p class="hero-desc fade-up fade-up-d2">@S("HomeHeroSubtitle")</p>
+        <div class="hero-actions fade-up fade-up-d3">
+            <a href="/Blog" class="btn btn-teal">
+                @(isPt ? "Ler o Blog" : isEn ? "Read the Blog" : "Leer el Blog")
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
+            <a href="/Tours" class="btn btn-outline">@(isPt ? "Reservar Tour" : isEn ? "Book a Tour" : "Reservar Tour")</a>
+        </div>
+        <div class="hero-accent fade-up fade-up-d3">
+            <span class="a1"></span><span class="a2"></span><span class="a3"></span><span class="a4"></span>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ FEATURED STRIP ═══ -->
+@* <div class="featured-strip">
+    <div class="container">
+        <div class="featured-stat"><div class="featured-stat-num">22km</div><div class="featured-stat-label">@(isPt ? "Rambla costeira" : isEn ? "Rambla coastline" : "Rambla costera")</div></div>
+        <div class="featured-stat"><div class="featured-stat-num">62</div><div class="featured-stat-label">@(isPt ? "Bairros" : isEn ? "Neighborhoods" : "Barrios")</div></div>
+        <div class="featured-stat"><div class="featured-stat-num">1724</div><div class="featured-stat-label">@(isPt ? "Fundação" : isEn ? "Founded" : "Fundación")</div></div>
+        <div class="featured-stat"><div class="featured-stat-num">∞</div><div class="featured-stat-label">@(isPt ? "Histórias por contar" : isEn ? "Stories to tell" : "Historias por contar")</div></div>
+    </div>
+</div> *@
+
+<!-- ═══ INTRO ═══ -->
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-label">@(isPt ? "Bem-vindos" : isEn ? "Welcome" : "Bienvenidos")</span>
+            <h2 class="section-title">@(isPt ? "Montevidéu, passo a passo" : isEn ? "Montevideo, step by step" : "Montevideo, paso a paso")</h2>
+            <p class="section-subtitle">@S("HomeIntro")</p>
+        </div>
+    </div>
+</section>
+
+<!-- ═══ LATEST POSTS ═══ -->
+@if (posts.Any())
+{
+    <section class="section" style="padding-top:0">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Blog</span>
+                <h2 class="section-title">@(isPt ? "Últimas Publicações" : isEn ? "Latest Posts" : "Últimas Publicaciones")</h2>
+            </div>
+            <div class="cards-grid">
+                @foreach (var post in posts)
+                {
+                    <a href="/Blog/Post/@post.Slug" class="card reveal">
+                        <div class="card-img-wrap"><img src="@(post.ImagePath ?? "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=600")" alt="@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)" class="card-img" loading="lazy"></div>
+                        <div class="card-body">
+                            <span class="card-tag">@(isPt ? post.LocationNamePt ?? "Montevidéu" : isEn ? post.LocationNameEn ?? "Montevideo" : post.LocationName ?? "Montevideo")</span>
+                            <h3 class="card-title">@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)</h3>
+                            <p class="card-text">@(isPt ? post.ExcerptPt : isEn ? post.ExcerptEn : post.Excerpt)</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-date">@post.PublishDate.ToString("dd MMM yyyy")</span>
+                            <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
+                        </div>
+                    </a>
+                }
+            </div>
+            <div style="text-align:center;margin-top:36px">
+                <a href="/Blog" class="btn btn-outline">@(isPt ? "Ver Todas as Publicações" : isEn ? "View All Posts" : "Ver Todas las Publicaciones")</a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ═══ TOURS PREVIEW ═══ -->
+@if (tours.Any())
+{
+    <section class="section" style="background:var(--bg-section)">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">Tours</span>
+                <h2 class="section-title">@(isPt ? "Caminhe Conosco" : isEn ? "Walk with Us" : "Caminá con Nosotros")</h2>
+            </div>
+            <div class="cards-grid">
+                @foreach (var tour in tours)
+                {
+                    <a href="/Tours/Detail/@tour.Slug" class="card reveal">
+                        <div class="card-img-wrap"><img src="@(tour.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)" class="card-img" loading="lazy"></div>
+                        <div class="card-body">
+                            <span class="card-tag">@(isPt ? tour.DurationPt : isEn ? tour.DurationEn : tour.Duration)</span>
+                            <h3 class="card-title">@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)</h3>
+                            <p class="card-text">@(isPt ? tour.DescriptionPt : isEn ? tour.DescriptionEn : tour.Description)</p>
+                        </div>
+                        <div class="card-footer">
+                            @if (tour.Price.HasValue) { <span style="font-weight:700;color:var(--teal)">$@tour.Price.Value.ToString("N0") UYU</span> }
+                            <span class="card-link">@(isPt ? "Reservar" : isEn ? "Book now" : "Reservar") →</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ═══ NEWSLETTER CTA ═══ -->
+<section class="newsletter-section">
+    <div class="container reveal">
+        <span class="section-label">Newsletter</span>
+        <h2 class="section-title">@(isPt ? "Não Perca Nenhum Passeio" : isEn ? "Don't Miss a Walk" : "No te Pierdas Ningún Paseo")</h2>
+        <p class="section-subtitle">@(isPt ? "Inscreva-se para receber itinerários, histórias e datas do clube." : isEn ? "Subscribe to receive itineraries, stories, and walking club dates." : "Suscribite para recibir itinerarios, historias y fechas del club.")</p>
+        <form class="newsletter-form" asp-controller="Newsletter" asp-action="Subscribe" method="post">
+            <input type="email" name="email" placeholder="@(isPt ? "Seu email" : isEn ? "Your email" : "Tu email")" required>
+            <button type="submit" class="btn btn-yellow">@(isPt ? "Inscrever-me" : isEn ? "Subscribe" : "Suscribirme")</button>
+        </form>
+    </div>
+</section>

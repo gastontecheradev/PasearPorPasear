@@ -1,0 +1,28 @@
+@model List<SiteSetting>
+@{
+    ViewData["Title"] = "Configuración";
+    ViewData["AdminTitle"] = "Configuración del Sitio";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form method="post" asp-controller="Admin" asp-action="Settings">
+    @foreach (var setting in Model)
+    {
+        <div style="margin-bottom:24px;padding:20px;background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg)">
+            <div style="font-family:var(--font-mono);font-size:var(--fs-xs);color:var(--ink-40);letter-spacing:.08em;margin-bottom:12px">@setting.Key</div>
+            <div class="form-group" style="margin-bottom:8px">
+                <label>Español</label>
+                <textarea name="values[@setting.Key]" class="form-control" rows="2">@setting.Value</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0">
+                <label>English</label>
+                <textarea name="valuesEn[@setting.Key]" class="form-control" rows="2">@setting.ValueEn</textarea>
+            </div>
+            <div class="form-group" style="margin-bottom:0;margin-top:8px">
+                <label>Português</label>
+                <textarea name="valuesPt[@setting.Key]" class="form-control" rows="2">@setting.ValuePt</textarea>
+            </div>
+        </div>
+    }
+    <button type="submit" class="btn btn-teal">Guardar Configuración</button>
+</form>

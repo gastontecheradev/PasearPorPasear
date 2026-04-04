@@ -1,0 +1,101 @@
+@model Tour
+@{
+    ViewData["Title"] = "Nuevo Tour";
+    ViewData["AdminTitle"] = "Nuevo Tour";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form asp-controller="Tours" asp-action="Create" method="post" enctype="multipart/form-data" style="max-width:800px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+            <label>Nombre (Español) *</label>
+            <input asp-for="Name" class="form-control" placeholder="Nombre del tour">
+            <span asp-validation-for="Name" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+        </div>
+        <div class="form-group">
+            <label>Name (English) *</label>
+            <input asp-for="NameEn" class="form-control" placeholder="Tour name">
+        </div>
+        <div class="form-group">
+            <label>Nome (Português)</label>
+            <input asp-for="NamePt" class="form-control" placeholder="Nome do tour">
+            <span asp-validation-for="NameEn" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Descripción (Español) *</label>
+        <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Description (English) *</label>
+        <textarea asp-for="DescriptionEn" class="form-control" rows="4"></textarea>
+    </div>
+    <div class="form-group">
+        <label>Descrição (Português)</label>
+        <textarea asp-for="DescriptionPt" class="form-control" rows="4"></textarea>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div class="form-group">
+            <label>Duración (ES)</label>
+            <input asp-for="Duration" class="form-control" placeholder="Ej: 3 horas">
+        </div>
+        <div class="form-group">
+            <label>Duration (EN)</label>
+            <input asp-for="DurationEn" class="form-control" placeholder="Eg: 3 hours">
+        </div>
+        <div class="form-group">
+            <label>Duração (PT)</label>
+            <input asp-for="DurationPt" class="form-control" placeholder="Ex: 3 horas">
+        </div>
+        <div class="form-group">
+            <label>Precio (UYU)</label>
+            <input asp-for="Price" type="number" class="form-control" step="50" placeholder="0">
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+            <label>Punto de encuentro (ES)</label>
+            <input asp-for="MeetingPoint" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Meeting Point (EN)</label>
+            <input asp-for="MeetingPointEn" class="form-control">
+        </div>
+        <div class="form-group">
+            <label>Ponto de Encontro (PT)</label>
+            <input asp-for="MeetingPointPt" class="form-control">
+        </div>
+    </div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group">
+            <label>Máx. participantes</label>
+            <input asp-for="MaxParticipants" type="number" class="form-control" min="1" max="100">
+        </div>
+        <div class="form-group">
+            <label style="display:flex;align-items:center;gap:8px;cursor:pointer;margin-top:28px">
+                <input asp-for="IsActive" type="checkbox" checked style="width:18px;height:18px;accent-color:var(--yellow)">
+                Activo
+            </label>
+        </div>
+    </div>
+
+    <div class="form-group">
+        <label>Google Maps Embed URL</label>
+        <input asp-for="MapEmbedUrl" class="form-control" placeholder="https://www.google.com/maps/embed?pb=...">
+    </div>
+
+    <div class="form-group">
+        <label>Imagen</label>
+        <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="tourImgPreview" style="font-size:var(--fs-sm)">
+        <img id="tourImgPreview" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-top:12px">
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px">
+        <button type="submit" class="btn btn-teal">Crear Tour</button>
+        <a href="/Tours/Manage" class="btn btn-outline">Cancelar</a>
+    </div>
+</form>

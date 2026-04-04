@@ -1,0 +1,43 @@
+@{
+    ViewData["Title"] = "Dashboard";
+    ViewData["AdminTitle"] = "Dashboard";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<h2 style="font-family:var(--font-display);margin-bottom:24px">Bienvenida, Rosalía 👋</h2>
+
+<div class="dashboard-grid">
+    <a href="/Blog/Manage" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.PostCount</div>
+        <div class="dash-card-label">Publicaciones</div>
+    </a>
+    <a href="/Tours/Manage" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.TourCount</div>
+        <div class="dash-card-label">Tours</div>
+    </a>
+    <a href="/Tours/Reservations" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.ReservationCount</div>
+        <div class="dash-card-label">Reservas Pendientes</div>
+    </a>
+    <a href="/Itineraries/Manage" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.ItineraryCount</div>
+        <div class="dash-card-label">Itinerarios</div>
+    </a>
+    <a href="/Newsletter/Manage" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.SubscriberCount</div>
+        <div class="dash-card-label">Suscriptores</div>
+    </a>
+    <a href="/Contact/Manage" class="dash-card" style="text-decoration:none">
+        <div class="dash-card-num">@ViewBag.MessageCount</div>
+        <div class="dash-card-label">Mensajes sin Leer</div>
+    </a>
+</div>
+
+<h3 style="font-family:var(--font-display);margin-bottom:16px">Acciones Rápidas</h3>
+<div style="display:flex;gap:12px;flex-wrap:wrap">
+    <a href="/Blog/Create" class="btn btn-teal btn-sm">+ Nueva Publicación</a>
+    <a href="/Tours/Create" class="btn btn-outline btn-sm">+ Nuevo Tour</a>
+    <a href="/Itineraries/Create" class="btn btn-outline btn-sm">+ Nuevo Itinerario</a>
+    <a href="/Tours/Reservations" class="btn btn-outline btn-sm">Ver Reservas</a>
+    <a href="/Contact/Manage" class="btn btn-outline btn-sm">Ver Mensajes</a>
+</div>

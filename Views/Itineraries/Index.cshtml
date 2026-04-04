@@ -1,0 +1,37 @@
+@model List<Itinerary>
+@{
+    ViewData["Title"] = "Itinerarios";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-label">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</span>
+            <h2 class="section-title">@(isPt ? "Rotas para Explorar" : isEn ? "Routes to Explore" : "Rutas para Explorar")</h2>
+            <p class="section-subtitle">@(isEn ? "Detailed routes so you can explore Montevideo on your own, at your own pace." : "Rutas detalladas para que puedas recorrer Montevideo por tu cuenta, a tu ritmo.")</p>
+        </div>
+
+        <div class="cards-grid">
+            @foreach (var item in Model)
+            {
+                <a href="/Itineraries/Detail/@item.Slug" class="card reveal">
+                    <div class="card-img-wrap">
+                        <img src="@(item.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? item.TitlePt : isEn ? item.TitleEn : item.Title)" class="card-img" loading="lazy">
+                    </div>
+                    <div class="card-body">
+                        <span class="card-tag">@(isPt ? item.DurationPt : isEn ? item.DurationEn : item.Duration) @(item.Distance != null ? $"· {item.Distance}" : "")</span>
+                        <h3 class="card-title">@(isPt ? item.TitlePt : isEn ? item.TitleEn : item.Title)</h3>
+                        <p class="card-text">@(isPt ? item.DescriptionPt : isEn ? item.DescriptionEn : item.Description)</p>
+                    </div>
+                    <div class="card-footer">
+                        <span class="card-date"></span>
+                        <span class="card-link">@(isPt ? "Ver rota" : isEn ? "View route" : "Ver ruta") →</span>
+                    </div>
+                </a>
+            }
+        </div>
+    </div>
+</section>

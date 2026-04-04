@@ -1,0 +1,85 @@
+@model List<TourReservation>
+@{
+    ViewData["Title"] = "Reservas";
+    ViewData["AdminTitle"] = "Reservas de Tours";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    var tours = ViewBag.Tours as List<Tour> ?? new List<Tour>();
+    var selectedTourId = ViewBag.SelectedTourId as int?;
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <h3 style="font-family:var(--font-display)">@Model.Count reservas</h3>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="/Tours/Reservations" class="btn btn-xs @(selectedTourId == null ? "btn-yellow" : "btn-outline")">Todas</a>
+        @foreach (var tour in tours)
+        {
+            <a href="/Tours/Reservations?tourId=@tour.Id" class="btn btn-xs @(selectedTourId == tour.Id ? "btn-yellow" : "btn-outline")">@tour.Name</a>
+        }
+    </div>
+</div>
+
+@if (!Model.Any())
+{
+    <div style="text-align:center;padding:48px;color:var(--ink-40)">
+        <p style="font-size:var(--fs-lg)">No hay reservas aún.</p>
+    </div>
+}
+else
+{
+    <table class="admin-table">
+        <thead>
+            <tr>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Teléfono</th>
+                <th>Tour</th>
+                <th>Fecha</th>
+                <th>Personas</th>
+                <th>Estado</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var res in Model)
+            {
+                <tr>
+                    <td><strong>@res.FullName</strong></td>
+                    <td><a href="mailto:@res.Email" style="color:var(--info)">@res.Email</a></td>
+                    <td>@(res.Phone ?? "—")</td>
+                    <td>@res.Tour.Name</td>
+                    <td>@res.ReservationDate.ToString("dd/MM/yyyy")</td>
+                    <td>@res.NumberOfPeople</td>
+                    <td>
+                        <span class="badge @(res.Status == ReservationStatus.Pending ? "badge-pending" : res.Status == ReservationStatus.Confirmed ? "badge-confirmed" : "badge-cancelled")">
+                            @res.Status
+                        </span>
+                    </td>
+                    <td>
+                        <div style="display:flex;gap:4px;flex-wrap:wrap">
+                            @if (res.Status != ReservationStatus.Confirmed)
+                            {
+                                <form asp-controller="Tours" asp-action="UpdateReservationStatus" method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@res.Id" />
+                                    <input type="hidden" name="status" value="@ReservationStatus.Confirmed" />
+                                    <button type="submit" class="btn btn-xs" style="background:var(--success);color:#fff">Confirmar</button>
+                                </form>
+                            }
+                            @if (res.Status != ReservationStatus.Cancelled)
+                            {
+                                <form asp-controller="Tours" asp-action="UpdateReservationStatus" method="post" style="display:inline">
+                                    <input type="hidden" name="id" value="@res.Id" />
+                                    <input type="hidden" name="status" value="@ReservationStatus.Cancelled" />
+                                    <button type="submit" class="btn btn-danger btn-xs">Cancelar</button>
+                                </form>
+                            }
+                        </div>
+                        @if (!string.IsNullOrEmpty(res.Comments))
+                        {
+                            <div style="font-size:var(--fs-xs);color:var(--ink-40);margin-top:4px">💬 @res.Comments</div>
+                        }
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}

@@ -1,0 +1,39 @@
+@model BlogPost
+@{
+    ViewData["Title"] = Model.Title;
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="content-page">
+    <div class="container">
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)" class="content-hero-img">
+        }
+
+        <div class="content-meta">
+            <span>@Model.PublishDate.ToString("dd MMMM yyyy")</span>
+            @if (!string.IsNullOrEmpty(isEn ? Model.LocationNameEn : Model.LocationName))
+            {
+                <span>📍 @(isEn ? Model.LocationNameEn : Model.LocationName)</span>
+            }
+        </div>
+
+        <h1 class="content-title">@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)</h1>
+
+        <div class="content-body">
+            @Html.Raw(isPt ? Model?.ContentPt : isEn ? Model?.ContentEn : Model?.Content)
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
+        {
+            <iframe src="@Model.MapEmbedUrl" class="content-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        }
+
+        <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--ink-10)">
+            <a href="/Blog" class="btn btn-outline">← @(isPt ? "Voltar ao Blog" : isEn ? "Back to Blog" : "Volver al Blog")</a>
+        </div>
+    </div>
+</section>

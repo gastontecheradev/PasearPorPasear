@@ -1,0 +1,159 @@
+@inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager
+@inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
+@{
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var culture = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName ?? "es";
+    var isEn = culture == "en";
+    var isPt = culture == "pt";
+}
+<!DOCTYPE html>
+<html lang="@culture">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — Pasear por Pasear</title>
+    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="icon" type="image/png" href="/images/favicon.png">
+    @await RenderSectionAsync("Styles", required: false)
+    <!-- Open Graph -->
+    <meta property="og:title" content="Pasear por Pasear" />
+    <meta property="og:description" content="Blog de paseos por Montevideo, Uruguay" />
+    <meta property="og:image" content="https://TU-DOMINIO.com/images/og-image.jpg" />
+    <meta property="og:type" content="website" />
+</head>
+<body>
+    <!-- ═══ NAVBAR ═══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="/" class="navbar-brand">
+                <img src="/images/logo.png" alt="Pasear por Pasear" style="height:40px"> Pasear por Pasear
+            </a>
+
+            <ul class="navbar-links" id="navLinks">
+                <li><a href="/" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
+                <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a></li>
+                <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</a></li>
+                <li><a href="/Itineraries" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Itineraries" ? "active" : "")">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</a></li>
+                <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li>
+                <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li>
+                <li><a href="/About" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" ? "active" : "")">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
+                <li><a href="/Contact" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" ? "active" : "")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+            </ul>
+
+            <div class="navbar-right">
+                <div class="lang-toggle">
+                    <button onclick="setLanguage('es')" class="@(culture == "es" ? "active" : "")">ES</button>
+                    <button onclick="setLanguage('en')" class="@(culture == "en" ? "active" : "")">EN</button>
+                    <button onclick="setLanguage('pt')" class="@(culture == "pt" ? "active" : "")">PT</button>
+                </div>
+
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <a href="/Admin/Dashboard" class="btn btn-teal btn-xs">Admin</a>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                        <button type="submit" class="btn btn-outline btn-xs">@(isEn ? "Logout" : "Salir")</button>
+                    </form>
+                }
+                else
+                @* Login *@
+                {
+                    <a href="/Account/Login" class="btn btn-outline btn-xs" title="@(isEn ? "Admin Login" : "Acceso Admin")">
+                        Admin
+                        @* <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> *@
+                    </a>
+                }
+
+                <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
+                    <span></span><span></span><span></span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hidden anti-forgery token for JS language switch -->
+    <form id="langForm" style="display:none">
+        @Html.AntiForgeryToken()
+    </form>
+
+    <!-- ═══ ALERTS ═══ -->
+    <div class="container" style="margin-top:16px">
+        @if (TempData["Success"] is string success)
+        {
+            <div class="alert alert-success">✓ @success</div>
+        }
+        @if (TempData["Error"] is string error)
+        {
+            <div class="alert alert-error">✕ @error</div>
+        }
+        @if (TempData["Info"] is string info)
+        {
+            <div class="alert alert-info">ℹ @info</div>
+        }
+        @if (TempData["ReservationSuccess"] is string resSuccess)
+        {
+            <div class="alert alert-success">✓ @resSuccess</div>
+        }
+    </div>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <main>
+        @RenderBody()
+    </main>
+
+    <!-- ═══ FOOTER ═══ -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <div class="footer-brand">Pasear por Pasear<span class="dot">.</span></div>
+                    <p class="footer-desc">@(isPt ? "Descobrindo Montevidéu um passo de cada vez. Passeios a pé, itinerários e histórias da capital uruguaia." : isEn ? "Discovering Montevideo one step at a time. Walking tours, itineraries, and stories from Uruguay's capital." : "Descubriendo Montevideo un paso a la vez. Tours a pie, itinerarios e historias de la capital uruguaya.")</p>
+                </div>
+                <div>
+                    <div class="footer-heading">@(isPt ? "Explorar" : isEn ? "Explore" : "Explorar")</div>
+                    <ul class="footer-links">
+                        <li><a href="/Blog">Blog</a></li>
+                        <li><a href="/Itineraries">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</a></li>
+                        <li><a href="/Tours">Tours</a></li>
+                        <li><a href="/ClubDePaseo">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-heading">@(isPt ? "Conectar" : isEn ? "Connect" : "Conectar")</div>
+                    <ul class="footer-links">
+                        <li><a href="/Newsletter">Newsletter</a></li>
+                        <li><a href="/Contact">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+                        <li><a href="/About">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="footer-heading">@(isPt ? "Siga-nos" : isEn ? "Follow Us" : "Seguinos")</div>
+                    <ul class="footer-links">
+                        <li><a href="https://instagram.com" target="_blank">Instagram</a></li>
+                        <li><a href="https://facebook.com" target="_blank">Facebook</a></li>
+                        <li><a href="mailto:pasearporpasear@@gmail.com">Email</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <span>© @DateTime.Now.Year — Pasear por Pasear · Rosalía Souza</span>
+                <span>
+                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                    {
+                        <a href="/Admin/Dashboard" style="color:var(--yellow)">Admin</a>
+                        <span style="margin:0 6px">·</span>
+                    }
+                    else
+                    {
+                        <a href="/Account/Login" style="color:rgba(244,239,232,.2);transition:color .3s" onmouseover="this.style.color='var(--yellow)'" onmouseout="this.style.color='rgba(244,239,232,.2)'">@(isEn ? "Admin" : "Admin")</a>
+                        <span style="margin:0 6px">·</span>
+                    }
+                    Montevideo, Uruguay 🇺🇾
+                </span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="~/js/site.js"></script>
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

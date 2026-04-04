@@ -1,0 +1,21 @@
+@* Rich text editor partial — Usage: @await Html.PartialAsync("_Editor", new ViewDataDictionary(ViewData) { { "FieldId", "Content" }, { "Label", "Contenido" } }) *@
+@{
+    var fieldId = ViewData["FieldId"]?.ToString() ?? "Content";
+    var label = ViewData["Label"]?.ToString() ?? "Contenido";
+}
+
+<div class="form-group">
+    <label>@label</label>
+    <div class="editor-toolbar">
+        <button type="button" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+        <button type="button" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+        <button type="button" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+        <button type="button" onclick="execCmd('insertUnorderedList')" title="List">☰</button>
+        <button type="button" onclick="execCmd('insertOrderedList')" title="Numbered">1.</button>
+        <button type="button" onclick="execCmd('formatBlock','h3')" title="Heading">H3</button>
+        <button type="button" onclick="execCmd('formatBlock','p')" title="Paragraph">¶</button>
+        <button type="button" onclick="insertLink()" title="Link">🔗</button>
+        <button type="button" onclick="execCmd('removeFormat')" title="Clear">✕</button>
+    </div>
+    <div class="editor-area" contenteditable="true" data-editor-for="@fieldId" id="editor_@fieldId"></div>
+</div>

@@ -1,0 +1,34 @@
+@model AboutPage
+@{
+    ViewData["Title"] = "Sobre Mí";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="content-page">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start" class="contact-layout">
+            <div>
+                <span class="section-label" style="margin-bottom:16px;display:block">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</span>
+                <h1 class="content-title">Rosalía Souza</h1>
+                <div class="content-body">
+                    @Html.Raw(isEn ? Model?.ContentEn : Model?.Content)
+                </div>
+            </div>
+            <div>
+                @if (!string.IsNullOrEmpty(Model?.ImagePath))
+                {
+                    <img src="@Model.ImagePath" alt="Rosalía Souza" style="width:100%;border-radius:var(--radius-lg);aspect-ratio:3/4;object-fit:cover">
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+@if (User.IsInRole("Admin"))
+{
+    <div class="container" style="margin-bottom:48px">
+        <a href="/About/Edit" class="btn btn-outline btn-sm">✏️ @(isPt ? "Editar Página" : isEn ? "Edit Page" : "Editar Página")</a>
+    </div>
+}

@@ -1,0 +1,76 @@
+@model ContactMessage
+@{
+    ViewData["Title"] = "Contacto";
+    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
+    var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
+    var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+}
+
+<section class="section">
+    <div class="container">
+        <div class="section-header reveal">
+            <span class="section-label">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</span>
+            <h2 class="section-title">@(isPt ? "Entre em Contato" : isEn ? "Get in Touch" : "Ponete en Contacto")</h2>
+            <p class="section-subtitle">@(isEn ? "Have questions about a tour, the walking club, or just want to chat about Montevideo? Write to us!" : "¿Tenés preguntas sobre un tour, el club de paseo, o simplemente querés charlar sobre Montevideo? ¡Escribinos!")</p>
+        </div>
+
+        <div class="contact-layout">
+            <div class="reveal">
+                <form asp-controller="Contact" asp-action="Index" method="post">
+                    <div class="form-group">
+                        <label>@(isPt ? "Nome" : isEn ? "Name" : "Nombre") *</label>
+                        <input asp-for="Name" class="form-control" placeholder="@(isEn ? "Your name" : "Tu nombre")">
+                        <span asp-validation-for="Name" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>Email *</label>
+                        <input asp-for="Email" class="form-control" placeholder="@(isEn ? "your@email.com" : "tu@email.com")">
+                        <span asp-validation-for="Email" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+                    </div>
+                    <div class="form-group">
+                        <label>@(isPt ? "Assunto" : isEn ? "Subject" : "Asunto")</label>
+                        <input asp-for="Subject" class="form-control" placeholder="@(isPt ? "Assunto" : isEn ? "Subject" : "Asunto")">
+                    </div>
+                    <div class="form-group">
+                        <label>@(isPt ? "Mensagem" : isEn ? "Message" : "Mensaje") *</label>
+                        <textarea asp-for="Message" class="form-control" rows="5" placeholder="@(isEn ? "Your message..." : "Tu mensaje...")"></textarea>
+                        <span asp-validation-for="Message" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+                    </div>
+                    <button type="submit" class="btn btn-yellow">
+                        @(isPt ? "Enviar Mensagem" : isEn ? "Send Message" : "Enviar Mensaje")
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                    </button>
+                </form>
+            </div>
+
+            <div class="reveal">
+                <div class="contact-info-item">
+                    <div class="contact-icon">📧</div>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--fs-sm)">Email</div>
+                        <div style="color:var(--ink-60);font-size:var(--fs-sm)">pasearporpasear@@gmail.com</div>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <div class="contact-icon">📍</div>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--fs-sm)">@(isPt ? "Localização" : isEn ? "Location" : "Ubicación")</div>
+                        <div style="color:var(--ink-60);font-size:var(--fs-sm)">Montevideo, Uruguay</div>
+                    </div>
+                </div>
+                <div class="contact-info-item">
+                    <div class="contact-icon">📱</div>
+                    <div>
+                        <div style="font-weight:600;font-size:var(--fs-sm)">@(isPt ? "Redes Sociais" : isEn ? "Social Media" : "Redes Sociales")</div>
+                        <div style="color:var(--ink-60);font-size:var(--fs-sm)">@@pasearporpasear</div>
+                    </div>
+                </div>
+
+                <div style="margin-top:32px;padding:28px;background:var(--yellow-light);border-radius:var(--radius-lg)">
+                    <h4 style="font-family:var(--font-display);margin-bottom:8px">@(isPt ? "Resposta Rápida" : isEn ? "Quick Response" : "Respuesta Rápida")</h4>
+                    <p style="font-size:var(--fs-sm);color:var(--ink-60);line-height:1.7">@(isEn ? "We usually respond within 24 hours. For tour reservations, we'll confirm availability by email." : "Generalmente respondemos dentro de las 24 horas. Para reservas de tours, confirmamos disponibilidad por email.")</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

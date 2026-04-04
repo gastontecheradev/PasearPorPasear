@@ -1,0 +1,79 @@
+@model ClubDePaseoPage
+@{
+    ViewData["Title"] = "Editar Club de Paseo";
+    ViewData["AdminTitle"] = "Editar Club de Paseo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<form asp-controller="ClubDePaseo" asp-action="Edit" method="post" enctype="multipart/form-data" style="max-width:900px">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+        <div class="form-group"><label>Título (Español)</label><input asp-for="Title" class="form-control"></div>
+        <div class="form-group"><label>Title (English)</label><input asp-for="TitleEn" class="form-control">
+    </div>
+    <div class="form-group"><label>Título (Português)</label><input asp-for="TitlePt" class="form-control"></div>
+    </div>
+
+    <div class="form-group">
+        <label>Contenido (Español)</label>
+        <div class="editor-toolbar">
+            <button type="button" onclick="execCmd('bold')"><b>B</b></button>
+            <button type="button" onclick="execCmd('italic')"><i>I</i></button>
+            <button type="button" onclick="execCmd('insertUnorderedList')">☰</button>
+            <button type="button" onclick="execCmd('insertOrderedList')">1.</button>
+            <button type="button" onclick="execCmd('formatBlock','h3')">H3</button>
+            <button type="button" onclick="execCmd('formatBlock','p')">¶</button>
+            <button type="button" onclick="insertLink()">🔗</button>
+            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+        </div>
+        <div class="editor-area" contenteditable="true" data-editor-for="Content" id="editor_Content"></div>
+        <textarea asp-for="Content" id="Content" style="display:none"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Content (English)</label>
+        <div class="editor-toolbar">
+            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('bold')"><b>B</b></button>
+            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('italic')"><i>I</i></button>
+            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('insertUnorderedList')">☰</button>
+            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','h3')">H3</button>
+            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','p')">¶</button>
+            <button type="button" onclick="insertLink()">🔗</button>
+            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+        </div>
+        <div class="editor-area" contenteditable="true" data-editor-for="ContentEn" id="editor_ContentEn"></div>
+        <textarea asp-for="ContentEn" id="ContentEn" style="display:none"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Conteúdo (Português)</label>
+        <div class="editor-toolbar">
+            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('bold')"><b>B</b></button>
+            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('italic')"><i>I</i></button>
+            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('insertUnorderedList')">☰</button>
+            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','h3')">H3</button>
+            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','p')">¶</button>
+            <button type="button" onclick="insertLink()">🔗</button>
+            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+        </div>
+        <div class="editor-area" contenteditable="true" data-editor-for="ContentPt" id="editor_ContentPt"></div>
+        <textarea asp-for="ContentPt" id="ContentPt" style="display:none"></textarea>
+    </div>
+
+    <div class="form-group">
+        <label>Imagen</label>
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="" style="width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px" id="clubImgPrev">
+        }
+        else
+        {
+            <img id="clubImgPrev" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px">
+        }
+        <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="clubImgPrev" style="font-size:var(--fs-sm)">
+    </div>
+
+    <div style="display:flex;gap:12px;margin-top:24px">
+        <button type="submit" class="btn btn-teal">Guardar Cambios</button>
+        <a href="/ClubDePaseo" class="btn btn-outline">Cancelar</a>
+    </div>
+</form>

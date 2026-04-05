@@ -1,35 +1,64 @@
-@model ClubDePaseoPage
+@model List<ClubDePaseoEntry>
 @{
     ViewData["Title"] = "Club de Paseo";
     var requestCulture = Context.Features.Get<IRequestCultureFeature>();
     var isEn = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "en";
     var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
+    var clubPage = ViewBag.Page as ClubDePaseoPage;
 }
 
-<section class="content-page">
-    <div class="container">
-        @if (!string.IsNullOrEmpty(Model?.ImagePath))
+<!-- Page Intro -->
+<section class="content-page" style="padding-bottom:0">
+    <div class="container" style="max-width:900px">
+        @if (!string.IsNullOrEmpty(clubPage?.ImagePath))
         {
-            <img src="@Model.ImagePath" alt="@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)" class="content-hero-img">
+            <img src="@clubPage.ImagePath" alt="@(isPt ? clubPage?.TitlePt : isEn ? clubPage?.TitleEn : clubPage?.Title)" class="content-hero-img">
         }
-
-        <h1 class="content-title">@(isEn ? Model?.TitleEn : Model?.Title)</h1>
-
-        <div class="content-body">
-            @Html.Raw(isEn ? Model?.ContentEn : Model?.Content)
+        <div class="section-header" style="text-align:center">
+            <span class="section-label">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</span>
+            <h1 class="section-title">@(isPt ? clubPage?.TitlePt : isEn ? clubPage?.TitleEn : clubPage?.Title)</h1>
+        </div>
+        <div class="content-body" style="max-width:700px;margin:0 auto">
+            @Html.Raw(isPt ? clubPage?.ContentPt : isEn ? clubPage?.ContentEn : clubPage?.Content)
         </div>
 
-        <div style="margin-top:48px;text-align:center;padding:40px;background:var(--yellow-light);border-radius:var(--radius-lg)">
-            <h3 style="font-family:var(--font-display);margin-bottom:12px">@(isPt ? "Junte-se ao Clube!" : isEn ? "Join the Club!" : "¡Unite al Club!")</h3>
-            <p style="color:var(--ink-60);margin-bottom:20px">@(isEn ? "Subscribe to the newsletter and receive the dates for each walk." : "Suscribite a la newsletter y recibí las fechas de cada paseo.")</p>
-            <a href="/Newsletter" class="btn btn-yellow">@(isPt ? "Inscrever-me" : isEn ? "Subscribe" : "Suscribirme")</a>
-        </div>
+        @if (User.IsInRole("Admin"))
+        {
+            <div style="text-align:center;margin-top:24px">
+                <a href="/ClubDePaseo/EditPage" class="btn btn-outline btn-sm">✏️ @(isPt ? "Editar Página" : isEn ? "Edit Page" : "Editar Página")</a>
+            </div>
+        }
     </div>
 </section>
 
-@if (User.IsInRole("Admin"))
+<!-- Entries -->
+@if (Model.Any())
 {
-    <div class="container" style="margin-top:24px;margin-bottom:48px">
-        <a href="/ClubDePaseo/Edit" class="btn btn-outline btn-sm">✏️ @(isPt ? "Editar Página" : isEn ? "Edit Page" : "Editar Página")</a>
-    </div>
+    <section class="section">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">@(isPt ? "Roteiros" : isEn ? "Routes" : "Recorridos")</span>
+                <h2 class="section-title">@(isPt ? "Rotas para Explorar" : isEn ? "Routes to Explore" : "Rutas para Explorar")</h2>
+            </div>
+            <div class="cards-grid">
+                @foreach (var entry in Model)
+                {
+                    <a href="/ClubDePaseo/Detail/@entry.Slug" class="card reveal">
+                        <div class="card-img-wrap">
+                            <img src="@(entry.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)" class="card-img" loading="lazy">
+                        </div>
+                        <div class="card-body">
+                            <span class="card-tag">@(isPt ? entry.DurationPt : isEn ? entry.DurationEn : entry.Duration) @(entry.Distance != null ? $"· {entry.Distance}" : "")</span>
+                            <h3 class="card-title">@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)</h3>
+                            <p class="card-text">@(isPt ? entry.DescriptionPt : isEn ? entry.DescriptionEn : entry.Description)</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-date"></span>
+                            <span class="card-link">@(isPt ? "Ver rota" : isEn ? "View route" : "Ver ruta") →</span>
+                        </div>
+                    </a>
+                }
+            </div>
+        </div>
+    </section>
 }

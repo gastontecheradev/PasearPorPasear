@@ -1,25 +1,19 @@
-@model Itinerary
+@model ClubDePaseoPage
 @{
-    ViewData["Title"] = "Nuevo Itinerario";
-    ViewData["AdminTitle"] = "Nuevo Itinerario";
+    ViewData["Title"] = "Editar Club de Paseo";
+    ViewData["AdminTitle"] = "Editar Página del Club";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<form asp-controller="Itineraries" asp-action="Create" method="post" enctype="multipart/form-data" style="max-width:900px">
+<form asp-controller="ClubDePaseo" asp-action="EditPage" method="post" enctype="multipart/form-data" style="max-width:900px">
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group"><label>Título (Español) *</label><input asp-for="Title" class="form-control"></div>
-        <div class="form-group"><label>Title (English) *</label><input asp-for="TitleEn" class="form-control"></div>
-        <div class="form-group"><label>Título (Português)</label><input asp-for="TitlePt" class="form-control"></div>
+        <div class="form-group"><label>Título (Español)</label><input asp-for="Title" class="form-control"></div>
+        <div class="form-group"><label>Title (English)</label><input asp-for="TitleEn" class="form-control"></div>
     </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
-        <div class="form-group"><label>Descripción (ES) *</label><textarea asp-for="Description" class="form-control" rows="3"></textarea></div>
-        <div class="form-group"><label>Description (EN) *</label><textarea asp-for="DescriptionEn" class="form-control" rows="3"></textarea></div>
-        </div>
-        <div class="form-group"><label>Descrição (PT)</label><textarea asp-for="DescriptionPt" class="form-control" rows="3"></textarea>
-    </div>
+    <div class="form-group"><label>Título (Português)</label><input asp-for="TitlePt" class="form-control"></div>
 
     <div class="form-group">
-        <label>Contenido (Español) *</label>
+        <label>Contenido (Español)</label>
         <div class="editor-toolbar">
             <button type="button" onclick="execCmd('bold')"><b>B</b></button>
             <button type="button" onclick="execCmd('italic')"><i>I</i></button>
@@ -32,9 +26,8 @@
         <div class="editor-area" contenteditable="true" data-editor-for="Content" id="editor_Content"></div>
         <textarea asp-for="Content" id="Content" style="display:none"></textarea>
     </div>
-
     <div class="form-group">
-        <label>Content (English) *</label>
+        <label>Content (English)</label>
         <div class="editor-toolbar">
             <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('bold')"><b>B</b></button>
             <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('italic')"><i>I</i></button>
@@ -47,7 +40,6 @@
         <div class="editor-area" contenteditable="true" data-editor-for="ContentEn" id="editor_ContentEn"></div>
         <textarea asp-for="ContentEn" id="ContentEn" style="display:none"></textarea>
     </div>
-
     <div class="form-group">
         <label>Conteúdo (Português)</label>
         <div class="editor-toolbar">
@@ -63,29 +55,21 @@
         <textarea asp-for="ContentPt" id="ContentPt" style="display:none"></textarea>
     </div>
 
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-        <div class="form-group"><label>Duración (ES)</label><input asp-for="Duration" class="form-control" placeholder="Todo el día"></div>
-        <div class="form-group"><label>Duration (EN)</label><input asp-for="DurationEn" class="form-control" placeholder="Full day"></div>
-        <div class="form-group"><label>Duração (PT)</label><input asp-for="DurationPt" class="form-control" placeholder="Dia inteiro"></div>
-        <div class="form-group"><label>Distancia</label><input asp-for="Distance" class="form-control" placeholder="~12 km"></div>
-    </div>
-
-    <div class="form-group"><label>Google Maps Embed URL</label><input asp-for="MapEmbedUrl" class="form-control"></div>
-
     <div class="form-group">
         <label>Imagen</label>
-        <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="itinImgPrev" style="font-size:var(--fs-sm)">
-        <img id="itinImgPrev" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-top:12px">
-    </div>
-
-    <div class="form-group">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input asp-for="IsPublished" type="checkbox" checked style="width:18px;height:18px;accent-color:var(--yellow)"> Publicar
-        </label>
+        @if (!string.IsNullOrEmpty(Model.ImagePath))
+        {
+            <img src="@Model.ImagePath" alt="" style="width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px" id="clubPageImg">
+        }
+        else
+        {
+            <img id="clubPageImg" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px">
+        }
+        <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="clubPageImg" style="font-size:var(--fs-sm)">
     </div>
 
     <div style="display:flex;gap:12px;margin-top:24px">
-        <button type="submit" class="btn btn-teal">Crear Itinerario</button>
-        <a href="/Itineraries/Manage" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-teal">Guardar Cambios</button>
+        <a href="/ClubDePaseo" class="btn btn-outline">Cancelar</a>
     </div>
 </form>

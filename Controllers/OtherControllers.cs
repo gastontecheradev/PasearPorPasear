@@ -21,14 +21,30 @@ public class ClubDePaseoController : Controller
         _upload = upload;
     }
 
+    // Public: shows page intro + list of entries
     public async Task<IActionResult> Index()
     {
-        var page = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
-        return View(page);
+        ViewBag.Page = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
+        var entries = await _ctx.ClubDePaseoEntries
+            .Where(e => e.IsPublished)
+            .OrderByDescending(e => e.CreatedAt)
+            .ToListAsync();
+        return View(entries);
     }
 
+    // Public: detail of a single entry
+    [Route("ClubDePaseo/Detail/{slug}")]
+    public async Task<IActionResult> Detail(string slug)
+    {
+        var entry = await _ctx.ClubDePaseoEntries.FirstOrDefaultAsync(e => e.Slug == slug && e.IsPublished);
+        if (entry is null) return NotFound();
+        return View(entry);
+    }
+
+    // ──────────── ADMIN: Page ────────────
+
     [Authorize(Roles = "Admin")]
-    public async Task<IActionResult> Edit()
+    public async Task<IActionResult> EditPage()
     {
         var page = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
         if (page is null) return NotFound();
@@ -36,7 +52,7 @@ public class ClubDePaseoController : Controller
     }
 
     [HttpPost, Authorize(Roles = "Admin"), ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit(ClubDePaseoPage page, IFormFile? imageFile)
+    public async Task<IActionResult> EditPage(ClubDePaseoPage page, IFormFile? imageFile)
     {
         var existing = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
         if (existing is null) return NotFound();
@@ -56,6 +72,94 @@ public class ClubDePaseoController : Controller
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Página actualizada.";
         return RedirectToAction(nameof(Index));
+    }
+
+    // ──────────── ADMIN: Entries CRUD ────────────
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Manage()
+    {
+        var entries = await _ctx.ClubDePaseoEntries.OrderByDescending(e => e.CreatedAt).ToListAsync();
+        return View(entries);
+    }
+
+    [Authorize(Roles = "Admin")]
+    public IActionResult Create() => View(new ClubDePaseoEntry());
+
+    [HttpPost, Authorize(Roles = "Admin"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Create(ClubDePaseoEntry entry, IFormFile? imageFile)
+    {
+        ModelState.Remove("Slug");
+        if (!ModelState.IsValid) return View(entry);
+
+        entry.Slug = SlugHelper.GenerateSlug(entry.Title);
+        if (await _ctx.ClubDePaseoEntries.AnyAsync(e => e.Slug == entry.Slug))
+            entry.Slug += "-" + DateTime.Now.Ticks.ToString()[^6..];
+
+        var img = await _upload.UploadImageAsync(imageFile);
+        if (img is not null) entry.ImagePath = img;
+
+        entry.CreatedAt = DateTime.Now;
+        _ctx.ClubDePaseoEntries.Add(entry);
+        await _ctx.SaveChangesAsync();
+
+        TempData["Success"] = "Entrada creada.";
+        return RedirectToAction(nameof(Manage));
+    }
+
+    [Authorize(Roles = "Admin")]
+    public async Task<IActionResult> Edit(int id)
+    {
+        var entry = await _ctx.ClubDePaseoEntries.FindAsync(id);
+        if (entry is null) return NotFound();
+        return View(entry);
+    }
+
+    [HttpPost, Authorize(Roles = "Admin"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit(int id, ClubDePaseoEntry entry, IFormFile? imageFile)
+    {
+        if (id != entry.Id) return NotFound();
+        var existing = await _ctx.ClubDePaseoEntries.FindAsync(id);
+        if (existing is null) return NotFound();
+
+        ModelState.Remove("Slug");
+        if (!ModelState.IsValid) return View(entry);
+
+        existing.Title = entry.Title;
+        existing.TitleEn = entry.TitleEn;
+        existing.TitlePt = entry.TitlePt;
+        existing.Description = entry.Description;
+        existing.DescriptionEn = entry.DescriptionEn;
+        existing.DescriptionPt = entry.DescriptionPt;
+        existing.Content = entry.Content;
+        existing.ContentEn = entry.ContentEn;
+        existing.ContentPt = entry.ContentPt;
+        existing.Duration = entry.Duration;
+        existing.DurationEn = entry.DurationEn;
+        existing.DurationPt = entry.DurationPt;
+        existing.Distance = entry.Distance;
+        existing.MapEmbedUrl = entry.MapEmbedUrl;
+        existing.IsPublished = entry.IsPublished;
+        existing.UpdatedAt = DateTime.Now;
+
+        var img = await _upload.UploadImageAsync(imageFile);
+        if (img is not null) { _upload.DeleteImage(existing.ImagePath); existing.ImagePath = img; }
+
+        await _ctx.SaveChangesAsync();
+        TempData["Success"] = "Entrada actualizada.";
+        return RedirectToAction(nameof(Manage));
+    }
+
+    [HttpPost, Authorize(Roles = "Admin"), ValidateAntiForgeryToken]
+    public async Task<IActionResult> Delete(int id)
+    {
+        var entry = await _ctx.ClubDePaseoEntries.FindAsync(id);
+        if (entry is null) return NotFound();
+        _upload.DeleteImage(entry.ImagePath);
+        _ctx.ClubDePaseoEntries.Remove(entry);
+        await _ctx.SaveChangesAsync();
+        TempData["Success"] = "Entrada eliminada.";
+        return RedirectToAction(nameof(Manage));
     }
 }
 
@@ -298,7 +402,7 @@ public class AdminController : Controller
         ViewBag.ReservationCount = await _ctx.TourReservations.CountAsync(r => r.Status == ReservationStatus.Pending);
         ViewBag.SubscriberCount = await _ctx.NewsletterSubscribers.CountAsync(s => s.IsActive);
         ViewBag.MessageCount = await _ctx.ContactMessages.CountAsync(m => !m.IsRead);
-        ViewBag.ItineraryCount = await _ctx.Itineraries.CountAsync();
+        ViewBag.ClubEntryCount = await _ctx.ClubDePaseoEntries.CountAsync();
         return View();
     }
 

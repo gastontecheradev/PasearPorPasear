@@ -21,8 +21,8 @@
         <a href="/Blog/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a>
         <a href="/Tours/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" && ViewContext.RouteData.Values["action"]?.ToString() != "Reservations" ? "active" : "")">Tours</a>
         <a href="/Tours/Reservations" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "Reservations" ? "active" : "")">@(isEn ? "Reservations" : "Reservas")</a>
-        <a href="/Itineraries/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Itineraries" ? "active" : "")">@(isEn ? "Itineraries" : "Itinerarios")</a>
-        <a href="/ClubDePaseo/Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">Club</a>
+        <a href="/ClubDePaseo/EditPage" class="@(ViewContext.RouteData.Values["action"]?.ToString() == "EditPage" ? "active" : "")">Club de Paseo</a>
+        <a href="/ClubDePaseo/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" && (ViewContext.RouteData.Values["action"]?.ToString() == "Manage" || ViewContext.RouteData.Values["action"]?.ToString() == "Create" || ViewContext.RouteData.Values["action"]?.ToString() == "Edit") ? "active" : "")">Club Entradas</a>
         <a href="/About/Edit" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" && ViewContext.RouteData.Values["action"]?.ToString() == "Edit" ? "active" : "")">@(isEn ? "About" : "Sobre Mí")</a>
         <a href="/Newsletter/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a>
         <a href="/Contact/Manage" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" && ViewContext.RouteData.Values["action"]?.ToString() == "Manage" ? "active" : "")">@(isEn ? "Messages" : "Mensajes")</a>

@@ -12,8 +12,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
 
     public DbSet<BlogPost> BlogPosts => Set<BlogPost>();
     public DbSet<ClubDePaseoPage> ClubDePaseoPages => Set<ClubDePaseoPage>();
+    public DbSet<ClubDePaseoEntry> ClubDePaseoEntries => Set<ClubDePaseoEntry>();
     public DbSet<AboutPage> AboutPages => Set<AboutPage>();
-    public DbSet<Itinerary> Itineraries => Set<Itinerary>();
     public DbSet<Tour> Tours => Set<Tour>();
     public DbSet<TourReservation> TourReservations => Set<TourReservation>();
     public DbSet<NewsletterSubscriber> NewsletterSubscribers => Set<NewsletterSubscriber>();
@@ -31,8 +31,8 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             e.Property(b => b.PublishDate).HasColumnType("TEXT");
         });
 
-        // Itinerary
-        builder.Entity<Itinerary>(e =>
+        // Club de Paseo Entries
+        builder.Entity<ClubDePaseoEntry>(e =>
         {
             e.HasIndex(i => i.Slug).IsUnique();
         });

@@ -1,13 +1,11 @@
 @model ClubDePaseoEntry
 @{
-    ViewData["Title"] = "Editar Entrada";
-    ViewData["AdminTitle"] = "Editar Entrada del Club";
+    ViewData["Title"] = "Nueva Entrada";
+    ViewData["AdminTitle"] = "Nueva Entrada del Club";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<form asp-controller="ClubDePaseo" asp-action="Edit" asp-route-id="@Model.Id" method="post" enctype="multipart/form-data" style="max-width:900px">
-    <input type="hidden" asp-for="Id" />
-
+<form asp-controller="ClubDePaseo" asp-action="Create" method="post" enctype="multipart/form-data" style="max-width:900px">
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
         <div class="form-group"><label>Título (Español) *</label><input asp-for="Title" class="form-control"></div>
         <div class="form-group"><label>Title (English)</label><input asp-for="TitleEn" class="form-control"></div>
@@ -54,35 +52,28 @@
     </div>
 
     <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px">
-        <div class="form-group"><label>Duración (ES)</label><input asp-for="Duration" class="form-control"></div>
-        <div class="form-group"><label>Duration (EN)</label><input asp-for="DurationEn" class="form-control"></div>
-        <div class="form-group"><label>Duração (PT)</label><input asp-for="DurationPt" class="form-control"></div>
-        <div class="form-group"><label>Distancia</label><input asp-for="Distance" class="form-control"></div>
+        <div class="form-group"><label>Duración (ES)</label><input asp-for="Duration" class="form-control" placeholder="Todo el día"></div>
+        <div class="form-group"><label>Duration (EN)</label><input asp-for="DurationEn" class="form-control" placeholder="Full day"></div>
+        <div class="form-group"><label>Duração (PT)</label><input asp-for="DurationPt" class="form-control" placeholder="Dia inteiro"></div>
+        <div class="form-group"><label>Distancia</label><input asp-for="Distance" class="form-control" placeholder="~12 km"></div>
     </div>
 
     <div class="form-group"><label>Google Maps Embed URL</label><input asp-for="MapEmbedUrl" class="form-control"></div>
 
     <div class="form-group">
         <label>Imagen</label>
-        @if (!string.IsNullOrEmpty(Model.ImagePath))
-        {
-            <img src="@Model.ImagePath" alt="" style="width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px" id="entryImg">
-        }
-        else
-        {
-            <img id="entryImg" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-bottom:12px">
-        }
         <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="entryImg" style="font-size:var(--fs-sm)">
+        <img id="entryImg" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-top:12px">
     </div>
 
     <div class="form-group">
         <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input asp-for="IsPublished" type="checkbox" style="width:18px;height:18px;accent-color:var(--teal)"> Publicar
+            <input asp-for="IsPublished" type="checkbox" checked style="width:18px;height:18px;accent-color:var(--teal)"> Publicar
         </label>
     </div>
 
     <div style="display:flex;gap:12px;margin-top:24px">
-        <button type="submit" class="btn btn-teal">Guardar Cambios</button>
+        <button type="submit" class="btn btn-teal">Crear Entrada</button>
         <a href="/ClubDePaseo/Manage" class="btn btn-outline">Cancelar</a>
     </div>
 </form>

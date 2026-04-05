@@ -82,16 +82,16 @@ public class AboutPage
 }
 
 // ──────────────────────────────────────
-// Itinerarios
+// Club de Paseo — Entries (itineraries/routes)
 // ──────────────────────────────────────
-public class Itinerary
+public class ClubDePaseoEntry
 {
     public int Id { get; set; }
 
     [Required(ErrorMessage = "El título es obligatorio")]
     [StringLength(200)]
     public string Title { get; set; } = string.Empty;
-    [Required][StringLength(200)]
+    [StringLength(200)]
     public string TitleEn { get; set; } = string.Empty;
     [StringLength(200)]
     public string TitlePt { get; set; } = string.Empty;

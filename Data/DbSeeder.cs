@@ -11,20 +11,17 @@ public static class DbSeeder
         var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
-        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
 
         await ctx.Database.EnsureCreatedAsync();
 
         if (!await roleMgr.RoleExistsAsync("Admin"))
             await roleMgr.CreateAsync(new IdentityRole("Admin"));
 
-        var adminEmail = config["AdminSettings:Email"] ?? "admin@admin.com";
-        var adminPassword = config["AdminSettings:Password"] ?? "Admin123!";
-
+        const string adminEmail = "pasearporpasear@gmail.com";
         if (await userMgr.FindByEmailAsync(adminEmail) is null)
         {
             var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-            var result = await userMgr.CreateAsync(admin, adminPassword);
+            var result = await userMgr.CreateAsync(admin, "Pasear170593!");
             if (result.Succeeded) await userMgr.AddToRoleAsync(admin, "Admin");
         }
 
@@ -163,16 +160,16 @@ public static class DbSeeder
             );
         }
 
-        // ── Itineraries ──
-        if (!ctx.Itineraries.Any())
+        // ── Club de Paseo Entries ──
+        if (!ctx.ClubDePaseoEntries.Any())
         {
-            ctx.Itineraries.Add(new Itinerary
+            ctx.ClubDePaseoEntries.Add(new ClubDePaseoEntry
             {
                 Title = "Montevideo en un día", TitleEn = "Montevideo in One Day", TitlePt = "Montevidéu em Um Dia",
                 Slug = "montevideo-en-un-dia",
-                Description = "El itinerario perfecto para conocer lo esencial.",
-                DescriptionEn = "The perfect itinerary to see the essentials.",
-                DescriptionPt = "O itinerário perfeito para conhecer o essencial.",
+                Description = "El recorrido perfecto para conocer lo esencial de la ciudad.",
+                DescriptionEn = "The perfect route to see the essentials of the city.",
+                DescriptionPt = "O roteiro perfeito para conhecer o essencial da cidade.",
                 Content = @"<h3>Mañana</h3><p><strong>9:00</strong> — Desayuno en la Ciudad Vieja.</p><p><strong>12:00</strong> — Almuerzo en el Mercado del Puerto.</p><h3>Tarde</h3><p><strong>14:00</strong> — Caminata por la Rambla.</p><h3>Noche</h3><p><strong>18:30</strong> — Atardecer en Pocitos.</p>",
                 ContentEn = @"<h3>Morning</h3><p><strong>9:00</strong> — Breakfast in Old Town.</p><p><strong>12:00</strong> — Lunch at Mercado del Puerto.</p><h3>Afternoon</h3><p><strong>14:00</strong> — Walk along the Rambla.</p><h3>Evening</h3><p><strong>18:30</strong> — Sunset at Pocitos.</p>",
                 ContentPt = @"<h3>Manhã</h3><p><strong>9:00</strong> — Café da manhã na Cidade Velha.</p><p><strong>12:00</strong> — Almoço no Mercado del Puerto.</p><h3>Tarde</h3><p><strong>14:00</strong> — Caminhada pela Rambla.</p><h3>Noite</h3><p><strong>18:30</strong> — Pôr do sol em Pocitos.</p>",

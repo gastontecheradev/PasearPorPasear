@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace PasearPorPasear.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCommit : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -102,6 +102,37 @@ namespace PasearPorPasear.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "ClubDePaseoEntries",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    TitleEn = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    TitlePt = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Slug = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
+                    Description = table.Column<string>(type: "TEXT", nullable: false),
+                    DescriptionEn = table.Column<string>(type: "TEXT", nullable: false),
+                    DescriptionPt = table.Column<string>(type: "TEXT", nullable: false),
+                    Content = table.Column<string>(type: "TEXT", nullable: false),
+                    ContentEn = table.Column<string>(type: "TEXT", nullable: false),
+                    ContentPt = table.Column<string>(type: "TEXT", nullable: false),
+                    ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    Duration = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    DurationEn = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    DurationPt = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    Distance = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
+                    MapEmbedUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
+                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    IsPublished = table.Column<bool>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ClubDePaseoEntries", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "ClubDePaseoPages",
                 columns: table => new
                 {
@@ -137,37 +168,6 @@ namespace PasearPorPasear.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ContactMessages", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Itineraries",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    Title = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    TitleEn = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    TitlePt = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Slug = table.Column<string>(type: "TEXT", maxLength: 200, nullable: false),
-                    Description = table.Column<string>(type: "TEXT", nullable: false),
-                    DescriptionEn = table.Column<string>(type: "TEXT", nullable: false),
-                    DescriptionPt = table.Column<string>(type: "TEXT", nullable: false),
-                    Content = table.Column<string>(type: "TEXT", nullable: false),
-                    ContentEn = table.Column<string>(type: "TEXT", nullable: false),
-                    ContentPt = table.Column<string>(type: "TEXT", nullable: false),
-                    ImagePath = table.Column<string>(type: "TEXT", nullable: true),
-                    Duration = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    DurationEn = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    DurationPt = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    Distance = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
-                    MapEmbedUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
-                    CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
-                    IsPublished = table.Column<bool>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Itineraries", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -411,8 +411,8 @@ namespace PasearPorPasear.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Itineraries_Slug",
-                table: "Itineraries",
+                name: "IX_ClubDePaseoEntries_Slug",
+                table: "ClubDePaseoEntries",
                 column: "Slug",
                 unique: true);
 
@@ -465,13 +465,13 @@ namespace PasearPorPasear.Migrations
                 name: "BlogPosts");
 
             migrationBuilder.DropTable(
+                name: "ClubDePaseoEntries");
+
+            migrationBuilder.DropTable(
                 name: "ClubDePaseoPages");
 
             migrationBuilder.DropTable(
                 name: "ContactMessages");
-
-            migrationBuilder.DropTable(
-                name: "Itineraries");
 
             migrationBuilder.DropTable(
                 name: "NewsletterSubscribers");

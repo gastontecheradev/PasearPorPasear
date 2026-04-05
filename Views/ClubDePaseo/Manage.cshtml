@@ -1,0 +1,50 @@
+@model List<ClubDePaseoEntry>
+@{
+    ViewData["Title"] = "Gestionar Club de Paseo";
+    ViewData["AdminTitle"] = "Entradas del Club de Paseo";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
+    <h3 style="font-family:var(--font-brand)">@Model.Count entradas</h3>
+    <div style="display:flex;gap:8px">
+        <a href="/ClubDePaseo/EditPage" class="btn btn-outline btn-sm">✏️ Editar Página Intro</a>
+        <a href="/ClubDePaseo/Create" class="btn btn-teal btn-sm">+ Nueva Entrada</a>
+    </div>
+</div>
+
+<table class="admin-table">
+    <thead>
+        <tr>
+            <th>Título</th>
+            <th>Duración</th>
+            <th>Distancia</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var entry in Model)
+        {
+            <tr>
+                <td>
+                    <strong>@entry.Title</strong>
+                    <div style="font-size:var(--fs-xs);color:var(--ink-40)">/@entry.Slug</div>
+                </td>
+                <td>@(entry.Duration ?? "—")</td>
+                <td>@(entry.Distance ?? "—")</td>
+                <td><span class="badge @(entry.IsPublished ? "badge-confirmed" : "badge-pending")">@(entry.IsPublished ? "Publicado" : "Borrador")</span></td>
+                <td>
+                    <div style="display:flex;gap:6px">
+                        <a href="/ClubDePaseo/Detail/@entry.Slug" class="btn btn-outline btn-xs" target="_blank">Ver</a>
+                        <a href="/ClubDePaseo/Edit/@entry.Id" class="btn btn-outline btn-xs">Editar</a>
+                        <form asp-controller="ClubDePaseo" asp-action="Delete" method="post" id="del-club-@entry.Id" style="display:inline">
+                            <input type="hidden" name="id" value="@entry.Id" />
+                            <button type="button" onclick="confirmDelete('del-club-@entry.Id','¿Eliminar esta entrada?')" class="btn btn-danger btn-xs">Eliminar</button>
+                        </form>
+                    </div>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

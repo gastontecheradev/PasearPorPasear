@@ -21,7 +21,7 @@
         <div class="hero-actions fade-up fade-up-d3">
             <a href="/Blog" class="btn btn-teal">
                 @(isPt ? "Ler o Blog" : isEn ? "Read the Blog" : "Leer el Blog")
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
             </a>
             <a href="/Tours" class="btn btn-outline">@(isPt ? "Reservar Tour" : isEn ? "Book a Tour" : "Reservar Tour")</a>
         </div>
@@ -65,11 +65,11 @@
                 @foreach (var post in posts)
                 {
                     <a href="/Blog/Post/@post.Slug" class="card reveal">
-                        <div class="card-img-wrap"><img src="@(post.ImagePath ?? "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=600")" alt="@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)" class="card-img" loading="lazy"></div>
+                        <div class="card-img-wrap"><img src="@(post.ImagePath ?? "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=600")" alt="@(isPt? post.TitlePt: isEn? post.TitleEn: post.Title)" class="card-img" loading="lazy"></div>
                         <div class="card-body">
-                            <span class="card-tag">@(isPt ? post.LocationNamePt ?? "Montevidéu" : isEn ? post.LocationNameEn ?? "Montevideo" : post.LocationName ?? "Montevideo")</span>
-                            <h3 class="card-title">@(isPt ? post.TitlePt : isEn ? post.TitleEn : post.Title)</h3>
-                            <p class="card-text">@(isPt ? post.ExcerptPt : isEn ? post.ExcerptEn : post.Excerpt)</p>
+                            <span class="card-tag">@(isPt? post.LocationNamePt ?? "Montevidéu" : isEn? post.LocationNameEn ?? "Montevideo" : post.LocationName ?? "Montevideo")</span>
+                            <h3 class="card-title">@(isPt? post.TitlePt: isEn? post.TitleEn: post.Title)</h3>
+                            <p class="card-text">@(isPt? post.ExcerptPt: isEn? post.ExcerptEn: post.Excerpt)</p>
                         </div>
                         <div class="card-footer">
                             <span class="card-date">@post.PublishDate.ToString("dd MMM yyyy")</span>
@@ -98,14 +98,17 @@
                 @foreach (var tour in tours)
                 {
                     <a href="/Tours/Detail/@tour.Slug" class="card reveal">
-                        <div class="card-img-wrap"><img src="@(tour.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)" class="card-img" loading="lazy"></div>
+                        <div class="card-img-wrap"><img src="@(tour.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt? tour.NamePt: isEn? tour.NameEn: tour.Name)" class="card-img" loading="lazy"></div>
                         <div class="card-body">
-                            <span class="card-tag">@(isPt ? tour.DurationPt : isEn ? tour.DurationEn : tour.Duration)</span>
-                            <h3 class="card-title">@(isPt ? tour.NamePt : isEn ? tour.NameEn : tour.Name)</h3>
-                            <p class="card-text">@(isPt ? tour.DescriptionPt : isEn ? tour.DescriptionEn : tour.Description)</p>
+                            <span class="card-tag">@(isPt? tour.DurationPt: isEn? tour.DurationEn: tour.Duration)</span>
+                            <h3 class="card-title">@(isPt? tour.NamePt: isEn? tour.NameEn: tour.Name)</h3>
+                            <p class="card-text">@(isPt? tour.DescriptionPt: isEn? tour.DescriptionEn: tour.Description)</p>
                         </div>
                         <div class="card-footer">
-                            @if (tour.Price.HasValue) { <span style="font-weight:700;color:var(--teal)">$@tour.Price.Value.ToString("N0") UYU</span> }
+                            @if (tour.Price.HasValue)
+                            {
+                                <span style="font-weight:700;color:var(--teal)">$@tour.Price.Value.ToString("N0") UYU</span>
+                            }
                             <span class="card-link">@(isPt ? "Reservar" : isEn ? "Book now" : "Reservar") →</span>
                         </div>
                     </a>

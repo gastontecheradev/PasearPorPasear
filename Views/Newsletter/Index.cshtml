@@ -11,7 +11,7 @@
         <div class="section-header reveal">
             <span class="section-label">Newsletter</span>
             <h2 class="section-title">@(isPt ? "Fique por Dentro" : isEn ? "Stay in the Loop" : "Mantenete al Día")</h2>
-            <p class="section-subtitle">@(isEn ? "Receive itineraries, new posts, walking club dates, and exclusive recommendations directly in your inbox." : "Recibí itinerarios, nuevas publicaciones, fechas del club de paseo y recomendaciones exclusivas directo en tu correo.")</p>
+            <p class="section-subtitle">@(isPt ? "Receba itinerários, novas publicações, datas do clube de passeio e recomendações exclusivas diretamente no seu e-mail." : isEn ? "Receive itineraries, new posts, walking club dates, and exclusive recommendations directly in your inbox." : "Recibí itinerarios, nuevas publicaciones, fechas del club de paseo y recomendaciones exclusivas directo en tu correo.")</p>
         </div>
 
         @if (!string.IsNullOrEmpty(mailchimpUrl))

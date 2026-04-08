@@ -22,21 +22,35 @@
     <meta property="og:type" content="website" />
 </head>
 <body>
-    <!-- ═══ NAVBAR ═══ -->
     <nav class="navbar">
         <div class="navbar-inner">
             <a href="/" class="navbar-brand">
-                <img src="/images/logo.png" alt="Pasear por Pasear" style="height:40px"> Pasear por Pasear
+                <img src="/images/logo.png" alt="Pasear por Pasear" style="height:40px">
+                <span class="brand-text">Pasear por Pasear</span>
             </a>
 
             <ul class="navbar-links" id="navLinks">
                 <li><a href="/" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
                 <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a></li>
-                <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</a></li>
+                <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Club de Paseo" : isEn ? "Club de Paseo" : "Club de Paseo")</a></li>
                 <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li>
                 <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li>
                 <li><a href="/About" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" ? "active" : "")">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
                 <li><a href="/Contact" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" ? "active" : "")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+                
+                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+                {
+                    <li><a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
+                    <li>
+                        <form asp-controller="Account" asp-action="Logout" method="post" class="nav-logout-form">
+                            <button type="submit" class="nav-logout-btn">@(isEn ? "Logout" : "Salir")</button>
+                        </form>
+                    </li>
+                }
+                else
+                {
+                    <li><a href="/Account/Login" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")" title="@(isEn ? "Admin Login" : "Acceso Admin")">Admin</a></li>
+                }
             </ul>
 
             <div class="navbar-right">
@@ -45,22 +59,6 @@
                     <button onclick="setLanguage('en')" class="@(culture == "en" ? "active" : "")">EN</button>
                     <button onclick="setLanguage('pt')" class="@(culture == "pt" ? "active" : "")">PT</button>
                 </div>
-
-                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-                {
-                    <a href="/Admin/Dashboard" class="btn btn-teal btn-xs">Admin</a>
-                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
-                        <button type="submit" class="btn btn-outline btn-xs">@(isEn ? "Logout" : "Salir")</button>
-                    </form>
-                }
-                else
-                @* Login *@
-                {
-                    <a href="/Account/Login" class="btn btn-outline btn-xs" title="@(isEn ? "Admin Login" : "Acceso Admin")">
-                        Admin
-                        @* <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/><polyline points="10 17 15 12 10 7"/><line x1="15" y1="12" x2="3" y2="12"/></svg> *@
-                    </a>
-                }
 
                 <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
                     <span></span><span></span><span></span>

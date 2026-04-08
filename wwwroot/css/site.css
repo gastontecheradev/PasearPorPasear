@@ -145,6 +145,44 @@ button{font-family:var(--font-body)}
 .hamburger.open span:nth-child(2){opacity:0}
 .hamburger.open span:nth-child(3){transform:rotate(-45deg);top:17px}
 
+
+
+
+/* Ocultar el texto del logo en resoluciones responsive (móviles/tablets) */
+/*@media (max-width: 768px) {
+    .brand-text {
+        display: none;
+    }
+}*/
+
+/* Estilos para el botón de logout convertido en link del navbar */
+.nav-logout-form {
+    display: inline;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-logout-btn {
+    background: transparent;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 100px;
+    font-size: .82rem;
+    font-weight: 500;
+    color: var(--ink-60);
+    cursor: pointer;
+    transition: all var(--transition);
+    font-family: inherit;
+}
+
+    .nav-logout-btn:hover {
+        color: var(--teal);
+        background: var(--teal-10);
+    }
+
+
+
+
 /* ══════════════════════════════════════
    HERO (text only, no image)
    ══════════════════════════════════════ */
@@ -628,7 +666,7 @@ textarea.form-control{min-height:110px;resize:vertical}
 /* ══════════════════════════════════════
    RESPONSIVE
    ══════════════════════════════════════ */
-@media(max-width:768px){
+@media(max-width:1200px){
   .navbar-links{
     display:none;position:absolute;top:100%;left:0;right:0;
     flex-direction:column;padding:12px;gap:2px;
@@ -637,7 +675,6 @@ textarea.form-control{min-height:110px;resize:vertical}
   }
   .navbar-links.open{display:flex}
   .hamburger{display:block}
-  .navbar-right .lang-toggle{display:none}
   .hero{padding:48px 0 40px}
   .hero-title{font-size:clamp(2.4rem,10vw,3.8rem)}
   .hero-actions{flex-direction:column;align-items:center}

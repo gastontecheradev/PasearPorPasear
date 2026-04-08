@@ -149,11 +149,11 @@ button{font-family:var(--font-body)}
 
 
 /* Ocultar el texto del logo en resoluciones responsive (móviles/tablets) */
-/*@media (max-width: 768px) {
+@media (max-width: 480px) {
     .brand-text {
         display: none;
     }
-}*/
+}
 
 /* Estilos para el botón de logout convertido en link del navbar */
 .nav-logout-form {

@@ -4,6 +4,8 @@ A full-featured web application for **Pasear por Pasear** — a Montevideo-based
 
 Built with **ASP.NET Core MVC (.NET 10)**, **SQLite**, and **ASP.NET Core Identity**, with full trilingual support (Spanish, English, Portuguese).
 
+🔗 **Live site:** [pasearporpasear](https://pasearporpasear.somee.com/)
+
 ---
 
 ## Features

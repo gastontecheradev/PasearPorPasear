@@ -33,8 +33,8 @@
                 <li><a href="/" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
                 <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a></li>
                 <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Club de Paseo" : isEn ? "Club de Paseo" : "Club de Paseo")</a></li>
-                <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li>
-                <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li>
+                @* <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li> *@
+                @* <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li> *@
                 <li><a href="/About" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" ? "active" : "")">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
                 <li><a href="/Contact" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" ? "active" : "")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
                 

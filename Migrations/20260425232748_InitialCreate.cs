@@ -91,6 +91,7 @@ namespace PasearPorPasear.Migrations
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
                     IsPublished = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Category = table.Column<string>(type: "TEXT", maxLength: 50, nullable: true),
                     MapEmbedUrl = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     LocationName = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),
                     LocationNameEn = table.Column<string>(type: "TEXT", maxLength: 200, nullable: true),

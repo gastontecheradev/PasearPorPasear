@@ -116,6 +116,21 @@ button{font-family:var(--font-body)}
 .navbar-links a.active{color:var(--white);background:var(--teal);font-weight:600}
 .navbar-right{display:flex;align-items:center;gap:10px}
 
+/* Nav Dropdown */
+.navbar-links > li{position:relative}
+.nav-dropdown{
+  display:none;position:absolute;top:100%;left:0;
+  background:var(--white);border:1px solid var(--ink-10);
+  border-radius:var(--radius);box-shadow:0 8px 24px rgba(0,0,0,.1);
+  padding:8px 0;min-width:180px;list-style:none;z-index:1001;
+}
+.nav-dropdown li a{
+  display:block;padding:8px 20px;font-size:.82rem;
+  color:var(--ink-60);white-space:nowrap;border-radius:0;
+}
+.nav-dropdown li a:hover{color:var(--teal);background:var(--teal-10)}
+.navbar-links > li:hover > .nav-dropdown{display:block}
+
 /* Language toggle */
 .lang-toggle{
   display:flex;border:1.5px solid var(--ink-20);border-radius:100px;overflow:hidden;
@@ -653,6 +668,35 @@ textarea.form-control{min-height:110px;resize:vertical}
 }
 
 /* ══════════════════════════════════════
+   BLOG CATEGORY TABS
+   ══════════════════════════════════════ */
+.blog-category-tabs{
+  display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:40px;
+}
+.category-tab{
+  padding:8px 20px;border-radius:100px;font-size:.82rem;font-weight:500;
+  color:var(--ink-60);border:1.5px solid var(--ink-20);
+  transition:all var(--transition);
+}
+.category-tab:hover{color:var(--teal);border-color:var(--teal);background:var(--teal-10)}
+.category-tab.active{color:var(--white);background:var(--teal);border-color:var(--teal);font-weight:600}
+
+/* ══════════════════════════════════════
+   CONTACT + NEWSLETTER ROW
+   ══════════════════════════════════════ */
+.contact-newsletter-row{
+  display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:start;
+}
+.contact-newsletter-col{
+  width:100%;
+}
+.contact-col-heading{
+  font-family:var(--font-brand);font-size:var(--fs-lg);
+  font-weight:700;color:var(--teal);margin-bottom:20px;
+  text-transform:uppercase;letter-spacing:.02em;
+}
+
+/* ══════════════════════════════════════
    ANIMATIONS
    ══════════════════════════════════════ */
 @keyframes fadeUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
@@ -686,4 +730,13 @@ textarea.form-control{min-height:110px;resize:vertical}
   .newsletter-form{flex-direction:column}
   .tour-info-grid{grid-template-columns:1fr 1fr}
   .contact-layout{grid-template-columns:1fr !important;gap:28px}
+  .contact-newsletter-row{grid-template-columns:1fr;gap:28px}
+  /* Dropdown becomes inline in mobile nav */
+  .nav-dropdown{
+    position:static;box-shadow:none;border:none;
+    background:transparent;padding:0 0 0 16px;display:none;
+  }
+  .navbar-links > li:hover > .nav-dropdown,
+  .navbar-links.open .nav-dropdown{display:block}
+  .nav-dropdown li a{padding:6px 15px;font-size:.8rem}
 }

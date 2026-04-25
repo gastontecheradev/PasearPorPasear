@@ -39,6 +39,9 @@ public class BlogPost
     public DateTime? UpdatedAt { get; set; }
     public bool IsPublished { get; set; } = true;
 
+    [StringLength(50)]
+    public string? Category { get; set; }
+
     [StringLength(500)]
     public string? MapEmbedUrl { get; set; }
     [StringLength(200)]

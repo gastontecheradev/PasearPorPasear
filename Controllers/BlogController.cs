@@ -19,12 +19,19 @@ public class BlogController : Controller
     }
 
     // GET: /Blog
-    public async Task<IActionResult> Index(int page = 1)
+    public async Task<IActionResult> Index(string? category = null, int page = 1)
     {
         const int pageSize = 6;
         var query = _ctx.BlogPosts
             .Where(p => p.IsPublished)
-            .OrderByDescending(p => p.PublishDate);
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(category))
+        {
+            query = query.Where(p => p.Category == category);
+        }
+
+        query = query.OrderByDescending(p => p.PublishDate);
 
         var total = await query.CountAsync();
         var posts = await query
@@ -34,6 +41,7 @@ public class BlogController : Controller
 
         ViewBag.CurrentPage = page;
         ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+        ViewBag.CurrentCategory = category;
         return View(posts);
     }
 
@@ -124,6 +132,7 @@ public class BlogController : Controller
         existing.LocationName = post.LocationName;
         existing.LocationNameEn = post.LocationNameEn;
         existing.LocationNamePt = post.LocationNamePt;
+        existing.Category = post.Category;
         existing.UpdatedAt = DateTime.Now;
 
         if (!string.IsNullOrEmpty(post.Slug) && post.Slug != existing.Slug)

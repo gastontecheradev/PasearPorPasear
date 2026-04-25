@@ -11,7 +11,7 @@ using PasearPorPasear.Data;
 namespace PasearPorPasear.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260405212154_InitialCreate")]
+    [Migration("20260425232748_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -262,6 +262,10 @@ namespace PasearPorPasear.Migrations
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
+
+                    b.Property<string>("Category")
+                        .HasMaxLength(50)
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Content")
                         .IsRequired()

@@ -6,6 +6,7 @@
     var isPt = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName == "pt";
     var currentPage = (int)ViewBag.CurrentPage;
     var totalPages = (int)ViewBag.TotalPages;
+    var currentCategory = ViewBag.CurrentCategory as string;
 }
 
 <section class="section">
@@ -14,6 +15,15 @@
             <span class="section-label">Blog</span>
             <h2 class="section-title">@(isPt ? "Histórias da Caminhada" : isEn ? "Stories from the Walk" : "Historias del Camino")</h2>
             <p class="section-subtitle">@(isEn ? "Each neighborhood tells a story. Here we share ours." : "Cada barrio cuenta una historia. Acá compartimos las nuestras.")</p>
+        </div>
+
+        <!-- Category Filter Tabs -->
+        <div class="blog-category-tabs reveal">
+            <a href="/Blog" class="category-tab @(string.IsNullOrEmpty(currentCategory) ? "active" : "")">@(isPt ? "Todos" : isEn ? "All" : "Todos")</a>
+            <a href="/Blog?category=itinerarios" class="category-tab @(currentCategory == "itinerarios" ? "active" : "")">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</a>
+            <a href="/Blog?category=personal" class="category-tab @(currentCategory == "personal" ? "active" : "")">Personal</a>
+            <a href="/Blog?category=recomendaciones" class="category-tab @(currentCategory == "recomendaciones" ? "active" : "")">@(isPt ? "Recomendações" : isEn ? "Recommendations" : "Recomendaciones")</a>
+            <a href="/Blog?category=viajes" class="category-tab @(currentCategory == "viajes" ? "active" : "")">@(isPt ? "Viagens" : isEn ? "Travel" : "Viajes")</a>
         </div>
 
         <div class="cards-grid">
@@ -47,7 +57,7 @@
                     }
                     else
                     {
-                        <a href="/Blog?page=@i">@i</a>
+                        <a href="/Blog?@(string.IsNullOrEmpty(currentCategory) ? "" : $"category={currentCategory}&")page=@i">@i</a>
                     }
                 }
             </div>

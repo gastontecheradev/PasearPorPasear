@@ -31,7 +31,15 @@
 
             <ul class="navbar-links" id="navLinks">
                 <li><a href="/" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
-                <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a></li>
+                <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a>
+                    <ul class="nav-dropdown">
+                        <li><a href="/Blog">@(isPt ? "Todos" : isEn ? "All" : "Todos")</a></li>
+                        <li><a href="/Blog?category=itinerarios">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</a></li>
+                        <li><a href="/Blog?category=personal">Personal</a></li>
+                        <li><a href="/Blog?category=recomendaciones">@(isPt ? "Recomendações" : isEn ? "Recommendations" : "Recomendaciones")</a></li>
+                        <li><a href="/Blog?category=viajes">@(isPt ? "Viagens" : isEn ? "Travel" : "Viajes")</a></li>
+                    </ul>
+                </li>
                 <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Club de Paseo" : isEn ? "Club de Paseo" : "Club de Paseo")</a></li>
                 @* <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li> *@
                 @* <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li> *@

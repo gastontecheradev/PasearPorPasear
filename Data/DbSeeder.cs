@@ -40,7 +40,7 @@ public static class DbSeeder
                 ContentPt = @"<p>Olá! Sou <strong>Rosalía Souza</strong>, criadora do <em>Pasear por Pasear</em>.</p>
 <p>Montevidéu é minha cidade e minha paixão. Este projeto nasceu da convicção de que a melhor maneira de conhecer um lugar é a pé, sem pressa, deixando-se surpreender.</p>
 <p>Sou guia de turismo certificada, fotógrafa amadora e eterna curiosa sobre a história de Montevidéu.</p>",
-                ImagePath = "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=600"
+                ImagePath = "/images/sobremi.jpg"
             });
         }
 
@@ -49,14 +49,16 @@ public static class DbSeeder
         {
             ctx.ClubDePaseoPages.Add(new ClubDePaseoPage
             {
-                Title = "Club de Paseo", TitleEn = "Walking Club", TitlePt = "Clube de Caminhada",
+                Title = "Club de Paseo",
+                TitleEn = "Walking Club",
+                TitlePt = "Clube de Caminhada",
                 Content = @"<p>El <strong>Club de Paseo</strong> es una comunidad para quienes disfrutan recorrer Montevideo a pie.</p>
-<p>Cada semana organizamos caminatas grupales por diferentes barrios. ¡Es totalmente gratuito!</p>",
+                <p>Acá publicamos los recorridos que ya realizamos, con fotos, mapas y todo lo que descubrimos en cada caminata.</p>",
                 ContentEn = @"<p>The <strong>Walking Club</strong> is a community for those who enjoy exploring Montevideo on foot.</p>
-<p>Every week we organize group walks through different neighborhoods. It's completely free!</p>",
+                <p>Here we publish the routes we've already completed, with photos, maps, and everything we discovered on each walk.</p>",
                 ContentPt = @"<p>O <strong>Clube de Caminhada</strong> é uma comunidade para quem gosta de explorar Montevidéu a pé.</p>
-<p>Toda semana organizamos caminhadas em grupo por diferentes bairros. É totalmente gratuito!</p>",
-                ImagePath = "https://images.unsplash.com/photo-1581889470536-467bdbe30cd0?w=800"
+                <p>Aqui publicamos os roteiros que já realizamos, com fotos, mapas e tudo o que descobrimos em cada caminhada.</p>",
+                ImagePath = "/images/clubdepaseo.jpg"
             });
         }
 
@@ -66,63 +68,60 @@ public static class DbSeeder
             ctx.BlogPosts.AddRange(
                 new BlogPost
                 {
-                    Title = "Ciudad Vieja: Un paseo por la historia",
-                    TitleEn = "Ciudad Vieja: A Walk Through History",
-                    TitlePt = "Ciudad Vieja: Um Passeio pela História",
-                    Slug = "ciudad-vieja-paseo-historia",
-                    Content = @"<p>La <strong>Ciudad Vieja</strong> es el corazón histórico de Montevideo. Caminar por sus calles empedradas es como viajar en el tiempo.</p>
-<p>El <strong>Mercado del Puerto</strong> es parada obligatoria. El aroma a parrilla se mezcla con el bullicio de los comensales.</p>",
-                    ContentEn = @"<p><strong>Ciudad Vieja</strong> is the historic heart of Montevideo. Walking through its cobblestone streets is like traveling through time.</p>
-<p>The <strong>Mercado del Puerto</strong> is a must-stop. The aroma of grilled meat mixes with the bustle of diners.</p>",
-                    ContentPt = @"<p>A <strong>Ciudad Vieja</strong> é o coração histórico de Montevidéu. Caminhar por suas ruas de paralelepípedos é como viajar no tempo.</p>
-<p>O <strong>Mercado del Puerto</strong> é parada obrigatória. O aroma da churrasqueira se mistura com o burburinho dos comensais.</p>",
-                    Excerpt = "Recorrido por el casco histórico de Montevideo.",
-                    ExcerptEn = "A tour through Montevideo's historic center.",
-                    ExcerptPt = "Um passeio pelo centro histórico de Montevidéu.",
-                    ImagePath = "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=800",
-                    PublishDate = DateTime.Now.AddDays(-10),
-                    LocationName = "Ciudad Vieja, Montevideo",
-                    LocationNameEn = "Old Town, Montevideo",
-                    LocationNamePt = "Cidade Velha, Montevidéu",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3272.1!2d-56.2!3d-34.91!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDU0JzM2LjAiUyA1NsKwMTInMDAuMCJX!5e0!3m2!1ses!2suy!4v1"
-                },
-                new BlogPost
-                {
-                    Title = "Rambla de Montevideo al atardecer",
-                    TitleEn = "Montevideo's Rambla at Sunset",
-                    TitlePt = "Rambla de Montevidéu ao Pôr do Sol",
-                    Slug = "rambla-montevideo-atardecer",
-                    Content = @"<p>La <strong>Rambla de Montevideo</strong> es uno de los paseos costeros más largos del mundo, con más de 22 kilómetros.</p>",
-                    ContentEn = @"<p>The <strong>Rambla de Montevideo</strong> is one of the longest coastal promenades in the world, with more than 22 kilometers.</p>",
-                    ContentPt = @"<p>A <strong>Rambla de Montevidéu</strong> é um dos calçadões costeiros mais longos do mundo, com mais de 22 quilômetros.</p>",
-                    Excerpt = "22 km de costa, mate y atardeceres inolvidables.",
-                    ExcerptEn = "22 km of coastline, mate, and unforgettable sunsets.",
-                    ExcerptPt = "22 km de costa, mate e pores do sol inesquecíveis.",
-                    ImagePath = "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=800",
-                    PublishDate = DateTime.Now.AddDays(-5),
-                    LocationName = "Rambla de Pocitos",
-                    LocationNameEn = "Pocitos Rambla",
-                    LocationNamePt = "Rambla de Pocitos",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6544.8!2d-56.16!3d-34.92!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDU1JzEyLjAiUyA1NsKwMDknMzYuMCJX!5e0!3m2!1ses!2suy!4v1"
-                },
-                new BlogPost
-                {
-                    Title = "Barrio Prado: Jardines y arquitectura",
-                    TitleEn = "Prado Neighborhood: Gardens and Architecture",
-                    TitlePt = "Bairro Prado: Jardins e Arquitetura",
-                    Slug = "barrio-prado-jardines-arquitectura",
-                    Content = @"<p>El <strong>Barrio Prado</strong> es el pulmón verde de Montevideo con parques, rosedales y casonas señoriales.</p>",
-                    ContentEn = @"<p>The <strong>Prado Neighborhood</strong> is Montevideo's green lung with parks, rose gardens, and stately mansions.</p>",
-                    ContentPt = @"<p>O <strong>Bairro Prado</strong> é o pulmão verde de Montevidéu com parques, roseirais e casarões senhoriais.</p>",
-                    Excerpt = "El barrio más verde de Montevideo.",
-                    ExcerptEn = "Montevideo's greenest neighborhood.",
-                    ExcerptPt = "O bairro mais verde de Montevidéu.",
-                    ImagePath = "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?w=800",
+                    Title = "Publicación 1",
+                    TitleEn = "Post 1",
+                    TitlePt = "publicação 1",
+                    Slug = "post-1",
+                    Content = @"<p>Contenido.</p>",
+                    ContentEn = @"<p>Content.</p>",
+                    ContentPt = @"<p>Conteúdo.</p>",
+                    Excerpt = "Resumen.",
+                    ExcerptEn = "Summary.",
+                    ExcerptPt = "Resume.",
+                    ImagePath = "/images/pasearporpasear.jpg",
                     PublishDate = DateTime.Now.AddDays(-2),
-                    LocationName = "Barrio Prado, Montevideo",
-                    LocationNameEn = "Prado Neighborhood, Montevideo",
-                    LocationNamePt = "Bairro Prado, Montevidéu",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d6543.5!2d-56.19!3d-34.87!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMzTCsDUyJzEyLjAiUyA1NsKwMTEnMjQuMCJX!5e0!3m2!1ses!2suy!4v1"
+                    LocationName = "Locación",
+                    LocationNameEn = "Location",
+                    LocationNamePt = "localização",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
+                },
+                new BlogPost
+                {
+                    Title = "Publicación 2",
+                    TitleEn = "Post 2",
+                    TitlePt = "publicação 2",
+                    Slug = "post-2",
+                    Content = @"<p>Contenido.</p>",
+                    ContentEn = @"<p>Content.</p>",
+                    ContentPt = @"<p>Conteúdo.</p>",
+                    Excerpt = "Resumen.",
+                    ExcerptEn = "Summary.",
+                    ExcerptPt = "Resume.",
+                    ImagePath = "/images/pasearporpasear.jpg",
+                    PublishDate = DateTime.Now.AddDays(-2),
+                    LocationName = "Locación",
+                    LocationNameEn = "Location",
+                    LocationNamePt = "localização",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
+                },
+                new BlogPost
+                {
+                    Title = "Publicación 3",
+                    TitleEn = "Post 3",
+                    TitlePt = "publicação 3",
+                    Slug = "post-3",
+                    Content = @"<p>Contenido.</p>",
+                    ContentEn = @"<p>Content.</p>",
+                    ContentPt = @"<p>Conteúdo.</p>",
+                    Excerpt = "Resumen.",
+                    ExcerptEn = "Summary.",
+                    ExcerptPt = "Resume.",
+                    ImagePath = "/images/pasearporpasear.jpg",
+                    PublishDate = DateTime.Now.AddDays(-2),
+                    LocationName = "Locación",
+                    LocationNameEn = "Location",
+                    LocationNamePt = "localização",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
                 }
             );
         }
@@ -142,7 +141,7 @@ public static class DbSeeder
                     Price = 800,
                     MeetingPoint = "Plaza Independencia", MeetingPointEn = "Plaza Independencia", MeetingPointPt = "Plaza Independencia",
                     MaxParticipants = 15,
-                    ImagePath = "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=800",
+                    ImagePath = "/images/pasearporpasear.jpg",
                 },
                 new Tour
                 {
@@ -155,7 +154,7 @@ public static class DbSeeder
                     Price = 600,
                     MeetingPoint = "Playa de los Pocitos", MeetingPointEn = "Pocitos Beach", MeetingPointPt = "Praia de Pocitos",
                     MaxParticipants = 20,
-                    ImagePath = "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=800",
+                    ImagePath = "/images/pasearporpasear.jpg",
                 }
             );
         }
@@ -175,7 +174,7 @@ public static class DbSeeder
                 ContentPt = @"<h3>Manhã</h3><p><strong>9:00</strong> — Café da manhã na Cidade Velha.</p><p><strong>12:00</strong> — Almoço no Mercado del Puerto.</p><h3>Tarde</h3><p><strong>14:00</strong> — Caminhada pela Rambla.</p><h3>Noite</h3><p><strong>18:30</strong> — Pôr do sol em Pocitos.</p>",
                 Duration = "Todo el día", DurationEn = "Full day", DurationPt = "Dia inteiro",
                 Distance = "~12 km",
-                ImagePath = "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=800",
+                ImagePath = "/images/pasearporpasear.jpg",
             });
         }
 

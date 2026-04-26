@@ -162,27 +162,71 @@ public static class DbSeeder
         // ── Club de Paseo Entries ──
         if (!ctx.ClubDePaseoEntries.Any())
         {
-            ctx.ClubDePaseoEntries.Add(new ClubDePaseoEntry
-            {
-                Title = "Prueba",
-                TitleEn = "Test",
-                TitlePt = "Prova",
-                Slug = "prueba",
-                Excerpt = "Entrada de pruebe.",
-                ExcerptEn = "Test entry.",
-                ExcerptPt = "Entrada de teste.",
-                Content = @"<h3>Introducción</h3><p>Este es un <strong>contenido de prueba</strong> en español. Sirve para validar que el editor, los estilos y la traducción funcionan como esperamos.</p><h3>Detalles</h3><ul><li>Primer punto de prueba</li><li>Segundo punto de prueba</li><li>Tercer punto de prueba</li></ul><p>Fin de la prueba.</p>",
-                ContentEn = @"<h3>Introduction</h3><p>This is a <strong>test content</strong> in English. It is used to validate that the editor, styles, and translation work as expected.</p><h3>Details</h3><ul><li>First test point</li><li>Second test point</li><li>Third test point</li></ul><p>End of test.</p>",
-                ContentPt = @"<h3>Introdução</h3><p>Este é um <strong>conteúdo de teste</strong> em português. Serve para validar que o editor, os estilos e a tradução funcionam como esperamos.</p><h3>Detalhes</h3><ul><li>Primeiro ponto de teste</li><li>Segundo ponto de teste</li><li>Terceiro ponto de teste</li></ul><p>Fim do teste.</p>",
-                Category = "personal",
-                LocationName = "Montevideo",
-                LocationNameEn = "Montevideo",
-                LocationNamePt = "Montevidéu",
-                MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
-                PublishDate = DateTime.Now,
-                IsPublished = true,
-                ImagePath = "/images/pasearporpasear.jpg",
-            });
+            ctx.ClubDePaseoEntries.AddRange(
+                new ClubDePaseoEntry
+                {
+                    Title = "Prueba 1",
+                    TitleEn = "Test 1",
+                    TitlePt = "Prova 1",
+                    Slug = "prueba-1",
+                    Excerpt = "Entrada de pruebe.",
+                    ExcerptEn = "Test entry.",
+                    ExcerptPt = "Entrada de teste.",
+                    Content = @"<h3>Introducción</h3><p>Este es un <strong>contenido de prueba</strong> en español. Sirve para validar que el editor, los estilos y la traducción funcionan como esperamos.</p><h3>Detalles</h3><ul><li>Primer punto de prueba</li><li>Segundo punto de prueba</li><li>Tercer punto de prueba</li></ul><p>Fin de la prueba.</p>",
+                    ContentEn = @"<h3>Introduction</h3><p>This is a <strong>test content</strong> in English. It is used to validate that the editor, styles, and translation work as expected.</p><h3>Details</h3><ul><li>First test point</li><li>Second test point</li><li>Third test point</li></ul><p>End of test.</p>",
+                    ContentPt = @"<h3>Introdução</h3><p>Este é um <strong>conteúdo de teste</strong> em português. Serve para validar que o editor, os estilos e a tradução funcionam como esperamos.</p><h3>Detalhes</h3><ul><li>Primeiro ponto de teste</li><li>Segundo ponto de teste</li><li>Terceiro ponto de teste</li></ul><p>Fim do teste.</p>",
+                    Category = "personal",
+                    LocationName = "Montevideo",
+                    LocationNameEn = "Montevideo",
+                    LocationNamePt = "Montevidéu",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
+                    PublishDate = DateTime.Now,
+                    IsPublished = true,
+                    ImagePath = "/images/pasearporpasear.jpg",
+                },
+                new ClubDePaseoEntry
+                {
+                    Title = "Prueba 2",
+                    TitleEn = "Test 2",
+                    TitlePt = "Prova 2",
+                    Slug = "prueba-2",
+                    Excerpt = "Entrada de pruebe.",
+                    ExcerptEn = "Test entry.",
+                    ExcerptPt = "Entrada de teste.",
+                    Content = @"<h3>Introducción</h3><p>Este es un <strong>contenido de prueba</strong> en español. Sirve para validar que el editor, los estilos y la traducción funcionan como esperamos.</p><h3>Detalles</h3><ul><li>Primer punto de prueba</li><li>Segundo punto de prueba</li><li>Tercer punto de prueba</li></ul><p>Fin de la prueba.</p>",
+                    ContentEn = @"<h3>Introduction</h3><p>This is a <strong>test content</strong> in English. It is used to validate that the editor, styles, and translation work as expected.</p><h3>Details</h3><ul><li>First test point</li><li>Second test point</li><li>Third test point</li></ul><p>End of test.</p>",
+                    ContentPt = @"<h3>Introdução</h3><p>Este é um <strong>conteúdo de teste</strong> em português. Serve para validar que o editor, os estilos e a tradução funcionam como esperamos.</p><h3>Detalhes</h3><ul><li>Primeiro ponto de teste</li><li>Segundo ponto de teste</li><li>Terceiro ponto de teste</li></ul><p>Fim do teste.</p>",
+                    Category = "personal",
+                    LocationName = "Montevideo",
+                    LocationNameEn = "Montevideo",
+                    LocationNamePt = "Montevidéu",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
+                    PublishDate = DateTime.Now,
+                    IsPublished = true,
+                    ImagePath = "/images/pasearporpasear.jpg",
+                },
+                new ClubDePaseoEntry
+                {
+                    Title = "Prueba 3",
+                    TitleEn = "Test 3",
+                    TitlePt = "Prova 3",
+                    Slug = "prueba-3",
+                    Excerpt = "Entrada de pruebe.",
+                    ExcerptEn = "Test entry.",
+                    ExcerptPt = "Entrada de teste.",
+                    Content = @"<h3>Introducción</h3><p>Este es un <strong>contenido de prueba</strong> en español. Sirve para validar que el editor, los estilos y la traducción funcionan como esperamos.</p><h3>Detalles</h3><ul><li>Primer punto de prueba</li><li>Segundo punto de prueba</li><li>Tercer punto de prueba</li></ul><p>Fin de la prueba.</p>",
+                    ContentEn = @"<h3>Introduction</h3><p>This is a <strong>test content</strong> in English. It is used to validate that the editor, styles, and translation work as expected.</p><h3>Details</h3><ul><li>First test point</li><li>Second test point</li><li>Third test point</li></ul><p>End of test.</p>",
+                    ContentPt = @"<h3>Introdução</h3><p>Este é um <strong>conteúdo de teste</strong> em português. Serve para validar que o editor, os estilos e a tradução funcionam como esperamos.</p><h3>Detalhes</h3><ul><li>Primeiro ponto de teste</li><li>Segundo ponto de teste</li><li>Terceiro ponto de teste</li></ul><p>Fim do teste.</p>",
+                    Category = "personal",
+                    LocationName = "Montevideo",
+                    LocationNameEn = "Montevideo",
+                    LocationNamePt = "Montevidéu",
+                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
+                    PublishDate = DateTime.Now,
+                    IsPublished = true,
+                    ImagePath = "/images/pasearporpasear.jpg",
+                }
+            );
         }
 
         // ── Site Settings ──

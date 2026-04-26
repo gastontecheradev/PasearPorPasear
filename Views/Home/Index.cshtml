@@ -5,7 +5,9 @@
     var isEn = culture == "en"; var isPt = culture == "pt";
     var settings = ViewBag.Settings as Dictionary<string, SiteSetting> ?? new Dictionary<string, SiteSetting>();
     var posts = ViewBag.LatestPosts as List<BlogPost> ?? new List<BlogPost>();
+    var clubEntries = ViewBag.LatestClubEntries as List<ClubDePaseoEntry> ?? new List<ClubDePaseoEntry>();
     var tours = ViewBag.Tours as List<Tour> ?? new List<Tour>();
+    var aboutPage = ViewBag.AboutPage as AboutPage;
     string S(string key) => settings.TryGetValue(key, out var s) ? (isPt ? s.ValuePt : isEn ? s.ValueEn : s.Value) : "";
 }
 
@@ -15,11 +17,11 @@
         <h1 class="hero-title fade-up fade-up-d1">Pasear Por Pasear</h1>
         <p class="hero-desc fade-up fade-up-d2">@S("HomeHeroSubtitle")</p>
         <div class="hero-actions fade-up fade-up-d3">
-            <a href="/Blog" class="btn btn-teal">
-                @(isPt ? "Ler o Blog" : isEn ? "Read the Blog" : "Leer el Blog")
+            <a href="#club-de-paseo" class="btn btn-teal">
+                @(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
             </a>
-            <a href="/Tours" class="btn btn-outline">@(isPt ? "Reservar Tour" : isEn ? "Book a Tour" : "Reservar Tour")</a>
+            <a href="/Contact" class="btn btn-outline">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a>
         </div>
         <div class="hero-accent fade-up fade-up-d3">
             <span class="a1"></span><span class="a2"></span><span class="a3"></span><span class="a4"></span>
@@ -27,7 +29,67 @@
     </div>
 </section>
 
-<!-- ═══ LATEST POSTS ═══ -->
+<!-- ═══ CLUB DE PASEO — LATEST ENTRIES ═══ -->
+@if (clubEntries.Any())
+{
+    <section class="section" id="club-de-paseo" style="padding-top:0">
+        <div class="container">
+            <div class="section-header reveal">
+                <span class="section-label">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</span>
+                <h2 class="section-title">@(isPt ? "Últimas Publicações" : isEn ? "Latest Posts" : "Últimas Publicaciones")</h2>
+                <p class="section-subtitle">@(isPt ? "Explore as publicações do Clube de Caminhada" : isEn ? "Explore the latest Walking Club entries" : "Explora las publicaciones del Club de Paseo")</p>
+            </div>
+            <div class="cards-grid">
+                @foreach (var entry in clubEntries)
+                {
+                    <a href="/ClubDePaseo/Detail/@entry.Slug" class="card reveal">
+                        <div class="card-img-wrap"><img src="@(entry.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)" class="card-img" loading="lazy"></div>
+                        <div class="card-body">
+                            <span class="card-tag">@(isPt ? entry.LocationNamePt ?? "Montevidéu" : isEn ? entry.LocationNameEn ?? "Montevideo" : entry.LocationName ?? "Montevideo")</span>
+                            <h3 class="card-title">@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)</h3>
+                            <p class="card-text">@(isPt ? entry.ExcerptPt : isEn ? entry.ExcerptEn : entry.Excerpt)</p>
+                        </div>
+                        <div class="card-footer">
+                            <span class="card-date">@entry.PublishDate.ToString("dd MMM yyyy")</span>
+                            <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
+                        </div>
+                    </a>
+                }
+            </div>
+            <div style="text-align:center;margin-top:36px">
+                <a href="/ClubDePaseo" class="btn btn-outline">@(isPt ? "Ver Todas as Publicações" : isEn ? "View All Posts" : "Ver Todas las Publicaciones")</a>
+            </div>
+        </div>
+    </section>
+}
+
+<!-- ═══ SOBRE MÍ ═══ -->
+<section class="section" id="sobre-mi">
+    <div class="container">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center" class="contact-layout">
+            <div class="reveal">
+                <span class="section-label" style="margin-bottom:16px;display:block">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</span>
+                <h2 class="section-title" style="margin-bottom:24px">Rosalía Souza</h2>
+                <div class="content-body">
+                    @Html.Raw(isPt ? aboutPage?.ContentPt : isEn ? aboutPage?.ContentEn : aboutPage?.Content)
+                </div>
+                <div style="margin-top:32px">
+                    <a href="/About" class="btn btn-outline">@(isPt ? "Saiba Mais" : isEn ? "Learn More" : "Conocer Más")</a>
+                </div>
+            </div>
+            <div class="reveal">
+                @if (!string.IsNullOrEmpty(aboutPage?.ImagePath))
+                {
+                    <img src="@aboutPage.ImagePath" alt="Rosalía Souza" style="width:100%;max-width:400px;border-radius:var(--radius-lg);aspect-ratio:3/4;object-fit:cover">
+                }
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- ═══ LATEST POSTS (BLOG) ═══ -->
 @*@if (posts.Any())
 {
     <section class="section" style="padding-top:0">

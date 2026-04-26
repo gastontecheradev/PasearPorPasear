@@ -21,10 +21,16 @@ public class HomeController : Controller
             .OrderByDescending(p => p.PublishDate)
             .Take(3)
             .ToListAsync();
+        ViewBag.LatestClubEntries = await _ctx.ClubDePaseoEntries
+            .Where(e => e.IsPublished)
+            .OrderByDescending(e => e.PublishDate)
+            .Take(3)
+            .ToListAsync();
         ViewBag.Tours = await _ctx.Tours
             .Where(t => t.IsActive)
             .OrderBy(t => t.Name)
             .ToListAsync();
+        ViewBag.AboutPage = await _ctx.AboutPages.FirstOrDefaultAsync();
         return View();
     }
 

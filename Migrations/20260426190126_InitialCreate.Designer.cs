@@ -11,7 +11,7 @@ using PasearPorPasear.Data;
 namespace PasearPorPasear.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260426025806_InitialCreate")]
+    [Migration("20260426190126_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />

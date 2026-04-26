@@ -14,29 +14,28 @@
         }
 
         <div class="content-meta">
-            @if (!string.IsNullOrEmpty(Model.Duration))
-            {
-                <span>⏱ @(isPt ? Model.DurationPt : isEn ? Model.DurationEn : Model.Duration)</span>
+            <span>@Model.PublishDate.ToString("dd MMMM yyyy")</span>
+            @{
+                var locName = isPt ? Model.LocationNamePt : isEn ? Model.LocationNameEn : Model.LocationName;
             }
-            @if (!string.IsNullOrEmpty(Model.Distance))
+            @if (!string.IsNullOrEmpty(locName))
             {
-                <span>📏 @Model.Distance</span>
+                <span>📍 @locName</span>
             }
         </div>
 
         <h1 class="content-title">@(isPt ? Model.TitlePt : isEn ? Model.TitleEn : Model.Title)</h1>
-        <p style="font-size:var(--fs-md);color:var(--ink-60);margin-bottom:28px;line-height:1.8">@(isPt ? Model.DescriptionPt : isEn ? Model.DescriptionEn : Model.Description)</p>
 
         <div class="content-body">
-            @Html.Raw(isPt ? Model.ContentPt : isEn ? Model.ContentEn : Model.Content)
+            @Html.Raw(isPt ? Model?.ContentPt : isEn ? Model?.ContentEn : Model?.Content)
         </div>
 
         @if (!string.IsNullOrEmpty(Model.MapEmbedUrl))
         {
-            <iframe src="@Model.MapEmbedUrl" class="content-map" allowfullscreen="" loading="lazy"></iframe>
+            <iframe src="@Model.MapEmbedUrl" class="content-map" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         }
 
-        <div style="margin-top:44px;padding-top:28px;border-top:1px solid var(--ink-10)">
+        <div style="margin-top:48px;padding-top:32px;border-top:1px solid var(--ink-10)">
             <a href="/ClubDePaseo" class="btn btn-outline">← @(isPt ? "Voltar ao Clube" : isEn ? "Back to Club" : "Volver al Club")</a>
         </div>
     </div>

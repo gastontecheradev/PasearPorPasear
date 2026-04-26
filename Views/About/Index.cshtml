@@ -13,7 +13,7 @@
                 <span class="section-label" style="margin-bottom:16px;display:block">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</span>
                 <h1 class="content-title">Rosalía Souza</h1>
                 <div class="content-body">
-                    @Html.Raw(isEn ? Model?.ContentEn : Model?.Content)
+                    @Html.Raw(isPt ? Model?.ContentPt : isEn ? Model?.ContentEn : Model?.Content)
                 </div>
             </div>
             <div>

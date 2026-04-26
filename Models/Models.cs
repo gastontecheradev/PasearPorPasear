@@ -94,30 +94,44 @@ public class ClubDePaseoEntry
     [Required(ErrorMessage = "El título es obligatorio")]
     [StringLength(200)]
     public string Title { get; set; } = string.Empty;
+
     [StringLength(200)]
     public string TitleEn { get; set; } = string.Empty;
+
     [StringLength(200)]
     public string TitlePt { get; set; } = string.Empty;
 
     [StringLength(200)]
     public string Slug { get; set; } = string.Empty;
 
-    public string Description { get; set; } = string.Empty;
-    public string DescriptionEn { get; set; } = string.Empty;
-    public string DescriptionPt { get; set; } = string.Empty;
     public string Content { get; set; } = string.Empty;
     public string ContentEn { get; set; } = string.Empty;
     public string ContentPt { get; set; } = string.Empty;
 
+    [StringLength(500)]
+    public string? Excerpt { get; set; }
+    [StringLength(500)]
+    public string? ExcerptEn { get; set; }
+    [StringLength(500)]
+    public string? ExcerptPt { get; set; }
+
     public string? ImagePath { get; set; }
-    [StringLength(100)] public string? Duration { get; set; }
-    [StringLength(100)] public string? DurationEn { get; set; }
-    [StringLength(100)] public string? DurationPt { get; set; }
-    [StringLength(100)] public string? Distance { get; set; }
-    [StringLength(500)] public string? MapEmbedUrl { get; set; }
+    public DateTime PublishDate { get; set; } = DateTime.Now;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
     public bool IsPublished { get; set; } = true;
+
+    [StringLength(50)]
+    public string? Category { get; set; }
+
+    [StringLength(500)]
+    public string? MapEmbedUrl { get; set; }
+    [StringLength(200)]
+    public string? LocationName { get; set; }
+    [StringLength(200)]
+    public string? LocationNameEn { get; set; }
+    [StringLength(200)]
+    public string? LocationNamePt { get; set; }
 }
 
 // ──────────────────────────────────────

@@ -22,13 +22,31 @@ public class ClubDePaseoController : Controller
     }
 
     // Public: shows page intro + list of entries
-    public async Task<IActionResult> Index()
+    public async Task<IActionResult> Index(string? category = null, int page = 1)
     {
         ViewBag.Page = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
-        var entries = await _ctx.ClubDePaseoEntries
+
+        const int pageSize = 6;
+        var query = _ctx.ClubDePaseoEntries
             .Where(e => e.IsPublished)
-            .OrderByDescending(e => e.CreatedAt)
+            .AsQueryable();
+
+        if (!string.IsNullOrEmpty(category))
+        {
+            query = query.Where(e => e.Category == category);
+        }
+
+        query = query.OrderByDescending(e => e.PublishDate);
+
+        var total = await query.CountAsync();
+        var entries = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
+
+        ViewBag.CurrentPage = page;
+        ViewBag.TotalPages = (int)Math.Ceiling(total / (double)pageSize);
+        ViewBag.CurrentCategory = category;
         return View(entries);
     }
 
@@ -79,12 +97,12 @@ public class ClubDePaseoController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Manage()
     {
-        var entries = await _ctx.ClubDePaseoEntries.OrderByDescending(e => e.CreatedAt).ToListAsync();
+        var entries = await _ctx.ClubDePaseoEntries.OrderByDescending(e => e.PublishDate).ToListAsync();
         return View(entries);
     }
 
     [Authorize(Roles = "Admin")]
-    public IActionResult Create() => View(new ClubDePaseoEntry());
+    public IActionResult Create() => View(new ClubDePaseoEntry { PublishDate = DateTime.Now });
 
     [HttpPost, Authorize(Roles = "Admin"), ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(ClubDePaseoEntry entry, IFormFile? imageFile)
@@ -128,18 +146,19 @@ public class ClubDePaseoController : Controller
         existing.Title = entry.Title;
         existing.TitleEn = entry.TitleEn;
         existing.TitlePt = entry.TitlePt;
-        existing.Description = entry.Description;
-        existing.DescriptionEn = entry.DescriptionEn;
-        existing.DescriptionPt = entry.DescriptionPt;
         existing.Content = entry.Content;
         existing.ContentEn = entry.ContentEn;
         existing.ContentPt = entry.ContentPt;
-        existing.Duration = entry.Duration;
-        existing.DurationEn = entry.DurationEn;
-        existing.DurationPt = entry.DurationPt;
-        existing.Distance = entry.Distance;
-        existing.MapEmbedUrl = entry.MapEmbedUrl;
+        existing.Excerpt = entry.Excerpt;
+        existing.ExcerptEn = entry.ExcerptEn;
+        existing.ExcerptPt = entry.ExcerptPt;
+        existing.PublishDate = entry.PublishDate;
         existing.IsPublished = entry.IsPublished;
+        existing.MapEmbedUrl = entry.MapEmbedUrl;
+        existing.LocationName = entry.LocationName;
+        existing.LocationNameEn = entry.LocationNameEn;
+        existing.LocationNamePt = entry.LocationNamePt;
+        existing.Category = entry.Category;
         existing.UpdatedAt = DateTime.Now;
 
         var img = await _upload.UploadImageAsync(imageFile);

@@ -6,7 +6,7 @@
 }
 
 <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px">
-    <h3 style="font-family:var(--font-brand)">@Model.Count entradas</h3>
+    <h3 style="font-family:var(--font-display)">@Model.Count entradas</h3>
     <div style="display:flex;gap:8px">
         <a href="/ClubDePaseo/EditPage" class="btn btn-outline btn-sm">✏️ Editar Página Intro</a>
         <a href="/ClubDePaseo/Create" class="btn btn-teal btn-sm">+ Nueva Entrada</a>
@@ -17,8 +17,8 @@
     <thead>
         <tr>
             <th>Título</th>
-            <th>Duración</th>
-            <th>Distancia</th>
+            <th>Categoría</th>
+            <th>Fecha</th>
             <th>Estado</th>
             <th>Acciones</th>
         </tr>
@@ -31,9 +31,27 @@
                     <strong>@entry.Title</strong>
                     <div style="font-size:var(--fs-xs);color:var(--ink-40)">/@entry.Slug</div>
                 </td>
-                <td>@(entry.Duration ?? "—")</td>
-                <td>@(entry.Distance ?? "—")</td>
-                <td><span class="badge @(entry.IsPublished ? "badge-confirmed" : "badge-pending")">@(entry.IsPublished ? "Publicado" : "Borrador")</span></td>
+                <td>
+                    @if (!string.IsNullOrEmpty(entry.Category))
+                    {
+                        <span class="badge badge-pending" style="text-transform:capitalize">@entry.Category</span>
+                    }
+                    else
+                    {
+                        <span style="color:var(--ink-40);font-size:var(--fs-xs)">—</span>
+                    }
+                </td>
+                <td>@entry.PublishDate.ToString("dd/MM/yyyy")</td>
+                <td>
+                    @if (entry.IsPublished)
+                    {
+                        <span class="badge badge-confirmed">Publicado</span>
+                    }
+                    else
+                    {
+                        <span class="badge badge-pending">Borrador</span>
+                    }
+                </td>
                 <td>
                     <div style="display:flex;gap:6px">
                         <a href="/ClubDePaseo/Detail/@entry.Slug" class="btn btn-outline btn-xs" target="_blank">Ver</a>

@@ -164,16 +164,23 @@ public static class DbSeeder
         {
             ctx.ClubDePaseoEntries.Add(new ClubDePaseoEntry
             {
-                Title = "Montevideo en un día", TitleEn = "Montevideo in One Day", TitlePt = "Montevidéu em Um Dia",
-                Slug = "montevideo-en-un-dia",
-                Description = "El recorrido perfecto para conocer lo esencial de la ciudad.",
-                DescriptionEn = "The perfect route to see the essentials of the city.",
-                DescriptionPt = "O roteiro perfeito para conhecer o essencial da cidade.",
-                Content = @"<h3>Mañana</h3><p><strong>9:00</strong> — Desayuno en la Ciudad Vieja.</p><p><strong>12:00</strong> — Almuerzo en el Mercado del Puerto.</p><h3>Tarde</h3><p><strong>14:00</strong> — Caminata por la Rambla.</p><h3>Noche</h3><p><strong>18:30</strong> — Atardecer en Pocitos.</p>",
-                ContentEn = @"<h3>Morning</h3><p><strong>9:00</strong> — Breakfast in Old Town.</p><p><strong>12:00</strong> — Lunch at Mercado del Puerto.</p><h3>Afternoon</h3><p><strong>14:00</strong> — Walk along the Rambla.</p><h3>Evening</h3><p><strong>18:30</strong> — Sunset at Pocitos.</p>",
-                ContentPt = @"<h3>Manhã</h3><p><strong>9:00</strong> — Café da manhã na Cidade Velha.</p><p><strong>12:00</strong> — Almoço no Mercado del Puerto.</p><h3>Tarde</h3><p><strong>14:00</strong> — Caminhada pela Rambla.</p><h3>Noite</h3><p><strong>18:30</strong> — Pôr do sol em Pocitos.</p>",
-                Duration = "Todo el día", DurationEn = "Full day", DurationPt = "Dia inteiro",
-                Distance = "~12 km",
+                Title = "Prueba",
+                TitleEn = "Test",
+                TitlePt = "Prova",
+                Slug = "prueba",
+                Excerpt = "Entrada de pruebe.",
+                ExcerptEn = "Test entry.",
+                ExcerptPt = "Entrada de teste.",
+                Content = @"<h3>Introducción</h3><p>Este es un <strong>contenido de prueba</strong> en español. Sirve para validar que el editor, los estilos y la traducción funcionan como esperamos.</p><h3>Detalles</h3><ul><li>Primer punto de prueba</li><li>Segundo punto de prueba</li><li>Tercer punto de prueba</li></ul><p>Fin de la prueba.</p>",
+                ContentEn = @"<h3>Introduction</h3><p>This is a <strong>test content</strong> in English. It is used to validate that the editor, styles, and translation work as expected.</p><h3>Details</h3><ul><li>First test point</li><li>Second test point</li><li>Third test point</li></ul><p>End of test.</p>",
+                ContentPt = @"<h3>Introdução</h3><p>Este é um <strong>conteúdo de teste</strong> em português. Serve para validar que o editor, os estilos e a tradução funcionam como esperamos.</p><h3>Detalhes</h3><ul><li>Primeiro ponto de teste</li><li>Segundo ponto de teste</li><li>Terceiro ponto de teste</li></ul><p>Fim do teste.</p>",
+                Category = "personal",
+                LocationName = "Montevideo",
+                LocationNameEn = "Montevideo",
+                LocationNamePt = "Montevidéu",
+                MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
+                PublishDate = DateTime.Now,
+                IsPublished = true,
                 ImagePath = "/images/pasearporpasear.jpg",
             });
         }

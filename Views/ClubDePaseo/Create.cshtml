@@ -5,75 +5,174 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<form asp-controller="ClubDePaseo" asp-action="Create" method="post" enctype="multipart/form-data" style="max-width:900px">
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-        <div class="form-group"><label>Título (Español) *</label><input asp-for="Title" class="form-control"></div>
-        <div class="form-group"><label>Title (English)</label><input asp-for="TitleEn" class="form-control"></div>
-        <div class="form-group"><label>Título (Português)</label><input asp-for="TitlePt" class="form-control"></div>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
-        <div class="form-group"><label>Descripción (ES)</label><textarea asp-for="Description" class="form-control" rows="3"></textarea></div>
-        <div class="form-group"><label>Description (EN)</label><textarea asp-for="DescriptionEn" class="form-control" rows="3"></textarea></div>
-        <div class="form-group"><label>Descrição (PT)</label><textarea asp-for="DescriptionPt" class="form-control" rows="3"></textarea></div>
-    </div>
-
-    <div class="form-group">
-        <label>Contenido (Español)</label>
-        <div class="editor-toolbar">
-            <button type="button" onclick="execCmd('bold')"><b>B</b></button><button type="button" onclick="execCmd('italic')"><i>I</i></button>
-            <button type="button" onclick="execCmd('insertUnorderedList')">☰</button><button type="button" onclick="execCmd('formatBlock','h3')">H3</button>
-            <button type="button" onclick="execCmd('formatBlock','p')">¶</button><button type="button" onclick="insertLink()">🔗</button>
-            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+<form asp-controller="ClubDePaseo" asp-action="Create" method="post" enctype="multipart/form-data">
+    @if (!ViewData.ModelState.IsValid)
+    {
+        <div class="alert alert-error" style="margin-bottom:24px">
+            <div>
+                <strong>Por favor corregí los siguientes errores:</strong>
+                <ul style="margin:8px 0 0 16px;font-size:var(--fs-sm)">
+                    @foreach (var error in ViewData.ModelState.Values.SelectMany(v => v.Errors))
+                    {
+                        <li>@error.ErrorMessage</li>
+                    }
+                </ul>
+            </div>
         </div>
-        <div class="editor-area" contenteditable="true" data-editor-for="Content" id="editor_Content"></div>
-        <textarea asp-for="Content" id="Content" style="display:none"></textarea>
-    </div>
-    <div class="form-group">
-        <label>Content (English)</label>
-        <div class="editor-toolbar">
-            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('bold')"><b>B</b></button><button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('italic')"><i>I</i></button>
-            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('insertUnorderedList')">☰</button><button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','h3')">H3</button>
-            <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','p')">¶</button><button type="button" onclick="insertLink()">🔗</button>
-            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+    }
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:32px;align-items:start">
+        <!-- Main content -->
+        <div>
+            <div class="form-group">
+                <label>Título (Español) *</label>
+                <input asp-for="Title" class="form-control" placeholder="Título de la entrada">
+                <span asp-validation-for="Title" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+            </div>
+            <div class="form-group">
+                <label>Título (English) *</label>
+                <input asp-for="TitleEn" class="form-control" placeholder="Entry title in English">
+                <span asp-validation-for="TitleEn" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+            </div>
+            <div class="form-group">
+                <label>Título (Português)</label>
+                <input asp-for="TitlePt" class="form-control" placeholder="Título da entrada em português">
+                <span asp-validation-for="TitlePt" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+            </div>
+
+            <!-- Spanish content editor -->
+            <div class="form-group">
+                <label>Contenido (Español) *</label>
+                <div class="editor-toolbar">
+                    <button type="button" onclick="execCmd('bold')" title="Bold"><b>B</b></button>
+                    <button type="button" onclick="execCmd('italic')" title="Italic"><i>I</i></button>
+                    <button type="button" onclick="execCmd('underline')" title="Underline"><u>U</u></button>
+                    <button type="button" onclick="execCmd('insertUnorderedList')" title="List">☰</button>
+                    <button type="button" onclick="execCmd('insertOrderedList')" title="Numbered">1.</button>
+                    <button type="button" onclick="execCmd('formatBlock','h3')" title="H3">H3</button>
+                    <button type="button" onclick="execCmd('formatBlock','p')" title="Paragraph">¶</button>
+                    <button type="button" onclick="insertLink()" title="Link">🔗</button>
+                    <button type="button" onclick="execCmd('removeFormat')" title="Clear">✕</button>
+                </div>
+                <div class="editor-area" contenteditable="true" data-editor-for="Content" id="editor_Content"></div>
+                <textarea asp-for="Content" id="Content" style="display:none"></textarea>
+                <span asp-validation-for="Content" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+            </div>
+
+            <!-- English content editor -->
+            <div class="form-group">
+                <label>Content (English) *</label>
+                <div class="editor-toolbar">
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('bold')" title="Bold"><b>B</b></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('italic')" title="Italic"><i>I</i></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('underline')" title="Underline"><u>U</u></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('insertUnorderedList')" title="List">☰</button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('insertOrderedList')" title="Numbered">1.</button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','h3')" title="H3">H3</button>
+                    <button type="button" onclick="document.getElementById('editor_ContentEn').focus();execCmd('formatBlock','p')" title="Paragraph">¶</button>
+                    <button type="button" onclick="insertLink()" title="Link">🔗</button>
+                    <button type="button" onclick="execCmd('removeFormat')" title="Clear">✕</button>
+                </div>
+                <div class="editor-area" contenteditable="true" data-editor-for="ContentEn" id="editor_ContentEn"></div>
+                <textarea asp-for="ContentEn" id="ContentEn" style="display:none"></textarea>
+                <span asp-validation-for="ContentEn" style="color:var(--danger);font-size:var(--fs-xs)"></span>
+            </div>
+
+            <!-- Portuguese content editor -->
+            <div class="form-group">
+                <label>Conteúdo (Português)</label>
+                <div class="editor-toolbar">
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('bold')"><b>B</b></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('italic')"><i>I</i></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('underline')"><u>U</u></button>
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('insertUnorderedList')">☰</button>
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','h3')">H3</button>
+                    <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','p')">¶</button>
+                    <button type="button" onclick="insertLink()">🔗</button>
+                    <button type="button" onclick="execCmd('removeFormat')">✕</button>
+                </div>
+                <div class="editor-area" contenteditable="true" data-editor-for="ContentPt" id="editor_ContentPt"></div>
+                <textarea asp-for="ContentPt" id="ContentPt" style="display:none"></textarea>
+            </div>
         </div>
-        <div class="editor-area" contenteditable="true" data-editor-for="ContentEn" id="editor_ContentEn"></div>
-        <textarea asp-for="ContentEn" id="ContentEn" style="display:none"></textarea>
-    </div>
-    <div class="form-group">
-        <label>Conteúdo (Português)</label>
-        <div class="editor-toolbar">
-            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('bold')"><b>B</b></button><button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('italic')"><i>I</i></button>
-            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('insertUnorderedList')">☰</button><button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','h3')">H3</button>
-            <button type="button" onclick="document.getElementById('editor_ContentPt').focus();execCmd('formatBlock','p')">¶</button><button type="button" onclick="insertLink()">🔗</button>
-            <button type="button" onclick="execCmd('removeFormat')">✕</button>
+
+        <!-- Sidebar -->
+        <div style="position:sticky;top:80px">
+            <div style="background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px">
+                <h4 style="font-family:var(--font-display);margin-bottom:16px">Entrada</h4>
+
+                <div class="form-group">
+                    <label>Fecha de publicación</label>
+                    <input asp-for="PublishDate" type="datetime-local" class="form-control" value="@Model.PublishDate.ToString("yyyy-MM-ddTHH:mm")">
+                </div>
+
+                <div class="form-group">
+                    <label>Categoría</label>
+                    <select asp-for="Category" class="form-control">
+                        <option value="">— Sin categoría —</option>
+                        <option value="itinerarios">Itinerarios</option>
+                        <option value="personal">Personal</option>
+                        <option value="recomendaciones">Recomendaciones</option>
+                        <option value="viajes">Viajes</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+                        <input asp-for="IsPublished" type="checkbox" checked style="width:18px;height:18px;accent-color:var(--teal)">
+                        Publicar
+                    </label>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px">
+                <h4 style="font-family:var(--font-display);margin-bottom:16px">Imagen</h4>
+                <div class="form-group">
+                    <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="imgPreview" style="font-size:var(--fs-sm)">
+                </div>
+                <img id="imgPreview" src="" alt="" style="display:none;width:100%;border-radius:var(--radius);margin-top:8px">
+            </div>
+
+            <div style="background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px">
+                <h4 style="font-family:var(--font-display);margin-bottom:16px">Extracto</h4>
+                <div class="form-group">
+                    <label>Español</label>
+                    <textarea asp-for="Excerpt" class="form-control" rows="2" placeholder="Resumen breve..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>English</label>
+                    <textarea asp-for="ExcerptEn" class="form-control" rows="2" placeholder="Brief summary..."></textarea>
+                </div>
+                <div class="form-group">
+                    <label>Português</label>
+                    <textarea asp-for="ExcerptPt" class="form-control" rows="2" placeholder="Resumo breve..."></textarea>
+                </div>
+            </div>
+
+            <div style="background:var(--bg-card);border:1px solid var(--ink-10);border-radius:var(--radius-lg);padding:24px;margin-bottom:20px">
+                <h4 style="font-family:var(--font-display);margin-bottom:16px">Ubicación</h4>
+                <div class="form-group">
+                    <label>Nombre (ES)</label>
+                    <input asp-for="LocationName" class="form-control" placeholder="Ej: Ciudad Vieja, Montevideo">
+                </div>
+                <div class="form-group">
+                    <label>Name (EN)</label>
+                    <input asp-for="LocationNameEn" class="form-control" placeholder="Eg: Old Town, Montevideo">
+                </div>
+                <div class="form-group">
+                    <label>Nome (PT)</label>
+                    <input asp-for="LocationNamePt" class="form-control" placeholder="Ex: Cidade Velha, Montevidéu">
+                </div>
+                <div class="form-group">
+                    <label>Google Maps Embed URL</label>
+                    <input asp-for="MapEmbedUrl" class="form-control" placeholder="https://www.google.com/maps/embed?pb=...">
+                    <p class="form-hint">Ir a Google Maps → Compartir → Insertar mapa → copiar URL del src del iframe</p>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-teal" style="width:100%;justify-content:center">
+                Crear Entrada
+            </button>
+            <a href="/ClubDePaseo/Manage" class="btn btn-outline" style="width:100%;justify-content:center;margin-top:8px">Cancelar</a>
         </div>
-        <div class="editor-area" contenteditable="true" data-editor-for="ContentPt" id="editor_ContentPt"></div>
-        <textarea asp-for="ContentPt" id="ContentPt" style="display:none"></textarea>
-    </div>
-
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:16px">
-        <div class="form-group"><label>Duración (ES)</label><input asp-for="Duration" class="form-control" placeholder="Todo el día"></div>
-        <div class="form-group"><label>Duration (EN)</label><input asp-for="DurationEn" class="form-control" placeholder="Full day"></div>
-        <div class="form-group"><label>Duração (PT)</label><input asp-for="DurationPt" class="form-control" placeholder="Dia inteiro"></div>
-        <div class="form-group"><label>Distancia</label><input asp-for="Distance" class="form-control" placeholder="~12 km"></div>
-    </div>
-
-    <div class="form-group"><label>Google Maps Embed URL</label><input asp-for="MapEmbedUrl" class="form-control"></div>
-
-    <div class="form-group">
-        <label>Imagen</label>
-        <input type="file" name="imageFile" accept="image/*" class="form-control" data-preview="entryImg" style="font-size:var(--fs-sm)">
-        <img id="entryImg" src="" alt="" style="display:none;width:100%;max-width:400px;border-radius:var(--radius);margin-top:12px">
-    </div>
-
-    <div class="form-group">
-        <label style="display:flex;align-items:center;gap:8px;cursor:pointer">
-            <input asp-for="IsPublished" type="checkbox" checked style="width:18px;height:18px;accent-color:var(--teal)"> Publicar
-        </label>
-    </div>
-
-    <div style="display:flex;gap:12px;margin-top:24px">
-        <button type="submit" class="btn btn-teal">Crear Entrada</button>
-        <a href="/ClubDePaseo/Manage" class="btn btn-outline">Cancelar</a>
     </div>
 </form>

@@ -1,4 +1,6 @@
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Models;
 
 namespace PasearPorPasear.Data;
@@ -12,7 +14,17 @@ public static class DbSeeder
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
+        // Create the schema (or no-op if DB already exists at the level of EnsureCreated).
         await ctx.Database.EnsureCreatedAsync();
+
+        // Idempotently add new columns for in-DB image storage on existing databases.
+        // This is critical because EnsureCreated does NOT alter existing tables.
+        await EnsureImageColumnsAsync(ctx);
+
+        // One-time cleanup: orphaned ImagePaths pointing at /uploads/* (filesystem-stored
+        // images that may not exist on the host). The next admin re-upload will store
+        // the image in the DB instead.
+        await CleanOrphanedUploadPathsAsync(ctx);
 
         if (!await roleMgr.RoleExistsAsync("Admin"))
             await roleMgr.CreateAsync(new IdentityRole("Admin"));
@@ -32,14 +44,14 @@ public static class DbSeeder
             {
                 Title = "Sobre Mí", TitleEn = "About Me", TitlePt = "Sobre Mim",
                 Content = @"<p>¡Hola! Soy <strong>Rosalía Souza</strong>, creadora de <em>Pasear por Pasear</em>.</p>
-<p>Montevideo es mi ciudad y mi pasión. Este proyecto nació de la convicción de que la mejor manera de conocer un lugar es a pie, sin prisa, dejándose sorprender.</p>
-<p>Soy guía de turismo certificada, fotógrafa aficionada y eterna curiosa de la historia montevideana.</p>",
+<p>Este proyecto nació de la convicción de que la mejor manera de conocer un lugar es a pie, sin prisa, dejándose sorprender.</p>
+<p>Soy una eterna curiosa de la historia montevideana.</p>",
                 ContentEn = @"<p>Hi! I'm <strong>Rosalía Souza</strong>, creator of <em>Pasear por Pasear</em>.</p>
-<p>Montevideo is my city and my passion. This project was born from the conviction that the best way to know a place is on foot, unhurried, letting yourself be surprised.</p>
-<p>I'm a certified tour guide, amateur photographer, and an eternal curious about Montevideo's history.</p>",
+<p>This project was born from the conviction that the best way to know a place is on foot, unhurried, letting yourself be surprised.</p>
+<p>I'm an eternal curious about Montevideo's history.</p>",
                 ContentPt = @"<p>Olá! Sou <strong>Rosalía Souza</strong>, criadora do <em>Pasear por Pasear</em>.</p>
-<p>Montevidéu é minha cidade e minha paixão. Este projeto nasceu da convicção de que a melhor maneira de conhecer um lugar é a pé, sem pressa, deixando-se surpreender.</p>
-<p>Sou guia de turismo certificada, fotógrafa amadora e eterna curiosa sobre a história de Montevidéu.</p>",
+<p>Este projeto nasceu da convicção de que a melhor maneira de conhecer um lugar é a pé, sem pressa, deixando-se surpreender.</p>
+<p>Sou uma eterna curiosa sobre a história de Montevidéu.</p>",
                 ImagePath = "/images/sobremi.jpg"
             });
         }
@@ -60,70 +72,6 @@ public static class DbSeeder
                 <p>Aqui publicamos os roteiros que já realizamos, com fotos, mapas e tudo o que descobrimos em cada caminhada.</p>",
                 ImagePath = "/images/clubdepaseo.jpg"
             });
-        }
-
-        // ── Blog Posts ──
-        if (!ctx.BlogPosts.Any())
-        {
-            ctx.BlogPosts.AddRange(
-                new BlogPost
-                {
-                    Title = "Publicación 1",
-                    TitleEn = "Post 1",
-                    TitlePt = "publicação 1",
-                    Slug = "post-1",
-                    Content = @"<p>Contenido.</p>",
-                    ContentEn = @"<p>Content.</p>",
-                    ContentPt = @"<p>Conteúdo.</p>",
-                    Excerpt = "Resumen.",
-                    ExcerptEn = "Summary.",
-                    ExcerptPt = "Resume.",
-                    ImagePath = "/images/pasearporpasear.jpg",
-                    PublishDate = DateTime.Now.AddDays(-2),
-                    LocationName = "Locación",
-                    LocationNameEn = "Location",
-                    LocationNamePt = "localização",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
-                },
-                new BlogPost
-                {
-                    Title = "Publicación 2",
-                    TitleEn = "Post 2",
-                    TitlePt = "publicação 2",
-                    Slug = "post-2",
-                    Content = @"<p>Contenido.</p>",
-                    ContentEn = @"<p>Content.</p>",
-                    ContentPt = @"<p>Conteúdo.</p>",
-                    Excerpt = "Resumen.",
-                    ExcerptEn = "Summary.",
-                    ExcerptPt = "Resume.",
-                    ImagePath = "/images/pasearporpasear.jpg",
-                    PublishDate = DateTime.Now.AddDays(-2),
-                    LocationName = "Locación",
-                    LocationNameEn = "Location",
-                    LocationNamePt = "localização",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
-                },
-                new BlogPost
-                {
-                    Title = "Publicación 3",
-                    TitleEn = "Post 3",
-                    TitlePt = "publicação 3",
-                    Slug = "post-3",
-                    Content = @"<p>Contenido.</p>",
-                    ContentEn = @"<p>Content.</p>",
-                    ContentPt = @"<p>Conteúdo.</p>",
-                    Excerpt = "Resumen.",
-                    ExcerptEn = "Summary.",
-                    ExcerptPt = "Resume.",
-                    ImagePath = "/images/pasearporpasear.jpg",
-                    PublishDate = DateTime.Now.AddDays(-2),
-                    LocationName = "Locación",
-                    LocationNameEn = "Location",
-                    LocationNamePt = "localização",
-                    MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d419185.17458825966!2d-56.52712040995068!3d-34.834004533391145!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0x6b321b2e355bec99!2sMontevideo%2C%20Departamento%20de%20Montevideo!5e0!3m2!1ses-419!2suy!4v1777158936633!5m2!1ses-419!2suy"
-                }
-            );
         }
 
         // ── Tours ──
@@ -182,7 +130,7 @@ public static class DbSeeder
                     MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
                     PublishDate = DateTime.Now,
                     IsPublished = true,
-                    ImagePath = "/images/pasearporpasear.jpg",
+                    ImagePath = "/images/prueba-1.jpg",
                 },
                 new ClubDePaseoEntry
                 {
@@ -203,7 +151,7 @@ public static class DbSeeder
                     MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
                     PublishDate = DateTime.Now,
                     IsPublished = true,
-                    ImagePath = "/images/pasearporpasear.jpg",
+                    ImagePath = "/images/prueba-2.jpg",
                 },
                 new ClubDePaseoEntry
                 {
@@ -224,7 +172,7 @@ public static class DbSeeder
                     MapEmbedUrl = "https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d104769.34!2d-56.2156!3d-34.9011!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x959f80ffc63bf7d3%3A0xc63b2110d426a3ae!2sMontevideo!5e0!3m2!1ses!2suy!4v1700000000000",
                     PublishDate = DateTime.Now,
                     IsPublished = true,
-                    ImagePath = "/images/pasearporpasear.jpg",
+                    ImagePath = "/images/prueba-3.jpg",
                 }
             );
         }
@@ -234,12 +182,78 @@ public static class DbSeeder
         {
             ctx.SiteSettings.AddRange(
                 new SiteSetting { Key = "HomeHeroTitle", Value = "Pasear por Pasear", ValueEn = "Pasear por Pasear", ValuePt = "Pasear por Pasear" },
-                new SiteSetting { Key = "HomeHeroSubtitle", Value = "Descubrí Montevideo a pie, sin prisa.", ValueEn = "Discover Montevideo on foot, unhurried.", ValuePt = "Descubra Montevidéu a pé, sem pressa." },
+                new SiteSetting { Key = "HomeHeroSubtitle", Value = "Aprendiendo y compartiendo sobre mirar Montevideo.", ValueEn = "Learning and sharing perspectives on Montevideo.", ValuePt = "Aprendendo e compartilhando olhares sobre Montevidéu." },
                 new SiteSetting { Key = "HomeIntro", Value = "Bienvenidos a Pasear por Pasear, un espacio dedicado a explorar Montevideo paso a paso.", ValueEn = "Welcome to Pasear por Pasear, a space dedicated to exploring Montevideo step by step.", ValuePt = "Bem-vindos ao Pasear por Pasear, um espaço dedicado a explorar Montevidéu passo a passo." },
                 new SiteSetting { Key = "MailchimpFormUrl", Value = "", ValueEn = "", ValuePt = "" }
             );
         }
 
         await ctx.SaveChangesAsync();
+    }
+
+    // Adds ImageData / ImageContentType columns to existing tables if they're missing.
+    // Uses raw SQL via SQLite's PRAGMA so it works even when EnsureCreated decides "DB exists, no-op".
+    private static async Task EnsureImageColumnsAsync(ApplicationDbContext ctx)
+    {
+        var connection = ctx.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
+
+        var tables = new (string Table, string Column, string Type)[]
+        {
+            ("BlogPosts",          "ImageData",        "BLOB"),
+            ("BlogPosts",          "ImageContentType", "TEXT"),
+            ("ClubDePaseoEntries", "ImageData",        "BLOB"),
+            ("ClubDePaseoEntries", "ImageContentType", "TEXT"),
+            ("ClubDePaseoPages",   "ImageData",        "BLOB"),
+            ("ClubDePaseoPages",   "ImageContentType", "TEXT"),
+            ("AboutPages",         "ImageData",        "BLOB"),
+            ("AboutPages",         "ImageContentType", "TEXT"),
+            ("Tours",              "ImageData",        "BLOB"),
+            ("Tours",              "ImageContentType", "TEXT"),
+        };
+
+        foreach (var (table, column, type) in tables)
+        {
+            if (!await ColumnExistsAsync(connection, table, column))
+            {
+                using var cmd = connection.CreateCommand();
+                cmd.CommandText = $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {type} NULL;";
+                await cmd.ExecuteNonQueryAsync();
+            }
+        }
+    }
+
+    private static async Task<bool> ColumnExistsAsync(System.Data.Common.DbConnection conn, string table, string column)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText = $"PRAGMA table_info(\"{table}\");";
+        using var reader = await cmd.ExecuteReaderAsync();
+        while (await reader.ReadAsync())
+        {
+            // PRAGMA columns: cid, name, type, notnull, dflt_value, pk
+            var name = reader.GetString(1);
+            if (string.Equals(name, column, StringComparison.OrdinalIgnoreCase)) return true;
+        }
+        return false;
+    }
+
+    // Reset ImagePath to NULL on rows that point to /uploads/ but have no ImageData blob.
+    // These are the "broken image" rows from the filesystem-storage era.
+    private static async Task CleanOrphanedUploadPathsAsync(ApplicationDbContext ctx)
+    {
+        var connection = ctx.Database.GetDbConnection();
+        if (connection.State != System.Data.ConnectionState.Open)
+            await connection.OpenAsync();
+
+        var tables = new[] { "BlogPosts", "ClubDePaseoEntries", "ClubDePaseoPages", "AboutPages", "Tours" };
+        foreach (var t in tables)
+        {
+            using var cmd = connection.CreateCommand();
+            cmd.CommandText =
+                $"UPDATE \"{t}\" SET \"ImagePath\" = NULL " +
+                $"WHERE \"ImagePath\" LIKE '/uploads/%' AND (\"ImageData\" IS NULL OR length(\"ImageData\") = 0);";
+            await cmd.ExecuteNonQueryAsync();
+        }
     }
 }

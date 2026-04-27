@@ -22,6 +22,7 @@ public class BlogController : Controller
     public async Task<IActionResult> Index(string? category = null, int page = 1)
     {
         const int pageSize = 6;
+        // Project without ImageData to avoid loading binary blobs into the listing.
         var query = _ctx.BlogPosts
             .Where(p => p.IsPublished)
             .AsQueryable();
@@ -37,6 +38,24 @@ public class BlogController : Controller
         var posts = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(p => new BlogPost
+            {
+                Id = p.Id,
+                Title = p.Title,
+                TitleEn = p.TitleEn,
+                TitlePt = p.TitlePt,
+                Slug = p.Slug,
+                Excerpt = p.Excerpt,
+                ExcerptEn = p.ExcerptEn,
+                ExcerptPt = p.ExcerptPt,
+                ImagePath = p.ImagePath,
+                PublishDate = p.PublishDate,
+                IsPublished = p.IsPublished,
+                Category = p.Category,
+                LocationName = p.LocationName,
+                LocationNameEn = p.LocationNameEn,
+                LocationNamePt = p.LocationNamePt
+            })
             .ToListAsync();
 
         ViewBag.CurrentPage = page;
@@ -59,7 +78,19 @@ public class BlogController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Manage()
     {
-        var posts = await _ctx.BlogPosts.OrderByDescending(p => p.PublishDate).ToListAsync();
+        var posts = await _ctx.BlogPosts
+            .OrderByDescending(p => p.PublishDate)
+            .Select(p => new BlogPost
+            {
+                Id = p.Id,
+                Title = p.Title,
+                Slug = p.Slug,
+                ImagePath = p.ImagePath,
+                PublishDate = p.PublishDate,
+                IsPublished = p.IsPublished,
+                Category = p.Category
+            })
+            .ToListAsync();
         return View(posts);
     }
 
@@ -74,23 +105,32 @@ public class BlogController : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(BlogPost post, IFormFile? imageFile)
     {
-        // Slug is auto-generated, remove from validation
         ModelState.Remove("Slug");
 
         if (!ModelState.IsValid) return View(post);
 
         post.Slug = SlugHelper.GenerateSlug(post.Title);
 
-        // Check unique slug
         if (await _ctx.BlogPosts.AnyAsync(p => p.Slug == post.Slug))
             post.Slug += "-" + DateTime.Now.Ticks.ToString()[^6..];
 
-        var imagePath = await _upload.UploadImageAsync(imageFile);
-        if (imagePath is not null) post.ImagePath = imagePath;
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            post.ImageData = img.Data;
+            post.ImageContentType = img.ContentType;
+        }
 
         post.CreatedAt = DateTime.Now;
         _ctx.BlogPosts.Add(post);
         await _ctx.SaveChangesAsync();
+
+        // Now that we have the Id, set ImagePath to the controller URL.
+        if (img is not null)
+        {
+            post.ImagePath = $"/Images/Blog/{post.Id}";
+            await _ctx.SaveChangesAsync();
+        }
 
         TempData["Success"] = "Publicación creada exitosamente.";
         return RedirectToAction(nameof(Manage));
@@ -140,11 +180,12 @@ public class BlogController : Controller
             existing.Slug = SlugHelper.GenerateSlug(post.Slug);
         }
 
-        var imagePath = await _upload.UploadImageAsync(imageFile);
-        if (imagePath is not null)
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
         {
-            _upload.DeleteImage(existing.ImagePath);
-            existing.ImagePath = imagePath;
+            existing.ImageData = img.Data;
+            existing.ImageContentType = img.ContentType;
+            existing.ImagePath = $"/Images/Blog/{existing.Id}";
         }
 
         await _ctx.SaveChangesAsync();
@@ -160,7 +201,6 @@ public class BlogController : Controller
         var post = await _ctx.BlogPosts.FindAsync(id);
         if (post is null) return NotFound();
 
-        _upload.DeleteImage(post.ImagePath);
         _ctx.BlogPosts.Remove(post);
         await _ctx.SaveChangesAsync();
 

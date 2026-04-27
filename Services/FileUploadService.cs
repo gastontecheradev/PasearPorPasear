@@ -1,40 +1,30 @@
 namespace PasearPorPasear.Services;
 
+public record UploadedImage(byte[] Data, string ContentType);
+
 public class FileUploadService
 {
-    private readonly IWebHostEnvironment _env;
-
-    public FileUploadService(IWebHostEnvironment env)
+    private static readonly Dictionary<string, string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
-        _env = env;
-    }
+        [".jpg"] = "image/jpeg",
+        [".jpeg"] = "image/jpeg",
+        [".png"] = "image/png",
+        [".gif"] = "image/gif",
+        [".webp"] = "image/webp"
+    };
 
-    public async Task<string?> UploadImageAsync(IFormFile? file, string folder = "uploads")
+    // Read the uploaded file fully into memory and return bytes + content type.
+    // Returns null if no file, empty file, or unsupported extension.
+    public async Task<UploadedImage?> ReadImageAsync(IFormFile? file)
     {
         if (file is null || file.Length == 0) return null;
 
-        var allowed = new[] { ".jpg", ".jpeg", ".png", ".gif", ".webp" };
-        var ext = Path.GetExtension(file.FileName).ToLowerInvariant();
-        if (!allowed.Contains(ext)) return null;
+        var ext = Path.GetExtension(file.FileName);
+        if (string.IsNullOrEmpty(ext) || !AllowedExtensions.TryGetValue(ext, out var contentType))
+            return null;
 
-        var uploadsDir = Path.Combine(_env.WebRootPath, folder);
-        Directory.CreateDirectory(uploadsDir);
-
-        var fileName = $"{Guid.NewGuid()}{ext}";
-        var filePath = Path.Combine(uploadsDir, fileName);
-
-        using var stream = new FileStream(filePath, FileMode.Create);
-        await file.CopyToAsync(stream);
-
-        return $"/{folder}/{fileName}";
-    }
-
-    public void DeleteImage(string? imagePath)
-    {
-        if (string.IsNullOrEmpty(imagePath) || imagePath.StartsWith("http")) return;
-
-        var fullPath = Path.Combine(_env.WebRootPath, imagePath.TrimStart('/'));
-        if (File.Exists(fullPath))
-            File.Delete(fullPath);
+        using var ms = new MemoryStream();
+        await file.CopyToAsync(ms);
+        return new UploadedImage(ms.ToArray(), contentType);
     }
 }

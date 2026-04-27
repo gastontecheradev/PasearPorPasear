@@ -18,14 +18,35 @@ public class ToursController : Controller
         _upload = upload;
     }
 
-    // GET: /Tours
+    // GET: /Tours — light projection, no ImageData
     public async Task<IActionResult> Index()
     {
-        var tours = await _ctx.Tours.Where(t => t.IsActive).OrderBy(t => t.Name).ToListAsync();
+        var tours = await _ctx.Tours
+            .Where(t => t.IsActive)
+            .OrderBy(t => t.Name)
+            .Select(t => new Tour
+            {
+                Id = t.Id,
+                Name = t.Name,
+                NameEn = t.NameEn,
+                NamePt = t.NamePt,
+                Slug = t.Slug,
+                Description = t.Description,
+                DescriptionEn = t.DescriptionEn,
+                DescriptionPt = t.DescriptionPt,
+                ImagePath = t.ImagePath,
+                Duration = t.Duration,
+                DurationEn = t.DurationEn,
+                DurationPt = t.DurationPt,
+                Price = t.Price,
+                MeetingPoint = t.MeetingPoint,
+                MaxParticipants = t.MaxParticipants,
+                IsActive = t.IsActive
+            })
+            .ToListAsync();
         return View(tours);
     }
 
-    // GET: /Tours/Detail/{slug}
     [Route("Tours/Detail/{slug}")]
     public async Task<IActionResult> Detail(string slug)
     {
@@ -35,7 +56,6 @@ public class ToursController : Controller
         return View(tour);
     }
 
-    // POST: /Tours/Reserve
     [HttpPost]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Reserve(TourReservation reservation)
@@ -64,7 +84,19 @@ public class ToursController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Manage()
     {
-        var tours = await _ctx.Tours.OrderBy(t => t.Name).ToListAsync();
+        var tours = await _ctx.Tours
+            .OrderBy(t => t.Name)
+            .Select(t => new Tour
+            {
+                Id = t.Id,
+                Name = t.Name,
+                Slug = t.Slug,
+                ImagePath = t.ImagePath,
+                Price = t.Price,
+                MaxParticipants = t.MaxParticipants,
+                IsActive = t.IsActive
+            })
+            .ToListAsync();
         return View(tours);
     }
 
@@ -86,12 +118,22 @@ public class ToursController : Controller
         if (await _ctx.Tours.AnyAsync(t => t.Slug == tour.Slug))
             tour.Slug += "-" + DateTime.Now.Ticks.ToString()[^6..];
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) tour.ImagePath = img;
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            tour.ImageData = img.Data;
+            tour.ImageContentType = img.ContentType;
+        }
 
         tour.CreatedAt = DateTime.Now;
         _ctx.Tours.Add(tour);
         await _ctx.SaveChangesAsync();
+
+        if (img is not null)
+        {
+            tour.ImagePath = $"/Images/Tour/{tour.Id}";
+            await _ctx.SaveChangesAsync();
+        }
 
         TempData["Success"] = "Tour creado.";
         return RedirectToAction(nameof(Manage));
@@ -134,8 +176,13 @@ public class ToursController : Controller
         existing.IsActive = tour.IsActive;
         existing.UpdatedAt = DateTime.Now;
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) { _upload.DeleteImage(existing.ImagePath); existing.ImagePath = img; }
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            existing.ImageData = img.Data;
+            existing.ImageContentType = img.ContentType;
+            existing.ImagePath = $"/Images/Tour/{existing.Id}";
+        }
 
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Tour actualizado.";
@@ -149,7 +196,6 @@ public class ToursController : Controller
     {
         var tour = await _ctx.Tours.Include(t => t.Reservations).FirstOrDefaultAsync(t => t.Id == id);
         if (tour is null) return NotFound();
-        _upload.DeleteImage(tour.ImagePath);
         _ctx.Tours.Remove(tour);
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Tour eliminado.";

@@ -51,20 +51,29 @@
             <div class="cards-grid">
                 @foreach (var entry in Model)
                 {
-                    <a href="/ClubDePaseo/Detail/@entry.Slug" class="card reveal">
-                        <div class="card-img-wrap">
-                            <img src="@(entry.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)" class="card-img" loading="lazy">
-                        </div>
-                        <div class="card-body">
-                            <span class="card-tag">@(isEn ? entry.LocationNameEn ?? "Montevideo" : isPt ? entry.LocationNamePt ?? "Montevidéu" : entry.LocationName ?? "Montevideo")</span>
-                            <h3 class="card-title">@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)</h3>
-                            <p class="card-text">@(isPt ? entry.ExcerptPt : isEn ? entry.ExcerptEn : entry.Excerpt)</p>
-                        </div>
-                        <div class="card-footer">
-                            <span class="card-date">@entry.PublishDate.ToString("dd MMM yyyy")</span>
-                            <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
-                        </div>
-                    </a>
+                    <div class="card-wrap reveal">
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <a href="/ClubDePaseo/Edit/@entry.Id" class="card-edit-btn" title="@(isPt ? "Editar" : isEn ? "Edit" : "Editar")" onclick="event.stopPropagation()">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                                @(isPt ? "Editar" : isEn ? "Edit" : "Editar")
+                            </a>
+                        }
+                        <a href="/ClubDePaseo/Detail/@entry.Slug" class="card">
+                            <div class="card-img-wrap">
+                                <img src="@(entry.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)" class="card-img" loading="lazy">
+                            </div>
+                            <div class="card-body">
+                                <span class="card-tag">@(isEn ? entry.LocationNameEn ?? "Montevideo" : isPt ? entry.LocationNamePt ?? "Montevidéu" : entry.LocationName ?? "Montevideo")</span>
+                                <h3 class="card-title">@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)</h3>
+                                <p class="card-text">@(isPt ? entry.ExcerptPt : isEn ? entry.ExcerptEn : entry.Excerpt)</p>
+                            </div>
+                            <div class="card-footer">
+                                <span class="card-date">@entry.PublishDate.ToString("dd MMM yyyy")</span>
+                                <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
+                            </div>
+                        </a>
+                    </div>
                 }
             </div>
 

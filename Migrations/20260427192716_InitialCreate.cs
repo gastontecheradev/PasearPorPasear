@@ -24,6 +24,8 @@ namespace PasearPorPasear.Migrations
                     ContentEn = table.Column<string>(type: "TEXT", nullable: false),
                     ContentPt = table.Column<string>(type: "TEXT", nullable: false),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ImageContentType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -87,6 +89,8 @@ namespace PasearPorPasear.Migrations
                     ExcerptEn = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     ExcerptPt = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ImageContentType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     PublishDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -119,6 +123,8 @@ namespace PasearPorPasear.Migrations
                     ExcerptEn = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     ExcerptPt = table.Column<string>(type: "TEXT", maxLength: 500, nullable: true),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ImageContentType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     PublishDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CreatedAt = table.Column<DateTime>(type: "TEXT", nullable: false),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: true),
@@ -147,6 +153,8 @@ namespace PasearPorPasear.Migrations
                     ContentEn = table.Column<string>(type: "TEXT", nullable: false),
                     ContentPt = table.Column<string>(type: "TEXT", nullable: false),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ImageContentType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     UpdatedAt = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
@@ -218,6 +226,8 @@ namespace PasearPorPasear.Migrations
                     DescriptionEn = table.Column<string>(type: "TEXT", nullable: false),
                     DescriptionPt = table.Column<string>(type: "TEXT", nullable: false),
                     ImagePath = table.Column<string>(type: "TEXT", nullable: true),
+                    ImageData = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    ImageContentType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     Duration = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     DurationEn = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     DurationPt = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),

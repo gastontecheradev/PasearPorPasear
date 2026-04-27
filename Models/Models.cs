@@ -34,6 +34,12 @@ public class BlogPost
     public string? ExcerptPt { get; set; }
 
     public string? ImagePath { get; set; }
+
+    // Image stored in DB (for portability across hosts that block writes to wwwroot)
+    public byte[]? ImageData { get; set; }
+    [StringLength(100)]
+    public string? ImageContentType { get; set; }
+
     public DateTime PublishDate { get; set; } = DateTime.Now;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
@@ -65,6 +71,8 @@ public class ClubDePaseoPage
     public string ContentEn { get; set; } = string.Empty;
     public string ContentPt { get; set; } = string.Empty;
     public string? ImagePath { get; set; }
+    public byte[]? ImageData { get; set; }
+    [StringLength(100)] public string? ImageContentType { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }
 
@@ -81,6 +89,8 @@ public class AboutPage
     public string ContentEn { get; set; } = string.Empty;
     public string ContentPt { get; set; } = string.Empty;
     public string? ImagePath { get; set; }
+    public byte[]? ImageData { get; set; }
+    [StringLength(100)] public string? ImageContentType { get; set; }
     public DateTime UpdatedAt { get; set; } = DateTime.Now;
 }
 
@@ -116,6 +126,8 @@ public class ClubDePaseoEntry
     public string? ExcerptPt { get; set; }
 
     public string? ImagePath { get; set; }
+    public byte[]? ImageData { get; set; }
+    [StringLength(100)] public string? ImageContentType { get; set; }
     public DateTime PublishDate { get; set; } = DateTime.Now;
     public DateTime CreatedAt { get; set; } = DateTime.Now;
     public DateTime? UpdatedAt { get; set; }
@@ -154,6 +166,8 @@ public class Tour
     public string DescriptionPt { get; set; } = string.Empty;
 
     public string? ImagePath { get; set; }
+    public byte[]? ImageData { get; set; }
+    [StringLength(100)] public string? ImageContentType { get; set; }
     [StringLength(100)] public string? Duration { get; set; }
     [StringLength(100)] public string? DurationEn { get; set; }
     [StringLength(100)] public string? DurationPt { get; set; }

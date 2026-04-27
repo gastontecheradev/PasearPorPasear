@@ -21,10 +21,23 @@ public class ClubDePaseoController : Controller
         _upload = upload;
     }
 
-    // Public: shows page intro + list of entries
     public async Task<IActionResult> Index(string? category = null, int page = 1)
     {
-        ViewBag.Page = await _ctx.ClubDePaseoPages.FirstOrDefaultAsync();
+        // Lightweight projection of the page (no ImageData blob)
+        ViewBag.Page = await _ctx.ClubDePaseoPages
+            .Select(p => new ClubDePaseoPage
+            {
+                Id = p.Id,
+                Title = p.Title,
+                TitleEn = p.TitleEn,
+                TitlePt = p.TitlePt,
+                Content = p.Content,
+                ContentEn = p.ContentEn,
+                ContentPt = p.ContentPt,
+                ImagePath = p.ImagePath,
+                UpdatedAt = p.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
 
         const int pageSize = 6;
         var query = _ctx.ClubDePaseoEntries
@@ -42,6 +55,24 @@ public class ClubDePaseoController : Controller
         var entries = await query
             .Skip((page - 1) * pageSize)
             .Take(pageSize)
+            .Select(e => new ClubDePaseoEntry
+            {
+                Id = e.Id,
+                Title = e.Title,
+                TitleEn = e.TitleEn,
+                TitlePt = e.TitlePt,
+                Slug = e.Slug,
+                Excerpt = e.Excerpt,
+                ExcerptEn = e.ExcerptEn,
+                ExcerptPt = e.ExcerptPt,
+                ImagePath = e.ImagePath,
+                PublishDate = e.PublishDate,
+                IsPublished = e.IsPublished,
+                Category = e.Category,
+                LocationName = e.LocationName,
+                LocationNameEn = e.LocationNameEn,
+                LocationNamePt = e.LocationNamePt
+            })
             .ToListAsync();
 
         ViewBag.CurrentPage = page;
@@ -50,7 +81,6 @@ public class ClubDePaseoController : Controller
         return View(entries);
     }
 
-    // Public: detail of a single entry
     [Route("ClubDePaseo/Detail/{slug}")]
     public async Task<IActionResult> Detail(string slug)
     {
@@ -84,8 +114,13 @@ public class ClubDePaseoController : Controller
         existing.ContentPt = page.ContentPt;
         existing.UpdatedAt = DateTime.Now;
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) { _upload.DeleteImage(existing.ImagePath); existing.ImagePath = img; }
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            existing.ImageData = img.Data;
+            existing.ImageContentType = img.ContentType;
+            existing.ImagePath = $"/Images/ClubPage/{existing.Id}";
+        }
 
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Página actualizada.";
@@ -97,7 +132,19 @@ public class ClubDePaseoController : Controller
     [Authorize(Roles = "Admin")]
     public async Task<IActionResult> Manage()
     {
-        var entries = await _ctx.ClubDePaseoEntries.OrderByDescending(e => e.PublishDate).ToListAsync();
+        var entries = await _ctx.ClubDePaseoEntries
+            .OrderByDescending(e => e.PublishDate)
+            .Select(e => new ClubDePaseoEntry
+            {
+                Id = e.Id,
+                Title = e.Title,
+                Slug = e.Slug,
+                ImagePath = e.ImagePath,
+                PublishDate = e.PublishDate,
+                IsPublished = e.IsPublished,
+                Category = e.Category
+            })
+            .ToListAsync();
         return View(entries);
     }
 
@@ -114,12 +161,22 @@ public class ClubDePaseoController : Controller
         if (await _ctx.ClubDePaseoEntries.AnyAsync(e => e.Slug == entry.Slug))
             entry.Slug += "-" + DateTime.Now.Ticks.ToString()[^6..];
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) entry.ImagePath = img;
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            entry.ImageData = img.Data;
+            entry.ImageContentType = img.ContentType;
+        }
 
         entry.CreatedAt = DateTime.Now;
         _ctx.ClubDePaseoEntries.Add(entry);
         await _ctx.SaveChangesAsync();
+
+        if (img is not null)
+        {
+            entry.ImagePath = $"/Images/ClubEntry/{entry.Id}";
+            await _ctx.SaveChangesAsync();
+        }
 
         TempData["Success"] = "Entrada creada.";
         return RedirectToAction(nameof(Manage));
@@ -161,8 +218,13 @@ public class ClubDePaseoController : Controller
         existing.Category = entry.Category;
         existing.UpdatedAt = DateTime.Now;
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) { _upload.DeleteImage(existing.ImagePath); existing.ImagePath = img; }
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            existing.ImageData = img.Data;
+            existing.ImageContentType = img.ContentType;
+            existing.ImagePath = $"/Images/ClubEntry/{existing.Id}";
+        }
 
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Entrada actualizada.";
@@ -174,7 +236,6 @@ public class ClubDePaseoController : Controller
     {
         var entry = await _ctx.ClubDePaseoEntries.FindAsync(id);
         if (entry is null) return NotFound();
-        _upload.DeleteImage(entry.ImagePath);
         _ctx.ClubDePaseoEntries.Remove(entry);
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Entrada eliminada.";
@@ -198,7 +259,20 @@ public class AboutController : Controller
 
     public async Task<IActionResult> Index()
     {
-        var page = await _ctx.AboutPages.FirstOrDefaultAsync();
+        var page = await _ctx.AboutPages
+            .Select(p => new AboutPage
+            {
+                Id = p.Id,
+                Title = p.Title,
+                TitleEn = p.TitleEn,
+                TitlePt = p.TitlePt,
+                Content = p.Content,
+                ContentEn = p.ContentEn,
+                ContentPt = p.ContentPt,
+                ImagePath = p.ImagePath,
+                UpdatedAt = p.UpdatedAt
+            })
+            .FirstOrDefaultAsync();
         return View(page);
     }
 
@@ -225,8 +299,13 @@ public class AboutController : Controller
         existing.ContentPt = page.ContentPt;
         existing.UpdatedAt = DateTime.Now;
 
-        var img = await _upload.UploadImageAsync(imageFile);
-        if (img is not null) { _upload.DeleteImage(existing.ImagePath); existing.ImagePath = img; }
+        var img = await _upload.ReadImageAsync(imageFile);
+        if (img is not null)
+        {
+            existing.ImageData = img.Data;
+            existing.ImageContentType = img.ContentType;
+            existing.ImagePath = $"/Images/About/{existing.Id}";
+        }
 
         await _ctx.SaveChangesAsync();
         TempData["Success"] = "Página actualizada.";

@@ -15,7 +15,7 @@ namespace PasearPorPasear.Migrations
         protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder.HasAnnotation("ProductVersion", "10.0.0");
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
                 {
@@ -231,6 +231,13 @@ namespace PasearPorPasear.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("TEXT");
 
@@ -290,6 +297,13 @@ namespace PasearPorPasear.Migrations
                     b.Property<string>("ExcerptPt")
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("TEXT");
@@ -384,6 +398,13 @@ namespace PasearPorPasear.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("TEXT");
 
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
+
                     b.Property<string>("ImagePath")
                         .HasColumnType("TEXT");
 
@@ -457,6 +478,13 @@ namespace PasearPorPasear.Migrations
                     b.Property<string>("ContentPt")
                         .IsRequired()
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("TEXT");
@@ -609,6 +637,13 @@ namespace PasearPorPasear.Migrations
                     b.Property<string>("DurationPt")
                         .HasMaxLength(100)
                         .HasColumnType("TEXT");
+
+                    b.Property<string>("ImageContentType")
+                        .HasMaxLength(100)
+                        .HasColumnType("TEXT");
+
+                    b.Property<byte[]>("ImageData")
+                        .HasColumnType("BLOB");
 
                     b.Property<string>("ImagePath")
                         .HasColumnType("TEXT");

@@ -2,8 +2,8 @@
 <!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
 <Project>
   <PropertyGroup>
-    <_PublishTargetUrl>C:\Users\Usuario\Desktop\PasearPorPasear\bin\Release\net10.0\publish\</_PublishTargetUrl>
-    <History>True|2026-04-08T19:34:58.4266412Z||;True|2026-04-08T16:18:38.5609459-03:00||;True|2026-04-08T10:45:16.2983562-03:00||;True|2026-04-05T19:25:36.6444884-03:00||;</History>
+    <_PublishTargetUrl>C:\Users\gasto\source\repos\gastontecheradev\PasearPorPasear\bin\Release\net10.0\publish\</_PublishTargetUrl>
+    <History>True|2026-04-26T21:04:04.6812487Z||;True|2026-04-26T16:24:09.9416914-03:00||;True|2026-04-26T16:23:28.8812484-03:00||;True|2026-04-08T16:34:58.4266412-03:00||;True|2026-04-08T16:18:38.5609459-03:00||;True|2026-04-08T10:45:16.2983562-03:00||;True|2026-04-05T19:25:36.6444884-03:00||;</History>
     <LastFailureDetails />
   </PropertyGroup>
 </Project>

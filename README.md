@@ -1,4 +1,4 @@
-# Pasear por Pasear
+# Pasear por Pasear - Blog
 
 A full-featured web application for **Pasear por Pasear** — a Montevideo-based tourism and walking blog created by Rosalía Souza. The site serves as a platform to share urban walks, guided tours, a walking club, and stories about the city of Montevideo, Uruguay.
 

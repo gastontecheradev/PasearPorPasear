@@ -12,8 +12,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — Pasear por Pasear</title>
-    <link rel="stylesheet" href="~/css/site.css" />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
     <link rel="icon" type="image/png" href="/images/favicon.png">
+
     @await RenderSectionAsync("Styles", required: false)
     <!-- Open Graph -->
     <meta property="og:title" content="Pasear por Pasear" />

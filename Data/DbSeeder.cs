@@ -74,39 +74,6 @@ public static class DbSeeder
             });
         }
 
-        // ── Tours ──
-        if (!ctx.Tours.Any())
-        {
-            ctx.Tours.AddRange(
-                new Tour
-                {
-                    Name = "Tour Ciudad Vieja Histórica", NameEn = "Historic Old Town Tour", NamePt = "Tour pela Cidade Velha Histórica",
-                    Slug = "tour-ciudad-vieja",
-                    Description = "Recorrido guiado por los principales puntos históricos.",
-                    DescriptionEn = "Guided tour through the main historical landmarks.",
-                    DescriptionPt = "Passeio guiado pelos principais pontos históricos.",
-                    Duration = "3 horas", DurationEn = "3 hours", DurationPt = "3 horas",
-                    Price = 800,
-                    MeetingPoint = "Plaza Independencia", MeetingPointEn = "Plaza Independencia", MeetingPointPt = "Plaza Independencia",
-                    MaxParticipants = 15,
-                    ImagePath = "/images/pasearporpasear.jpg",
-                },
-                new Tour
-                {
-                    Name = "Atardeceres en la Rambla", NameEn = "Rambla Sunset Walk", NamePt = "Pôr do Sol na Rambla",
-                    Slug = "atardeceres-rambla",
-                    Description = "Caminata al atardecer por la Rambla de Pocitos.",
-                    DescriptionEn = "Sunset walk along Pocitos Rambla.",
-                    DescriptionPt = "Caminhada ao pôr do sol pela Rambla de Pocitos.",
-                    Duration = "2 horas", DurationEn = "2 hours", DurationPt = "2 horas",
-                    Price = 600,
-                    MeetingPoint = "Playa de los Pocitos", MeetingPointEn = "Pocitos Beach", MeetingPointPt = "Praia de Pocitos",
-                    MaxParticipants = 20,
-                    ImagePath = "/images/pasearporpasear.jpg",
-                }
-            );
-        }
-
         // ── Club de Paseo Entries ──
         if (!ctx.ClubDePaseoEntries.Any())
         {

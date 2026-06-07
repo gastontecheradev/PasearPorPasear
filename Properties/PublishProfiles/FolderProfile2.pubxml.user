@@ -1,4 +1,9 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <!-- https://go.microsoft.com/fwlink/?LinkID=208121. -->
 <Project>
+  <PropertyGroup>
+    <_PublishTargetUrl>C:\Users\Usuario\source\repos\gastontecheradev\PasearPorPasear\bin\Release\net8.0\publish\</_PublishTargetUrl>
+    <History>True|2026-04-30T23:03:10.0765921Z||;True|2026-04-30T19:59:14.2851627-03:00||;</History>
+    <LastFailureDetails />
+  </PropertyGroup>
 </Project>

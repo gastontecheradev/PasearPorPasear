@@ -7,10 +7,22 @@ using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ── SQLite ──
-var dbPath = Path.Combine(builder.Environment.ContentRootPath, "pasearporpasear.db");
+// ── SQL Server ──
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "No se encontró la cadena de conexión 'DefaultConnection'. " +
+        "Configúrala en appsettings.json (local) o en Azure App Service > Configuración.");
+
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite($"Data Source={dbPath}"));
+    options.UseSqlServer(connectionString, sql =>
+    {
+        // Reintentos ante fallos transitorios (imprescindible en Azure SQL).
+        sql.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null);
+        sql.CommandTimeout(60);
+    }));
 
 // ── Identity ──
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>

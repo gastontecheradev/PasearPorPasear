@@ -28,7 +28,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         builder.Entity<BlogPost>(e =>
         {
             e.HasIndex(b => b.Slug).IsUnique();
-            e.Property(b => b.PublishDate).HasColumnType("TEXT");
+            e.Property(b => b.PublishDate).HasColumnType("datetime2");
         });
 
         // Club de Paseo Entries
@@ -41,7 +41,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         builder.Entity<Tour>(e =>
         {
             e.HasIndex(t => t.Slug).IsUnique();
-            e.Property(t => t.Price).HasColumnType("REAL");
+            e.Property(t => t.Price).HasColumnType("decimal(18,2)");
         });
 
         // Tour Reservation

@@ -2,7 +2,7 @@
 
 A full-featured web application for **Pasear por Pasear** — a Montevideo-based tourism and walking blog created by Rosalía Souza. The site serves as a platform to share urban walks, guided tours, a walking club, and stories about the city of Montevideo, Uruguay.
 
-Built with **ASP.NET Core MVC (.NET 10)**, **SQLite**, and **ASP.NET Core Identity**, with full trilingual support (Spanish, English, Portuguese).
+Built with **ASP.NET Core MVC**, **SQL Server**, and **ASP.NET Core Identity**, with full trilingual support (Spanish, English, Portuguese).
 
 🔗 **Live site:** [PasearPorPasear](https://pasearporpasear.somee.com/)
 
@@ -29,7 +29,7 @@ Built with **ASP.NET Core MVC (.NET 10)**, **SQLite**, and **ASP.NET Core Identi
 |---|---|
 | Framework | ASP.NET Core MVC (.NET 10) |
 | ORM | Entity Framework Core 10 |
-| Database | SQLite |
+| Database | SQL Server (LocalDB en desarrollo / Azure SQL en producción) |
 | Auth | ASP.NET Core Identity with Role-based access |
 | Frontend | Custom CSS + vanilla JavaScript |
 | Localization | ASP.NET Core `IStringLocalizer` + cookie-based culture |

@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Models;
 
@@ -13,12 +12,18 @@ public static class DbSeeder
         var ctx = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
         var userMgr = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
         var roleMgr = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+        var config = scope.ServiceProvider.GetRequiredService<IConfiguration>();
+        var logger = scope.ServiceProvider
+            .GetRequiredService<ILoggerFactory>()
+            .CreateLogger("PasearPorPasear.Data.DbSeeder");
 
-        // Create the schema (or no-op if DB already exists at the level of EnsureCreated).
-        await ctx.Database.EnsureCreatedAsync();
+        // Apply pending EF Core migrations (creates the schema on a brand-new database).
+        // NOTE: with SQL Server we use Migrate instead of EnsureCreated, so that the
+        // __EFMigrationsHistory table is written and Update-Database stays in sync.
+        await ctx.Database.MigrateAsync();
 
         // Idempotently add new columns for in-DB image storage on existing databases.
-        // This is critical because EnsureCreated does NOT alter existing tables.
+        // Defensive no-op once the migrations above have run.
         await EnsureImageColumnsAsync(ctx);
 
         // One-time cleanup: orphaned ImagePaths pointing at /uploads/* (filesystem-stored
@@ -26,16 +31,8 @@ public static class DbSeeder
         // the image in the DB instead.
         await CleanOrphanedUploadPathsAsync(ctx);
 
-        if (!await roleMgr.RoleExistsAsync("Admin"))
-            await roleMgr.CreateAsync(new IdentityRole("Admin"));
-
-        const string adminEmail = "pasearporpasear@gmail.com";
-        if (await userMgr.FindByEmailAsync(adminEmail) is null)
-        {
-            var admin = new IdentityUser { UserName = adminEmail, Email = adminEmail, EmailConfirmed = true };
-            var result = await userMgr.CreateAsync(admin, "Pasear170593!");
-            if (result.Succeeded) await userMgr.AddToRoleAsync(admin, "Admin");
-        }
+        // ── Admin role + user (credentials come from configuration, never from source) ──
+        await SeedAdminAsync(userMgr, roleMgr, config, logger);
 
         // ── About ──
         if (!ctx.AboutPages.Any())
@@ -158,8 +155,70 @@ public static class DbSeeder
         await ctx.SaveChangesAsync();
     }
 
+    private const string AdminRole = "Admin";
+
+    // Creates the Admin role and the administrator account using credentials taken from
+    // configuration (User Secrets in local development, App Settings in Azure).
+    // Nothing is hardcoded here on purpose: this file is committed to source control.
+    private static async Task SeedAdminAsync(
+        UserManager<IdentityUser> userMgr,
+        RoleManager<IdentityRole> roleMgr,
+        IConfiguration config,
+        ILogger logger)
+    {
+        if (!await roleMgr.RoleExistsAsync(AdminRole))
+            await roleMgr.CreateAsync(new IdentityRole(AdminRole));
+
+        var adminEmail = config["AdminSettings:Email"];
+        var adminPassword = config["AdminSettings:Password"];
+
+        if (string.IsNullOrWhiteSpace(adminEmail) || string.IsNullOrWhiteSpace(adminPassword))
+        {
+            logger.LogWarning(
+                "No se creó el usuario administrador porque falta 'AdminSettings:Email' " +
+                "y/o 'AdminSettings:Password'. En local: clic derecho sobre el proyecto > " +
+                "Administrar secretos de usuario. En Azure: App Service > Configuración > " +
+                "Configuración de la aplicación (AdminSettings__Email / AdminSettings__Password).");
+            return;
+        }
+
+        var existing = await userMgr.FindByEmailAsync(adminEmail);
+        if (existing is not null)
+        {
+            // The account already exists: its password is never overwritten from configuration.
+            // We only make sure the Admin role is still assigned.
+            if (!await userMgr.IsInRoleAsync(existing, AdminRole))
+                await userMgr.AddToRoleAsync(existing, AdminRole);
+            return;
+        }
+
+        var admin = new IdentityUser
+        {
+            UserName = adminEmail,
+            Email = adminEmail,
+            EmailConfirmed = true
+        };
+
+        var result = await userMgr.CreateAsync(admin, adminPassword);
+        if (result.Succeeded)
+        {
+            await userMgr.AddToRoleAsync(admin, AdminRole);
+            logger.LogInformation("Usuario administrador creado: {Email}", adminEmail);
+        }
+        else
+        {
+            // Most common cause: the configured password does not satisfy the Identity
+            // policy declared in Program.cs (8+ chars, digit, uppercase, symbol).
+            logger.LogError(
+                "No se pudo crear el usuario administrador '{Email}'. Errores: {Errors}",
+                adminEmail,
+                string.Join(" | ", result.Errors.Select(e => $"{e.Code}: {e.Description}")));
+        }
+    }
+
     // Adds ImageData / ImageContentType columns to existing tables if they're missing.
-    // Uses raw SQL via SQLite's PRAGMA so it works even when EnsureCreated decides "DB exists, no-op".
+    // Uses INFORMATION_SCHEMA (SQL Server) so it is safe to run against a database that
+    // was created before these columns existed.
     private static async Task EnsureImageColumnsAsync(ApplicationDbContext ctx)
     {
         var connection = ctx.Database.GetDbConnection();
@@ -168,41 +227,61 @@ public static class DbSeeder
 
         var tables = new (string Table, string Column, string Type)[]
         {
-            ("BlogPosts",          "ImageData",        "BLOB"),
-            ("BlogPosts",          "ImageContentType", "TEXT"),
-            ("ClubDePaseoEntries", "ImageData",        "BLOB"),
-            ("ClubDePaseoEntries", "ImageContentType", "TEXT"),
-            ("ClubDePaseoPages",   "ImageData",        "BLOB"),
-            ("ClubDePaseoPages",   "ImageContentType", "TEXT"),
-            ("AboutPages",         "ImageData",        "BLOB"),
-            ("AboutPages",         "ImageContentType", "TEXT"),
-            ("Tours",              "ImageData",        "BLOB"),
-            ("Tours",              "ImageContentType", "TEXT"),
+            ("BlogPosts",          "ImageData",        "varbinary(max)"),
+            ("BlogPosts",          "ImageContentType", "nvarchar(100)"),
+            ("ClubDePaseoEntries", "ImageData",        "varbinary(max)"),
+            ("ClubDePaseoEntries", "ImageContentType", "nvarchar(100)"),
+            ("ClubDePaseoPages",   "ImageData",        "varbinary(max)"),
+            ("ClubDePaseoPages",   "ImageContentType", "nvarchar(100)"),
+            ("AboutPages",         "ImageData",        "varbinary(max)"),
+            ("AboutPages",         "ImageContentType", "nvarchar(100)"),
+            ("Tours",              "ImageData",        "varbinary(max)"),
+            ("Tours",              "ImageContentType", "nvarchar(100)"),
         };
 
         foreach (var (table, column, type) in tables)
         {
+            if (!await TableExistsAsync(connection, table)) continue;
+
             if (!await ColumnExistsAsync(connection, table, column))
             {
                 using var cmd = connection.CreateCommand();
-                cmd.CommandText = $"ALTER TABLE \"{table}\" ADD COLUMN \"{column}\" {type} NULL;";
+                // ADD (not ADD COLUMN) is the T-SQL syntax.
+                cmd.CommandText = $"ALTER TABLE [{table}] ADD [{column}] {type} NULL;";
                 await cmd.ExecuteNonQueryAsync();
             }
         }
     }
 
+    private static async Task<bool> TableExistsAsync(System.Data.Common.DbConnection conn, string table)
+    {
+        using var cmd = conn.CreateCommand();
+        cmd.CommandText =
+            "SELECT COUNT(1) FROM INFORMATION_SCHEMA.TABLES " +
+            "WHERE TABLE_NAME = @table AND TABLE_SCHEMA = SCHEMA_NAME();";
+        AddParam(cmd, "@table", table);
+        var result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(result) > 0;
+    }
+
     private static async Task<bool> ColumnExistsAsync(System.Data.Common.DbConnection conn, string table, string column)
     {
         using var cmd = conn.CreateCommand();
-        cmd.CommandText = $"PRAGMA table_info(\"{table}\");";
-        using var reader = await cmd.ExecuteReaderAsync();
-        while (await reader.ReadAsync())
-        {
-            // PRAGMA columns: cid, name, type, notnull, dflt_value, pk
-            var name = reader.GetString(1);
-            if (string.Equals(name, column, StringComparison.OrdinalIgnoreCase)) return true;
-        }
-        return false;
+        cmd.CommandText =
+            "SELECT COUNT(1) FROM INFORMATION_SCHEMA.COLUMNS " +
+            "WHERE TABLE_NAME = @table AND COLUMN_NAME = @column AND TABLE_SCHEMA = SCHEMA_NAME();";
+        AddParam(cmd, "@table", table);
+        AddParam(cmd, "@column", column);
+        var result = await cmd.ExecuteScalarAsync();
+        return Convert.ToInt32(result) > 0;
+    }
+
+    private static void AddParam(System.Data.Common.DbCommand cmd, string name, string value)
+    {
+        var p = cmd.CreateParameter();
+        p.ParameterName = name;
+        p.Value = value;
+        cmd.Parameters.Add(p);
     }
 
     // Reset ImagePath to NULL on rows that point to /uploads/ but have no ImageData blob.
@@ -216,10 +295,13 @@ public static class DbSeeder
         var tables = new[] { "BlogPosts", "ClubDePaseoEntries", "ClubDePaseoPages", "AboutPages", "Tours" };
         foreach (var t in tables)
         {
+            if (!await TableExistsAsync(connection, t)) continue;
+
             using var cmd = connection.CreateCommand();
+            // T-SQL: DATALENGTH is the equivalent of SQLite's length() over a blob.
             cmd.CommandText =
-                $"UPDATE \"{t}\" SET \"ImagePath\" = NULL " +
-                $"WHERE \"ImagePath\" LIKE '/uploads/%' AND (\"ImageData\" IS NULL OR length(\"ImageData\") = 0);";
+                $"UPDATE [{t}] SET [ImagePath] = NULL " +
+                $"WHERE [ImagePath] LIKE '/uploads/%' AND ([ImageData] IS NULL OR DATALENGTH([ImageData]) = 0);";
             await cmd.ExecuteNonQueryAsync();
         }
     }

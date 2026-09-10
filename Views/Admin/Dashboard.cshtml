@@ -1,43 +1,48 @@
+@model PasearPorPasear.Controllers.AdminController.TableroVm
 @{
-    ViewData["Title"] = "Dashboard";
-    ViewData["AdminTitle"] = "Dashboard";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Panel";
 }
 
-<h2 style="font-family:var(--font-display);margin-bottom:24px">Bienvenida, Rosalía 👋</h2>
+<section class="banda banda--crema">
+    <div class="contenedor">
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">Panel</h1>
+        <p class="bajada">Cómo está el sitio hoy.</p>
 
-<div class="dashboard-grid">
-    <a href="/Blog/Manage" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.PostCount</div>
-        <div class="dash-card-label">Publicaciones</div>
-    </a>
-    <a href="/Tours/Manage" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.TourCount</div>
-        <div class="dash-card-label">Tours</div>
-    </a>
-    <a href="/Tours/Reservations" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.ReservationCount</div>
-        <div class="dash-card-label">Reservas Pendientes</div>
-    </a>
-    <a href="/ClubDePaseo/Manage" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.ClubEntryCount</div>
-        <div class="dash-card-label">Entradas Club</div>
-    </a>
-    <a href="/Newsletter/Manage" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.SubscriberCount</div>
-        <div class="dash-card-label">Suscriptores</div>
-    </a>
-    <a href="/Contact/Manage" class="dash-card" style="text-decoration:none">
-        <div class="dash-card-num">@ViewBag.MessageCount</div>
-        <div class="dash-card-label">Mensajes sin Leer</div>
-    </a>
-</div>
+        <div class="contador" style="max-width:none;margin-block:40px">
+            <div><b>@Model.Fachadas</b><span>fachadas publicadas</span></div>
+            <div><b>@Model.ProximosEncuentros</b><span>encuentros por venir</span></div>
+            <div><b>@Model.AfichesPublicados</b><span>afiches en la cartelera</span></div>
+            <div><b>@Model.SuscriptoresBuzon</b><span>en el buzón</span></div>
+        </div>
 
-<h3 style="font-family:var(--font-display);margin-bottom:16px">Acciones Rápidas</h3>
-<div style="display:flex;gap:12px;flex-wrap:wrap">
-    <a href="/Blog/Create" class="btn btn-teal btn-sm">+ Nueva Publicación</a>
-    <a href="/Tours/Create" class="btn btn-outline btn-sm">+ Nuevo Tour</a>
-    <a href="/ClubDePaseo/Create" class="btn btn-outline btn-sm">+ Nueva Entrada Club</a>
-    <a href="/Tours/Reservations" class="btn btn-outline btn-sm">Ver Reservas</a>
-    <a href="/Contact/Manage" class="btn btn-outline btn-sm">Ver Mensajes</a>
-</div>
+        @if (Model.AfichesPorRevisar > 0 || Model.MensajesSinLeer > 0 || Model.ConsultasPendientes > 0)
+        {
+            <h2 style="font-size:var(--t-xl);margin-bottom:16px">Esperando tu respuesta</h2>
+            <ul class="datos" style="max-width:560px">
+                @if (Model.AfichesPorRevisar > 0)
+                {
+                    <li><strong>Cartelera</strong>@Model.AfichesPorRevisar afiche(s) por revisar</li>
+                }
+                @if (Model.MensajesSinLeer > 0)
+                {
+                    <li><strong>Contacto</strong>@Model.MensajesSinLeer mensaje(s) sin leer</li>
+                }
+                @if (Model.ConsultasPendientes > 0)
+                {
+                    <li><strong>Paseos</strong>@Model.ConsultasPendientes consulta(s) pendiente(s)</li>
+                }
+            </ul>
+        }
+        else
+        {
+            <p class="bajada">No hay nada pendiente.</p>
+        }
+
+        <div class="recuadro" style="background:var(--crema-2);margin-top:44px">
+            <h2>Las pantallas de edición están en camino</h2>
+            <p>Por ahora el contenido se carga desde la base. Las altas y ediciones
+               de fachadas, encuentros, afiches y productos llegan en la próxima entrega.</p>
+        </div>
+    </div>
+</section>

@@ -1,0 +1,82 @@
+@model FichaDetalleVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+    var f = Model.Ficha;
+}
+
+<section class="banda banda--crema">
+    <div class="contenedor angosto">
+        <p class="migas">
+            <a href="/">@(esPortugues ? "Início" : esIngles ? "Home" : "Inicio")</a> ·
+            <a href="/Archivo">#ArchivoDeFachadas</a> ·
+            @f.NumeroFormateado
+        </p>
+        <span class="etiqueta">@f.Barrio</span>
+        <h1 style="font-size:var(--t-3xl);font-weight:900;letter-spacing:-.035em">@f.Titulo</h1>
+        <p class="meta">
+            <span>@(esPortugues ? "Ficha" : esIngles ? "Entry" : "Ficha") @f.NumeroFormateado</span>
+            <span>@f.Fecha.ToString("d 'de' MMMM 'de' yyyy")</span>
+            @if (Model.AnioConstruccion.HasValue)
+            {
+                <span>@(esPortugues ? "Casa de" : esIngles ? "House from" : "Casa de") @Model.AnioConstruccion</span>
+            }
+        </p>
+    </div>
+
+    <div class="contenedor angosto">
+        @if (!string.IsNullOrEmpty(f.ImagenSrc))
+        {
+            <figure class="foto-principal">
+                <img src="@f.ImagenSrc" alt="@f.ImagenAlt" />
+                @if (!string.IsNullOrEmpty(f.Extracto))
+                {
+                    <figcaption class="epigrafe">@f.Extracto</figcaption>
+                }
+            </figure>
+        }
+
+        <div class="texto">
+            @Html.Raw(Model.ContenidoHtml)
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.MapaEmbedUrl))
+        {
+            <div class="mapa" style="padding:0;overflow:hidden">
+                <iframe src="@Model.MapaEmbedUrl" width="100%" height="100%" style="border:0"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        title="@(esPortugues ? "Onde fica" : esIngles ? "Where it is" : "Dónde queda")"></iframe>
+            </div>
+        }
+
+        @if (Model.Cercanas.Count > 0)
+        {
+            <h2 style="font-size:var(--t-xl);margin-bottom:20px">
+                @(esPortugues ? "Outras fachadas do mesmo bairro" : esIngles ? "Other facades in the same neighbourhood" : "Otras fachadas del mismo barrio")
+            </h2>
+            <div class="galeria">
+                @foreach (var c in Model.Cercanas)
+                {
+                    <a href="@c.Url"><img src="@c.ImagenSrc" alt="@c.ImagenAlt" loading="lazy" /></a>
+                }
+            </div>
+        }
+
+        <div class="saltos">
+            @if (Model.Anterior is not null)
+            {
+                <a class="salto" href="@Model.Anterior.Url">
+                    <small>@(esPortugues ? "Ficha anterior" : esIngles ? "Previous entry" : "Ficha anterior")</small>
+                    @Model.Anterior.Titulo
+                </a>
+            }
+            @if (Model.Siguiente is not null)
+            {
+                <a class="salto" href="@Model.Siguiente.Url" style="text-align:right;margin-left:auto">
+                    <small>@(esPortugues ? "Ficha seguinte" : esIngles ? "Next entry" : "Ficha siguiente")</small>
+                    @Model.Siguiente.Titulo
+                </a>
+            }
+        </div>
+    </div>
+</section>

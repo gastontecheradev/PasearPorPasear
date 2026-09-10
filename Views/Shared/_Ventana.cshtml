@@ -1,0 +1,31 @@
+@model TarjetaVm
+@*
+    Tarjeta con forma de ventana: arco arriba y alféizar abajo.
+    Uso:  <partial name="_Ventana" model="tarjeta" />
+*@
+<a class="ventana" href="@Model.Url">
+    @if (!string.IsNullOrEmpty(Model.ImagenSrc))
+    {
+        <div class="ventana-foto">
+            <img src="@Model.ImagenSrc" alt="@Model.ImagenAlt" loading="lazy" />
+        </div>
+    }
+    <div class="ventana-cuerpo">
+        @if (!string.IsNullOrEmpty(Model.Etiqueta))
+        {
+            <span class="etiqueta">@Model.Etiqueta</span>
+        }
+        <h3>@Model.Titulo</h3>
+        @if (!string.IsNullOrEmpty(Model.Extracto))
+        {
+            <p>@Model.Extracto</p>
+        }
+    </div>
+    @if (!string.IsNullOrEmpty(Model.PieIzquierda) || !string.IsNullOrEmpty(Model.PieDerecha))
+    {
+        <div class="ventana-pie">
+            <span>@Model.PieIzquierda</span>
+            <strong>@Model.PieDerecha</strong>
+        </div>
+    }
+</a>

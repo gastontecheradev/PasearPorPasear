@@ -1,0 +1,24 @@
+@model BuzonVm
+@*
+    Suscripción al buzón de la Casita. Aparece en varias páginas; cada una
+    manda su origen y a dónde volver.
+*@
+<div class="@(Model.Clase ?? "")">
+    <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Model.Titulo</h2>
+    @if (!string.IsNullOrEmpty(Model.Texto))
+    {
+        <p style="max-width:46ch;margin-top:12px">@Model.Texto</p>
+    }
+    <form class="form-linea" asp-controller="Buzon" asp-action="Suscribir" method="post">
+        <input type="hidden" name="origen" value="@Model.Origen" />
+        <input type="hidden" name="volverA" value="@Model.VolverA" />
+        <label class="oculto-visual" for="buzon-@Model.Origen">@Model.Titulo</label>
+        <input id="buzon-@Model.Origen" name="email" type="email" inputmode="email"
+               autocomplete="email" placeholder="tu@@correo.com" required />
+        <button class="boton @Model.ClaseBoton" type="submit">@Model.EtiquetaBoton</button>
+    </form>
+    @if (!string.IsNullOrEmpty(Model.Nota))
+    {
+        <p class="nota">@Model.Nota</p>
+    }
+</div>

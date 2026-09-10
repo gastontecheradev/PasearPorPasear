@@ -1,133 +1,185 @@
+@model InicioVm
 @{
-    ViewData["Title"] = "Inicio";
-    var requestCulture = Context.Features.Get<IRequestCultureFeature>();
-    var culture = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName ?? "es";
-    var isEn = culture == "en"; var isPt = culture == "pt";
-    var settings = ViewBag.Settings as Dictionary<string, SiteSetting> ?? new Dictionary<string, SiteSetting>();
-    var posts = ViewBag.LatestPosts as List<BlogPost> ?? new List<BlogPost>();
-    var clubEntries = ViewBag.LatestClubEntries as List<ClubDePaseoEntry> ?? new List<ClubDePaseoEntry>();
-    var tours = ViewBag.Tours as List<Tour> ?? new List<Tour>();
-    var aboutPage = ViewBag.AboutPage as AboutPage;
-    string S(string key) => settings.TryGetValue(key, out var s) ? (isPt ? s.ValuePt : isEn ? s.ValueEn : s.Value) : "";
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
 }
 
-<!-- ═══ HERO ═══ -->
-<section class="hero">
-    <div class="hero-content">
-        <h1 class="hero-title fade-up fade-up-d1">Pasear Por Pasear</h1>
-        <p class="hero-desc fade-up fade-up-d2">@S("HomeHeroSubtitle")</p>
-        <div class="hero-actions fade-up fade-up-d3">
-            <a href="#club-de-paseo" class="btn btn-teal">
-                @(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M5 12h14" /><path d="m12 5 7 7-7 7" /></svg>
-            </a>
-            <a href="/Contact" class="btn btn-outline">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a>
-        </div>
-        <div class="hero-accent fade-up fade-up-d3">
-            <span class="a1"></span><span class="a2"></span><span class="a3"></span><span class="a4"></span>
+<section class="portada">
+    <div class="portada-int">
+        <h1 class="oculto-visual">Pasear por Pasear</h1>
+        <img class="lettering-grande" src="~/img/marca/wordmark-petroleo.webp"
+             alt="Pasear por Pasear" width="720" height="307" />
+        <p class="frase">@Model.TituloSeccion</p>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="entrada">@Model.BajadaSeccion</p>
+        }
+        <div class="acciones">
+            <a class="boton boton--principal" href="/Paseos">@(esPortugues ? "Passeia comigo" : esIngles ? "Walk with me" : "Paseá conmigo")</a>
+            <a class="boton boton--borde" href="/Archivo">@(esPortugues ? "Ver o arquivo" : esIngles ? "See the archive" : "Ver el archivo")</a>
         </div>
     </div>
 </section>
 
-<!-- ═══ CLUB DE PASEO — LATEST ENTRIES ═══ -->
-@if (clubEntries.Any())
+<div class="horizonte">
+    <img class="gorrion" src="~/img/marca/gorrion.webp" alt="" width="380" height="307" />
+    <partial name="_Tejados" />
+</div>
+
+@* ── Qué es Pasear por Pasear ── *@
+@if (Model.Definicion is not null)
 {
-    <section class="section" id="club-de-paseo" style="padding-top:0">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</span>
-                <h2 class="section-title">@(isPt ? "Últimas Publicações" : isEn ? "Latest Posts" : "Últimas Publicaciones")</h2>
-                <p class="section-subtitle">@(isPt ? "Explore as publicações do Clube de Caminhada" : isEn ? "Explore the latest Walking Club entries" : "Explora las publicaciones del Club de Paseo")</p>
+<section class="banda banda--petroleo" style="padding-top:calc(var(--aire) * .5)">
+    <div class="contenedor">
+        <div class="definicion">
+            <div>
+                <h2 class="titulo-seccion">@Model.T(Model.Definicion.Titulo, Model.Definicion.TituloEn, Model.Definicion.TituloPt)</h2>
+                <div class="texto" style="margin-top:22px;color:var(--tinta-clara)">
+                    @Html.Raw(Model.TO(Model.Definicion.Bajada, Model.Definicion.BajadaEn, Model.Definicion.BajadaPt))
+                </div>
+                <p class="atributos">
+                    @(esPortugues ? "Cotidiano" : esIngles ? "Everyday" : "Cotidiano")
+                    <partial name="_Flor" />
+                    @(esPortugues ? "Caloroso" : esIngles ? "Warm" : "Cálido")
+                    <partial name="_Flor" />
+                    @(esPortugues ? "Orgânico" : esIngles ? "Organic" : "Orgánico")
+                </p>
             </div>
-            <div class="cards-grid">
-                @foreach (var entry in clubEntries)
+            <img class="casita-grande" src="~/img/marca/casita.webp" alt="" width="380" height="447" />
+        </div>
+    </div>
+</section>
+
+<div class="transicion" style="background:var(--petroleo)"><partial name="_Onda" model="@("var(--crema)")" /></div>
+}
+
+@* ── Los cuatro pilares ── *@
+<section class="banda banda--crema" style="padding-top:calc(var(--aire) * .5)">
+    <div class="contenedor">
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h2 class="titulo-seccion">@(esPortugues ? "Por onde quer começar?" : esIngles ? "Where do you want to start?" : "¿Por dónde querés empezar?")</h2>
+        <p class="bajada">@(esPortugues ? "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra." : esIngles ? "There are four ways into this. None is better than the others." : "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.")</p>
+
+        <div class="pilares" style="margin-top:48px">
+            <a class="pilar pilar--mostaza" href="/Paseos">
+                <div class="pilar-imagen"><img src="~/img/marca/casita.webp" alt="" width="380" height="447" loading="lazy" /></div>
+                <div class="pilar-cuerpo">
+                    <h3>@(esPortugues ? "Passeia comigo?" : esIngles ? "Walk with me?" : "¿Paseás conmigo?")</h3>
+                    <p>@(esPortugues ? "El Clubcito, percursos criativos e saídas montadas sob encomenda." : esIngles ? "El Clubcito, creative walks and outings built on request." : "El Clubcito, recorridos creativos y salidas armadas a pedido.")</p>
+                    <span class="ver">@(esPortugues ? "Ver as quatro propostas" : esIngles ? "See the four offerings" : "Ver las cuatro propuestas")</span>
+                </div>
+            </a>
+
+            <a class="pilar pilar--durazno" href="/Archivo">
+                <div class="pilar-imagen"><img src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" loading="lazy" /></div>
+                <div class="pilar-cuerpo">
+                    <h3>#ArchivoDeFachadas</h3>
+                    <p>@(esPortugues ? "O arquivo das casas de Montevidéu, com sua rua, seu bairro e sua data." : esIngles ? "The archive of Montevideo's houses, with street, neighbourhood and date." : "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.")</p>
+                    <span class="ver">@(esPortugues ? "Entrar no arquivo" : esIngles ? "Enter the archive" : "Entrar al archivo")</span>
+                </div>
+            </a>
+
+            <a class="pilar pilar--crema2" href="/Productos">
+                <div class="pilar-imagen"><img src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" loading="lazy" /></div>
+                <div class="pilar-cuerpo">
+                    <h3>@(esPortugues ? "Produtos" : esIngles ? "Shop" : "Productos")</h3>
+                    <p>@(esPortugues ? "As ilustrações da marca, impressas. Ainda não saíram à venda." : esIngles ? "The brand illustrations, printed. Not on sale yet." : "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.")</p>
+                    <span class="ver">@(esPortugues ? "Ver o que vem" : esIngles ? "See what is coming" : "Ver lo que viene")</span>
+                </div>
+            </a>
+
+            <a class="pilar pilar--piedra" href="/Cartelera">
+                <div class="pilar-imagen"><img src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" /></div>
+                <div class="pilar-cuerpo">
+                    <h3>@(esPortugues ? "Mural do bairro" : esIngles ? "Neighbourhood board" : "Cartelera de barrio")</h3>
+                    <p>@(esPortugues ? "Uma parede para colar seu cartaz. Eventos, ofícios e pedidos de ajuda." : esIngles ? "A wall to put your poster up. Events, trades and requests for help." : "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.")</p>
+                    <span class="ver">@(esPortugues ? "Ver o mural" : esIngles ? "See the board" : "Ver la cartelera")</span>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>
+
+@if (Model.TiraArchivo.Count > 0)
+{
+    <div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--crema-2)")" /></div>
+
+    <section class="banda banda--crema2" style="padding-top:calc(var(--aire) * .5)">
+        <div class="contenedor">
+            <div class="regla regla--izq"><partial name="_Flor" /></div>
+            <h2 class="titulo-seccion">#ArchivoDeFachadas</h2>
+            <div class="archivo-tira" style="margin-top:38px">
+                @foreach (var f in Model.TiraArchivo)
                 {
-                    <div class="card-wrap reveal">
-                        @if (User.IsInRole("Admin"))
-                        {
-                            <a href="/ClubDePaseo/Edit/@entry.Id" class="card-edit-btn" title="@(isPt ? "Editar" : isEn ? "Edit" : "Editar")" onclick="event.stopPropagation()">
-                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
-                                @(isPt ? "Editar" : isEn ? "Edit" : "Editar")
-                            </a>
-                        }
-                        <a href="/ClubDePaseo/Detail/@entry.Slug" class="card">
-                            <div class="card-img-wrap"><img src="@(entry.ImagePath ?? "https://images.unsplash.com/photo-1599413987323-b2b8c0d7d9c8?w=600")" alt="@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)" class="card-img" loading="lazy"></div>
-                            <div class="card-body">
-                                <span class="card-tag">@(isPt ? entry.LocationNamePt ?? "Montevidéu" : isEn ? entry.LocationNameEn ?? "Montevideo" : entry.LocationName ?? "Montevideo")</span>
-                                <h3 class="card-title">@(isPt ? entry.TitlePt : isEn ? entry.TitleEn : entry.Title)</h3>
-                                <p class="card-text">@(isPt ? entry.ExcerptPt : isEn ? entry.ExcerptEn : entry.Excerpt)</p>
-                            </div>
-                            <div class="card-footer">
-                                <span class="card-date">@entry.PublishDate.ToString("dd MMM yyyy")</span>
-                                <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
-                            </div>
-                        </a>
+                    <a href="@f.Url"><img src="@f.ImagenSrc" alt="@f.ImagenAlt" loading="lazy" /></a>
+                }
+            </div>
+            <div class="acciones">
+                <a class="boton boton--borde" href="/Archivo">@(esPortugues ? "Entrar no arquivo completo" : esIngles ? "Enter the full archive" : "Entrar al archivo completo")</a>
+            </div>
+        </div>
+    </section>
+}
+
+@if (Model.Afiches.Count > 0)
+{
+    <div class="transicion" style="background:var(--crema-2)"><partial name="_Onda" model="@("var(--mostaza)")" /></div>
+
+    <section class="banda banda--mostaza" style="padding-top:calc(var(--aire) * .5)">
+        <div class="contenedor">
+            <div class="regla regla--izq" style="color:var(--petroleo)"><partial name="_Flor" /></div>
+            <h2 class="titulo-seccion">@(esPortugues ? "O mural do bairro" : esIngles ? "The neighbourhood board" : "La cartelera de barrio")</h2>
+            <div class="muro" style="margin-top:48px">
+                @foreach (var a in Model.Afiches)
+                {
+                    <partial name="_Afiche" model="a" />
+                }
+            </div>
+            <div class="acciones" style="margin-top:50px">
+                <a class="boton boton--principal" href="/Cartelera">@(esPortugues ? "Como colar seu cartaz" : esIngles ? "How to put your poster up" : "Cómo pegar tu afiche")</a>
+            </div>
+        </div>
+    </section>
+}
+
+@if (Model.Sobre is not null)
+{
+    <div class="transicion" style="background:var(--mostaza)"><partial name="_Onda" model="@("var(--crema)")" /></div>
+
+    <section class="banda banda--crema" style="padding-top:calc(var(--aire) * .5)">
+        <div class="contenedor">
+            <div class="duo">
+                <div>
+                    <div class="regla regla--izq"><partial name="_Flor" /></div>
+                    <h2 class="titulo-seccion">@(esPortugues ? "Atrás de tudo isto há uma pessoa" : esIngles ? "There is a person behind all this" : "Atrás de todo esto hay una persona")</h2>
+                    <div class="texto" style="margin-top:20px">
+                        @Html.Raw(Model.T(Model.Sobre.Contenido, Model.Sobre.ContenidoEn, Model.Sobre.ContenidoPt))
+                    </div>
+                    <p class="firma">@Model.Sobre.Firma</p>
+                    <div class="acciones">
+                        <a class="boton boton--borde" href="/Sobre">@(esPortugues ? "Ler a história completa" : esIngles ? "Read the full story" : "Leer la historia completa")</a>
+                    </div>
+                </div>
+                @if (!string.IsNullOrEmpty(Model.SobreImagenSrc))
+                {
+                    <div class="columna-retrato">
+                        <div class="retrato">
+                            <img src="@Model.SobreImagenSrc" alt="@Model.Sobre.ImagenAlt" loading="lazy" />
+                        </div>
                     </div>
                 }
             </div>
-            <div style="text-align:center;margin-top:36px">
-                <a href="/ClubDePaseo" class="btn btn-outline">@(isPt ? "Ver Todas as Publicações" : isEn ? "View All Posts" : "Ver Todas las Publicaciones")</a>
-            </div>
         </div>
     </section>
 }
 
-<!-- ═══ SOBRE MÍ ═══ -->
-<section class="section" id="sobre-mi">
-    <div class="container">
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center" class="contact-layout">
-            <div class="reveal">
-                <span class="section-label" style="margin-bottom:16px;display:block">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</span>
-                <h2 class="section-title" style="margin-bottom:24px">Rosalía Souza</h2>
-                <div class="content-body">
-                    @Html.Raw(isPt ? aboutPage?.ContentPt : isEn ? aboutPage?.ContentEn : aboutPage?.Content)
-                </div>
-                <div style="margin-top:32px">
-                    <a href="/About" class="btn btn-outline">@(isPt ? "Saiba Mais" : isEn ? "Learn More" : "Conocer Más")</a>
-                </div>
-            </div>
-            <div class="reveal">
-                @if (!string.IsNullOrEmpty(aboutPage?.ImagePath))
-                {
-                    <img src="@aboutPage.ImagePath" alt="Rosalía Souza" style="width:100%;max-width:400px;border-radius:var(--radius-lg);aspect-ratio:3/4;object-fit:cover">
-                }
-            </div>
+<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--durazno)")" /></div>
+
+<section class="banda banda--durazno banda--ajustada" style="padding-top:calc(var(--aire) * .35)">
+    <div class="contenedor">
+        <div class="suscripcion">
+            <partial name="_BloqueBuzon" model="Model.Buzon" />
+            <img class="kiosco" src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" />
         </div>
     </div>
 </section>
-
-
-
-<!-- ═══ LATEST POSTS (BLOG) ═══ -->
-@*@if (posts.Any())
-{
-    <section class="section" style="padding-top:0">
-        <div class="container">
-            <div class="section-header reveal">
-                <span class="section-label">Blog</span>
-                <h2 class="section-title">@(isPt ? "Últimas Publicações" : isEn ? "Latest Posts" : "Últimas Publicaciones")</h2>
-                <p class="section-subtitle">Explora las publicaciones del blog</p>
-            </div>
-            <div class="cards-grid">
-                @foreach (var post in posts)
-                {
-                    <a href="/Blog/Post/@post.Slug" class="card reveal">
-                        <div class="card-img-wrap"><img src="@(post.ImagePath ?? "https://images.unsplash.com/photo-1597933553032-2d264024ef41?w=600")" alt="@(isPt? post.TitlePt: isEn? post.TitleEn: post.Title)" class="card-img" loading="lazy"></div>
-                        <div class="card-body">
-                            <span class="card-tag">@(isPt? post.LocationNamePt ?? "Montevidéu" : isEn? post.LocationNameEn ?? "Montevideo" : post.LocationName ?? "Montevideo")</span>
-                            <h3 class="card-title">@(isPt? post.TitlePt: isEn? post.TitleEn: post.Title)</h3>
-                            <p class="card-text">@(isPt? post.ExcerptPt: isEn? post.ExcerptEn: post.Excerpt)</p>
-                        </div>
-                        <div class="card-footer">
-                            <span class="card-date">@post.PublishDate.ToString("dd MMM yyyy")</span>
-                            <span class="card-link">@(isPt ? "Ler mais" : isEn ? "Read more" : "Leer más") →</span>
-                        </div>
-                    </a>
-                }
-            </div>
-            <div style="text-align:center;margin-top:36px">
-                <a href="/Blog" class="btn btn-outline">@(isPt ? "Ver Todas as Publicações" : isEn ? "View All Posts" : "Ver Todas las Publicaciones")</a>
-            </div>
-        </div>
-    </section>
-}*@

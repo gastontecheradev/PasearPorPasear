@@ -1,0 +1,64 @@
+@model EncuentroDetalleVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+    var e = Model.Encuentro;
+}
+
+<section class="banda banda--crema">
+    <div class="contenedor angosto">
+        <p class="migas">
+            <a href="/">@(esPortugues ? "Início" : esIngles ? "Home" : "Inicio")</a> ·
+            <a href="/Clubcito">El Clubcito</a>
+        </p>
+        @if (!string.IsNullOrEmpty(e.Barrio))
+        {
+            <span class="etiqueta">@e.Barrio</span>
+        }
+        <h1 style="font-size:var(--t-3xl);font-weight:900;letter-spacing:-.035em">@e.Titulo</h1>
+        <p class="meta">
+            <span>@e.Fecha.ToString("d 'de' MMMM 'de' yyyy")</span>
+            @if (e.Asistentes.HasValue)
+            {
+                <span>@e.Asistentes @(esPortugues ? "pessoas" : esIngles ? "people" : "personas")</span>
+            }
+            @if (!string.IsNullOrEmpty(e.PuntoEncuentro))
+            {
+                <span>@e.PuntoEncuentro</span>
+            }
+        </p>
+    </div>
+
+    <div class="contenedor angosto">
+        @if (!string.IsNullOrEmpty(e.ImagenSrc))
+        {
+            <figure class="foto-principal">
+                <img src="@e.ImagenSrc" alt="@e.ImagenAlt" />
+            </figure>
+        }
+
+        <div class="texto">
+            @Html.Raw(Model.ContenidoHtml)
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.MapaEmbedUrl))
+        {
+            <div class="mapa" style="padding:0;overflow:hidden">
+                <iframe src="@Model.MapaEmbedUrl" width="100%" height="100%" style="border:0"
+                        loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        title="@(esPortugues ? "Mapa do percurso" : esIngles ? "Route map" : "Mapa del recorrido")"></iframe>
+            </div>
+        }
+
+        <div class="saltos">
+            <a class="salto" href="/Clubcito">
+                <small>@(esPortugues ? "Voltar" : esIngles ? "Back" : "Volver")</small>
+                @(esPortugues ? "Todas as saídas" : esIngles ? "All the walks" : "Todas las salidas")
+            </a>
+            <a class="salto" href="/Paseos#consulta" style="text-align:right">
+                <small>@(esPortugues ? "Próxima" : esIngles ? "Next one" : "La próxima")</small>
+                @(esPortugues ? "Quero ir" : esIngles ? "I want to come" : "Quiero ir")
+            </a>
+        </div>
+    </div>
+</section>

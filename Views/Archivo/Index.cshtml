@@ -1,0 +1,84 @@
+@model ArchivoVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+    string Enlace(string? barrio, int pagina) =>
+        Url.Action("Index", "Archivo", new { barrio, pagina = pagina > 1 ? pagina : (int?)null })!;
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/ventana-3.webp" alt="" width="300" height="417" />
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+
+        <div class="contador">
+            <div>
+                <b>@Model.TotalFachadas</b>
+                <span>@(esPortugues ? "fachadas arquivadas" : esIngles ? "facades archived" : "fachadas archivadas")</span>
+            </div>
+            <div>
+                <b>@Model.TotalBarrios</b>
+                <span>@(esPortugues ? "bairros percorridos" : esIngles ? "neighbourhoods walked" : "barrios recorridos")</span>
+            </div>
+            @if (Model.DesdeAnio.HasValue)
+            {
+                <div>
+                    <b>@Model.DesdeAnio</b>
+                    <span>@(esPortugues ? "desde" : esIngles ? "since" : "desde")</span>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+
+<section class="banda banda--crema" style="padding-top:0">
+    <div class="contenedor">
+        <nav class="filtros" aria-label="@(esPortugues ? "Filtrar por bairro" : esIngles ? "Filter by neighbourhood" : "Filtrar por barrio")">
+            <a class="filtro" href="@Enlace(null, 1)" aria-current="@(Model.BarrioActivo is null ? "page" : null)">@(esPortugues ? "Todos" : esIngles ? "All" : "Todos")</a>
+            @foreach (var b in Model.Barrios)
+            {
+                <a class="filtro" href="@Enlace(b, 1)" aria-current="@(Model.BarrioActivo == b ? "page" : null)">@b</a>
+            }
+        </nav>
+
+        @if (Model.Fichas.Count == 0)
+        {
+            <p class="bajada">@(esPortugues ? "Ainda não há fachadas neste bairro." : esIngles ? "No facades in this neighbourhood yet." : "Todavía no hay fachadas en este barrio.")</p>
+        }
+        else
+        {
+            <div class="archivo">
+                @foreach (var f in Model.Fichas)
+                {
+                    <a class="ficha" href="@f.Url">
+                        <div class="ficha-foto">
+                            <img src="@f.ImagenSrc" alt="@f.ImagenAlt" loading="lazy" />
+                        </div>
+                        <span class="ficha-num">@f.NumeroFormateado</span>
+                        <b>@f.Titulo</b>
+                        <em>@f.Barrio · @f.Fecha.ToString("d 'de' MMMM")</em>
+                    </a>
+                }
+            </div>
+        }
+
+        @if (Model.TotalPaginas > 1)
+        {
+            <nav class="paginacion" aria-label="@(esPortugues ? "Paginação" : esIngles ? "Pagination" : "Paginación")">
+                @foreach (var n in Model.PaginasVisibles)
+                {
+                    <a href="@Enlace(Model.BarrioActivo, n)" aria-current="@(n == Model.Pagina ? "page" : null)">@n</a>
+                }
+                @if (Model.Pagina < Model.TotalPaginas)
+                {
+                    <a href="@Enlace(Model.BarrioActivo, Model.Pagina + 1)">@(esPortugues ? "Seguinte" : esIngles ? "Next" : "Siguiente")</a>
+                }
+            </nav>
+        }
+    </div>
+</section>

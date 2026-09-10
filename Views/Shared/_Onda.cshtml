@@ -1,0 +1,11 @@
+@model string
+@*
+    Borde ondulado entre dos bandas de color. El modelo es el color de la
+    banda de ABAJO; el contenedor lleva de fondo el de la banda de ARRIBA.
+    Uso:  <div class="transicion" style="background:var(--crema)">
+              <partial name="_Onda" model="@("var(--petroleo)")" />
+          </div>
+*@
+<svg viewBox="0 0 1440 40" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <path d="M0,22 C70,6 132,32 214,24 C300,15 356,38 448,28 C534,19 592,6 690,20 C784,33 838,12 940,22 C1042,32 1096,9 1196,18 C1292,27 1350,38 1440,26 L1440,40 L0,40 Z" fill="@Model" />
+</svg>

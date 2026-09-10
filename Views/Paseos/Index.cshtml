@@ -1,0 +1,138 @@
+@model PaseosVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" />
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+    </div>
+</section>
+
+<section class="banda banda--crema" style="padding-top:0">
+    <div class="contenedor">
+        <div class="propuestas">
+            @foreach (var p in Model.Propuestas)
+            {
+                <article class="propuesta">
+                    @if (!string.IsNullOrEmpty(p.ImagenSrc))
+                    {
+                        <div class="propuesta-foto">
+                            <img src="@p.ImagenSrc" alt="@p.ImagenAlt" loading="lazy" />
+                        </div>
+                    }
+                    <div class="propuesta-cuerpo">
+                        @if (!string.IsNullOrEmpty(p.Etiqueta))
+                        {
+                            <span class="etiqueta">@p.Etiqueta</span>
+                        }
+                        <h2>@p.Titulo</h2>
+                        <div class="@(p.PendienteDeDefinir ? "por-definir" : "")">
+                            @Html.Raw(p.DescripcionHtml)
+                        </div>
+
+                        @if (p.PendienteDeDefinir)
+                        {
+                            <span class="pendiente">@(esPortugues ? "Falta definir o conteúdo" : esIngles ? "Content still to be defined" : "Falta definir el contenido")</span>
+                        }
+                        else
+                        {
+                            @if (p.Datos.Count > 0)
+                            {
+                                <div class="datos-paseo">
+                                    @foreach (var d in p.Datos)
+                                    {
+                                        <div><b>@d.Valor</b><span>@d.Etiqueta</span></div>
+                                    }
+                                </div>
+                            }
+                            <div class="acciones" style="margin-top:22px">
+                                <a class="boton boton--principal" href="@p.Enlace">@p.TextoEnlace</a>
+                            </div>
+                        }
+                    </div>
+                </article>
+            }
+        </div>
+    </div>
+</section>
+
+<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--crema-2)")" /></div>
+
+<section class="banda banda--crema2" id="consulta" style="padding-top:calc(var(--aire) * .5)">
+    <div class="contenedor">
+        <div class="duo" style="align-items:start">
+            <div>
+                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Escreva e a gente monta" : esIngles ? "Write and we'll sort it out" : "Escribime y lo armamos")</h2>
+                <p class="bajada" style="font-size:var(--t-md)">@(esPortugues ? "Conte qual proposta lhe interessa e quantos são. Respondo com as datas disponíveis e como se combina." : esIngles ? "Tell me which offering interests you and how many of you there are. I'll reply with available dates and how to arrange it." : "Contame qué propuesta te interesa y cuántos son. Te contesto con las fechas disponibles y cómo se coordina.")</p>
+                <ul class="datos" style="margin-top:30px">
+                    <li>
+                        <strong>@(esPortugues ? "Quando se sai" : esIngles ? "When we go out" : "Cuándo se sale")</strong>
+                        @(esPortugues ? "Sábados e domingos de manhã, e alguma quarta à tarde." : esIngles ? "Saturday and Sunday mornings, and the odd Wednesday afternoon." : "Sábados y domingos de mañana, y algún miércoles de tarde.")
+                    </li>
+                    <li>
+                        <strong>@(esPortugues ? "Se chover" : esIngles ? "If it rains" : "Si llueve")</strong>
+                        @(esPortugues ? "Passa para o fim de semana seguinte, sem custo." : esIngles ? "It moves to the following weekend, at no cost." : "Se pasa para el fin de semana siguiente, sin costo.")
+                    </li>
+                    <li>
+                        <strong>@(esPortugues ? "Acessibilidade" : esIngles ? "Accessibility" : "Accesibilidad")</strong>
+                        @(esPortugues ? "Se alguém caminha devagar ou precisa de paradas, monta-se diferente. É só dizer." : esIngles ? "If someone walks slowly or needs stops, we plan it differently. Just say so." : "Si alguien camina despacio o necesita paradas, se arma distinto. Decímelo y listo.")
+                    </li>
+                </ul>
+            </div>
+
+            <form asp-controller="Paseos" asp-action="Consulta" method="post">
+                <div asp-validation-summary="ModelOnly" class="aviso aviso--error" role="alert"></div>
+
+                <div class="campo">
+                    <label asp-for="Consulta.PropuestaId">@(esPortugues ? "Qual proposta lhe interessa" : esIngles ? "Which offering interests you" : "Qué propuesta te interesa")</label>
+                    <select asp-for="Consulta.PropuestaId">
+                        @foreach (var p in Model.Propuestas)
+                        {
+                            <option value="@p.Id">@p.Titulo</option>
+                        }
+                    </select>
+                </div>
+
+                <div class="dos-columnas">
+                    <div class="campo">
+                        <label asp-for="Consulta.Nombre">@(esPortugues ? "Seu nome" : esIngles ? "Your name" : "Tu nombre")</label>
+                        <input asp-for="Consulta.Nombre" autocomplete="name" required maxlength="150" />
+                        <span asp-validation-for="Consulta.Nombre" class="pista"></span>
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Consulta.Email">@(esPortugues ? "Seu e-mail" : esIngles ? "Your email" : "Tu correo")</label>
+                        <input asp-for="Consulta.Email" type="email" autocomplete="email" required maxlength="200" />
+                        <span asp-validation-for="Consulta.Email" class="pista"></span>
+                    </div>
+                </div>
+
+                <div class="dos-columnas">
+                    <div class="campo">
+                        <label asp-for="Consulta.FechaDeseada">@(esPortugues ? "Data que serve" : esIngles ? "A date that works" : "Fecha que te sirve")</label>
+                        <input asp-for="Consulta.FechaDeseada" type="date" />
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Consulta.CantidadPersonas">@(esPortugues ? "Quantos são" : esIngles ? "How many of you" : "Cuántos son")</label>
+                        <input asp-for="Consulta.CantidadPersonas" type="number" min="1" max="40" />
+                        <span asp-validation-for="Consulta.CantidadPersonas" class="pista"></span>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Consulta.Notas">@(esPortugues ? "Algo que eu deva saber" : esIngles ? "Anything I should know" : "Algo que deba saber")</label>
+                    <textarea asp-for="Consulta.Notas" style="min-height:92px" maxlength="1000"></textarea>
+                </div>
+
+                <button class="boton boton--principal" type="submit">@(esPortugues ? "Enviar a consulta" : esIngles ? "Send the enquiry" : "Enviar la consulta")</button>
+            </form>
+        </div>
+    </div>
+</section>

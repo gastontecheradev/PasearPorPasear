@@ -1,10 +1,16 @@
 @inject Microsoft.AspNetCore.Identity.SignInManager<Microsoft.AspNetCore.Identity.IdentityUser> SignInManager
-@inject Microsoft.AspNetCore.Identity.UserManager<Microsoft.AspNetCore.Identity.IdentityUser> UserManager
 @{
     var requestCulture = Context.Features.Get<IRequestCultureFeature>();
     var culture = requestCulture?.RequestCulture?.Culture?.TwoLetterISOLanguageName ?? "es";
     var isEn = culture == "en";
     var isPt = culture == "pt";
+
+    var controlador = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    // El Clubcito cuelga de ¿Paseás conmigo?: el menú marca la sección madre
+    var seccion = controlador == "Clubcito" ? "Paseos" : controlador;
+    Func<string, string> activo = c => seccion == c ? "page" : null;
+
+    var esAdmin = SignInManager.IsSignedIn(User) && User.IsInRole("Admin");
 }
 <!DOCTYPE html>
 <html lang="@culture">
@@ -12,153 +18,146 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>@ViewData["Title"] — Pasear por Pasear</title>
+
+    @* Precarga de los dos pesos que aparecen sobre el pliegue *@
+    <link rel="preload" href="~/fonts/golos-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="~/fonts/golos-800.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="icon" type="image/png" href="/images/favicon.png">
+    <link rel="icon" type="image/png" href="~/img/marca/favicon.png" />
 
     @await RenderSectionAsync("Styles", required: false)
-    <!-- Open Graph -->
-    <meta property="og:title" content="Pasear por Pasear" />
-    <meta property="og:description" content="Blog de paseos por Montevideo, Uruguay" />
-    <meta property="og:image" content="https://pasearporpasear.azurewebsites.net/images/og-image.jpg" />
+
+    <noscript>
+        <style>
+            /* Sin JavaScript el desplegable no puede abrirse: se deja el menú a la vista */
+            @@media (max-width:1100px){
+                .nav{display:flex}
+                .hamburguesa{display:none}
+            }
+        </style>
+    </noscript>
+
+    <meta name="theme-color" content="#FFF5E6" />
+    <meta property="og:title" content="@(ViewData["Title"] ?? "Pasear por Pasear")" />
+    <meta property="og:description" content="@(isPt ? "Caminhar Montevidéu sem pressa e contar. Bairro por bairro." : isEn ? "Walking Montevideo slowly, and writing it down. Block by block." : "Caminar Montevideo sin apuro y contarlo. Barrio por barrio, vereda por vereda.")" />
+    <meta property="og:image" content="https://pasearporpasear.com/img/marca/og-image.jpg" />
     <meta property="og:type" content="website" />
+    <meta property="og:locale" content="@culture" />
 </head>
 <body>
-    <nav class="navbar">
-        <div class="navbar-inner">
-            <a href="/" class="navbar-brand">
-                <img src="/images/logo.png" alt="Pasear por Pasear" style="height:40px">
-                <span class="brand-text">Pasear por Pasear</span>
-            </a>
 
-            <ul class="navbar-links" id="navLinks">
-                <li><a href="/" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Home" ? "active" : "")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
-                @* <li><a href="/Blog" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Blog" ? "active" : "")">Blog</a>
-                    <ul class="nav-dropdown">
-                        <li><a href="/Blog">@(isPt ? "Todos" : isEn ? "All" : "Todos")</a></li>
-                        <li><a href="/Blog?category=itinerarios">@(isPt ? "Itinerários" : isEn ? "Itineraries" : "Itinerarios")</a></li>
-                        <li><a href="/Blog?category=personal">Personal</a></li>
-                        <li><a href="/Blog?category=recomendaciones">@(isPt ? "Recomendações" : isEn ? "Recommendations" : "Recomendaciones")</a></li>
-                        <li><a href="/Blog?category=viajes">@(isPt ? "Viagens" : isEn ? "Travel" : "Viajes")</a></li>
-                    </ul>
-                </li> *@
-                <li><a href="/ClubDePaseo" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "ClubDePaseo" ? "active" : "")">@(isPt ? "Club de Paseo" : isEn ? "Club de Paseo" : "Club de Paseo")</a></li>
-                @* <li><a href="/Tours" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Tours" ? "active" : "")">Tours</a></li> *@
-                @* <li><a href="/Newsletter" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Newsletter" ? "active" : "")">Newsletter</a></li> *@
-                <li><a href="/About" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "About" ? "active" : "")">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
-                <li><a href="/Contact" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Contact" ? "active" : "")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
-                
-                @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
+<a class="saltar" href="#contenido">@(isPt ? "Ir ao conteúdo" : isEn ? "Skip to content" : "Ir al contenido")</a>
+
+<!-- ══════════════ CABECERA ══════════════ -->
+<header class="cabecera">
+    <div class="cabecera-int">
+        @* En la cabecera va sólo la casita: el lettering vive en la portada y en el pie *@
+        <a class="marca" href="/">
+            <img class="casita" src="~/img/marca/casita-sm.webp" alt="Pasear por Pasear" width="120" height="141" />
+        </a>
+
+        <ul class="nav" id="nav">
+            <li><a href="/" aria-current="@activo("Home")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
+            <li><a href="/Sobre" aria-current="@activo("Sobre")">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
+            <li><a href="/Paseos" aria-current="@activo("Paseos")">@(isPt ? "Passeia comigo?" : isEn ? "Walk with me?" : "¿Paseás conmigo?")</a></li>
+                @* El hashtag es parte de la marca: no se traduce en ningún idioma *@
+            <li><a href="/Archivo" aria-current="@activo("Archivo")">#ArchivoDeFachadas</a></li>
+            <li><a href="/Productos" aria-current="@activo("Productos")">@(isPt ? "Produtos" : isEn ? "Shop" : "Productos")</a></li>
+            <li><a href="/Cartelera" aria-current="@activo("Cartelera")">@(isPt ? "Mural do bairro" : isEn ? "Neighbourhood board" : "Cartelera")</a></li>
+            <li><a href="/Contacto" aria-current="@activo("Contacto")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+        </ul>
+
+        <div class="idiomas" role="group" aria-label="@(isPt ? "Idioma" : isEn ? "Language" : "Idioma")">
+            <button type="button" onclick="setLanguage('es')" aria-pressed="@(culture == "es" ? "true" : "false")">ES</button>
+            <button type="button" onclick="setLanguage('en')" aria-pressed="@(culture == "en" ? "true" : "false")">EN</button>
+            <button type="button" onclick="setLanguage('pt')" aria-pressed="@(culture == "pt" ? "true" : "false")">PT</button>
+        </div>
+
+        <button class="hamburguesa" id="hamburguesa" aria-expanded="false" aria-controls="nav"
+                aria-label="@(isPt ? "Abrir menu" : isEn ? "Open menu" : "Abrir menú")">
+            <span></span><span></span><span></span>
+        </button>
+    </div>
+</header>
+
+@* Token para el cambio de idioma por JS *@
+<form id="langForm" hidden>@Html.AntiForgeryToken()</form>
+
+@if (TempData["Success"] is string ok || TempData["Error"] is string err || TempData["Info"] is string info)
+{
+    <div class="contenedor" style="margin-top:20px">
+        @if (TempData["Success"] is string s1) { <p class="aviso aviso--ok" role="status">@s1</p> }
+        @if (TempData["Error"] is string s2) { <p class="aviso aviso--error" role="alert">@s2</p> }
+        @if (TempData["Info"] is string s3) { <p class="aviso aviso--info" role="status">@s3</p> }
+    </div>
+}
+
+<main id="contenido">
+    @RenderBody()
+</main>
+
+<!-- ══════════════ PIE ══════════════ -->
+<footer class="pie">
+    <div class="contenedor">
+        <div class="pie-grilla">
+            <div>
+                <img class="lettering" src="~/img/marca/wordmark-crema.webp" alt="Pasear por Pasear" width="720" height="307" />
+                <p>@(isPt ? "Caminhar Montevidéu sem pressa e contar. Bairro por bairro, calçada por calçada." : isEn ? "Walking Montevideo slowly, and writing it down. Block by block, pavement by pavement." : "Caminar Montevideo sin apuro y contarlo. Barrio por barrio, vereda por vereda.")</p>
+            </div>
+            <div>
+                <h4>@(isPt ? "Percorrer" : isEn ? "Explore" : "Recorrer")</h4>
+                <ul>
+                <li><a href="/Sobre">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
+                <li><a href="/Paseos">@(isPt ? "Passeia comigo?" : isEn ? "Walk with me?" : "¿Paseás conmigo?")</a></li>
+                <li><a href="/Clubcito">El Clubcito</a></li>
+                <li><a href="/Archivo">#ArchivoDeFachadas</a></li>
+                <li><a href="/Cartelera">@(isPt ? "Mural do bairro" : isEn ? "Neighbourhood board" : "Cartelera de barrio")</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>@(isPt ? "Escrever" : isEn ? "Write" : "Escribir")</h4>
+                <ul>
+                <li><a href="/Contacto">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+                <li><a href="/Productos">@(isPt ? "Produtos" : isEn ? "Shop" : "Productos")</a></li>
+                    <li><a href="mailto:pasearporpasear@gmail.com?subject=cartelera%20de%20barrio">@(isPt ? "Enviar um cartaz" : isEn ? "Send a poster" : "Mandar un afiche")</a></li>
+                <li><a href="/Contacto#buzon">@(isPt ? "A caixa de correio da Casita" : isEn ? "The Casita mailbox" : "El buzón de la Casita")</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4>@(isPt ? "Seguir" : isEn ? "Follow" : "Seguir")</h4>
+                <ul>
+                    <li><a href="https://www.instagram.com/pasearporpasear/" target="_blank" rel="noopener">Instagram</a></li>
+                    <li><a href="https://www.tiktok.com/@@pasearporpasear" target="_blank" rel="noopener">TikTok</a></li>
+                    <li><a href="https://www.threads.com/@@pasearporpasear" target="_blank" rel="noopener">Threads</a></li>
+                    <li><a href="https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08" target="_blank" rel="noopener">@(isPt ? "Canal do WhatsApp" : isEn ? "WhatsApp channel" : "Canal de WhatsApp")</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="pie-abajo">
+            <span>© @DateTime.Now.Year Pasear por Pasear · Rosalía Souza · Montevideo, Uruguay</span>
+            <span>
+                @if (esAdmin)
                 {
-                    <li><a href="/Admin/Dashboard" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Admin" ? "active" : "")">Admin</a></li>
-                    <li>
-                        <form asp-controller="Account" asp-action="Logout" method="post" class="nav-logout-form">
-                            <button type="submit" class="nav-logout-btn">@(isEn ? "Logout" : "Salir")</button>
-                        </form>
-                    </li>
+                    <a href="/Admin/Dashboard">Admin</a>
+                    <span style="margin:0 8px;opacity:.5">·</span>
+                    <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                        <button type="submit" class="pie-salir">@(isPt ? "Sair" : isEn ? "Log out" : "Salir")</button>
+                    </form>
+                    <span style="margin:0 8px;opacity:.5">·</span>
                 }
                 else
                 {
-                    <li><a href="/Account/Login" class="@(ViewContext.RouteData.Values["controller"]?.ToString() == "Account" ? "active" : "")" title="@(isEn ? "Admin Login" : "Acceso Admin")">Admin</a></li>
+                    <a href="/Account/Login">Admin</a>
+                    <span style="margin:0 8px;opacity:.5">·</span>
                 }
-            </ul>
-
-            <div class="navbar-right">
-                <div class="lang-toggle">
-                    <button onclick="setLanguage('es')" class="@(culture == "es" ? "active" : "")">ES</button>
-                    <button onclick="setLanguage('en')" class="@(culture == "en" ? "active" : "")">EN</button>
-                    <button onclick="setLanguage('pt')" class="@(culture == "pt" ? "active" : "")">PT</button>
-                </div>
-
-                <button class="hamburger" id="hamburger" onclick="toggleNav()" aria-label="Menu">
-                    <span></span><span></span><span></span>
-                </button>
-            </div>
+                @(isPt ? "Identidade visual" : isEn ? "Visual identity" : "Identidad visual"): Mechi Barrón
+            </span>
         </div>
-    </nav>
-
-    <!-- Hidden anti-forgery token for JS language switch -->
-    <form id="langForm" style="display:none">
-        @Html.AntiForgeryToken()
-    </form>
-
-    <!-- ═══ ALERTS ═══ -->
-    <div class="container" style="margin-top:16px">
-        @if (TempData["Success"] is string success)
-        {
-            <div class="alert alert-success">✓ @success</div>
-        }
-        @if (TempData["Error"] is string error)
-        {
-            <div class="alert alert-error">✕ @error</div>
-        }
-        @if (TempData["Info"] is string info)
-        {
-            <div class="alert alert-info">ℹ @info</div>
-        }
-        @if (TempData["ReservationSuccess"] is string resSuccess)
-        {
-            <div class="alert alert-success">✓ @resSuccess</div>
-        }
     </div>
+</footer>
 
-    <!-- ═══ MAIN CONTENT ═══ -->
-    <main>
-        @RenderBody()
-    </main>
-
-    <!-- ═══ FOOTER ═══ -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-grid">
-                <div>
-                    <div class="footer-brand">Pasear por Pasear<span class="dot">.</span></div>
-                    <p class="footer-desc">@(isPt ? "Descobrindo Montevidéu um passo de cada vez. Passeios a pé, itinerários e histórias de cidades no Uruguai." : isEn ? "Discovering Montevideo one step at a time. Walking tours, itineraries, and stories from Uruguay's cities." : "Descubriendo Montevideo un paso a la vez. Tours a pie, itinerarios e historias de ciudades de Uruguay.")</p>
-                </div>
-                <div>
-                    <div class="footer-heading">@(isPt ? "Explorar" : isEn ? "Explore" : "Explorar")</div>
-                    <ul class="footer-links">
-                        <li><a href="/">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
-                        <li><a href="/ClubDePaseo">@(isPt ? "Clube de Caminhada" : isEn ? "Walking Club" : "Club de Paseo")</a></li>
-                        <li><a href="/About">@(isPt ? "Sobre Mim" : isEn ? "About" : "Sobre Mí")</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="footer-heading">@(isPt ? "Conectar" : isEn ? "Connect" : "Conectar")</div>
-                    <ul class="footer-links">
-                        <li><a href="/Contact">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
-                        <li><a href="/Newsletter">Newsletter</a></li>
-                        <li><a href="https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08" target="_blank" rel="noopener">WhatsApp</a></li>
-                    </ul>
-                </div>
-                <div>
-                    <div class="footer-heading">@(isPt ? "Siga-nos" : isEn ? "Follow Us" : "Seguinos")</div>
-                    <ul class="footer-links">
-                        <li><a href="https://www.instagram.com/pasearporpasear/" target="_blank" rel="noopener">Instagram</a></li>
-                        <li><a href="https://www.threads.com/@@pasearporpasear" target="_blank" rel="noopener">Threads</a></li>
-                        <li><a href="https://www.tiktok.com/@@pasearporpasear" target="_blank" rel="noopener">Tiktok</a></li>
-                    </ul>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <span>© @DateTime.Now.Year — Pasear por Pasear · Rosalía Souza</span>
-                <span>
-                    @if (SignInManager.IsSignedIn(User) && User.IsInRole("Admin"))
-                    {
-                        <a href="/Admin/Dashboard" style="color:var(--yellow)">Admin</a>
-                        <span style="margin:0 6px">·</span>
-                    }
-                    else
-                    {
-                        <a href="/Account/Login" style="color:rgba(244,239,232,.2);transition:color .3s" onmouseover="this.style.color='var(--yellow)'" onmouseout="this.style.color='rgba(244,239,232,.2)'">@(isEn ? "Admin" : "Admin")</a>
-                        <span style="margin:0 6px">·</span>
-                    }
-                    Montevideo, Uruguay 🇺🇾
-                </span>
-            </div>
-        </div>
-    </footer>
-
-    <script src="~/js/site.js"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+<script src="~/js/site.js" asp-append-version="true"></script>
+@await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

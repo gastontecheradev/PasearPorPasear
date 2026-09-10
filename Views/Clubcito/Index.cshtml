@@ -1,0 +1,104 @@
+@model ClubcitoVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/gorrion.webp" alt="" width="380" height="307" />
+        <p class="migas">
+            <a href="/">@(esPortugues ? "Início" : esIngles ? "Home" : "Inicio")</a> ·
+            <a href="/Paseos">@(esPortugues ? "Passeia comigo?" : esIngles ? "Walk with me?" : "¿Paseás conmigo?")</a> ·
+            El Clubcito
+        </p>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+    </div>
+</section>
+
+<section class="banda banda--crema" style="padding-top:0">
+    <div class="contenedor">
+        <h2 style="font-size:var(--t-xl);margin-bottom:24px">@(esPortugues ? "O que vem" : esIngles ? "What's coming" : "Lo que viene")</h2>
+
+        @if (Model.Proximos.Count == 0)
+        {
+            <p class="bajada">@(esPortugues ? "Ainda não há data para a próxima saída. Avisamos pela caixa de correio." : esIngles ? "No date yet for the next walk. We announce it through the mailbox." : "Todavía no hay fecha para la próxima salida. Se avisa por el buzón.")</p>
+        }
+        else
+        {
+            <div class="encuentros">
+                @foreach (var e in Model.Proximos)
+                {
+                    var sinDefinir = e.Estado == EstadoEncuentro.SinDefinir;
+                    <article class="encuentro @(sinDefinir ? "encuentro--lleno" : "")">
+                        <div class="fecha"><b>@e.Dia</b><span>@e.MesCorto</span></div>
+                        <div>
+                            <h3>@e.Titulo</h3>
+                            @if (!string.IsNullOrEmpty(e.Extracto))
+                            {
+                                <p>@e.Extracto</p>
+                            }
+                            @if (!string.IsNullOrEmpty(e.PuntoEncuentro))
+                            {
+                                <p><strong>@(esPortugues ? "Ponto de encontro" : esIngles ? "Meeting point" : "Punto de encuentro"):</strong> @e.PuntoEncuentro</p>
+                            }
+                        </div>
+                        @if (sinDefinir)
+                        {
+                            <a class="boton boton--borde" href="/Contacto">@(esPortugues ? "Propor bairro" : esIngles ? "Suggest a neighbourhood" : "Proponer barrio")</a>
+                        }
+                        else
+                        {
+                            <a class="boton boton--principal" href="/Paseos#consulta">@(esPortugues ? "Inscrever-me" : esIngles ? "Sign me up" : "Anotarme")</a>
+                        }
+                    </article>
+                }
+            </div>
+        }
+    </div>
+</section>
+
+<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--petroleo)")" /></div>
+
+<section class="banda banda--petroleo banda--ajustada" style="padding-top:calc(var(--aire) * .4)">
+    <div class="contenedor">
+        <div class="suscripcion">
+            <partial name="_BloqueBuzon" model="Model.Buzon" />
+            <img class="kiosco" src="~/img/marca/casita.webp" alt="" width="380" height="447" loading="lazy" />
+        </div>
+    </div>
+</section>
+
+@if (Model.Anteriores.Count > 0)
+{
+    <section class="banda banda--crema">
+        <div class="contenedor">
+            <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Onde estivemos" : esIngles ? "Where we've been" : "Dónde estuvimos")</h2>
+            <p class="bajada">@(esPortugues ? "Cada saída fica escrita, com as fotos e o percurso que fizemos." : esIngles ? "Every walk gets written up, with the photos and the route we took." : "Cada salida queda escrita, con las fotos y el recorrido que hicimos.")</p>
+
+            <div class="grilla" style="margin-top:44px">
+                @foreach (var e in Model.Anteriores)
+                {
+                    var tarjeta = new TarjetaVm
+                    {
+                        Titulo = e.Titulo,
+                        Url = e.Url,
+                        Etiqueta = e.Barrio,
+                        Extracto = e.Extracto,
+                        ImagenSrc = e.ImagenSrc,
+                        ImagenAlt = e.ImagenAlt,
+                        PieIzquierda = e.Fecha.ToString("d 'de' MMMM"),
+                        PieDerecha = e.Asistentes.HasValue
+                            ? $"{e.Asistentes} {(esPortugues ? "pessoas" : esIngles ? "people" : "personas")}"
+                            : null
+                    };
+                    <partial name="_Ventana" model="tarjeta" />
+                }
+            </div>
+        </div>
+    </section>
+}

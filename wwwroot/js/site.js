@@ -1,149 +1,81 @@
-// ══════════════════════════════════════
-// Pasear por Pasear — Main JS
-// ══════════════════════════════════════
+/* ══════════════════════════════════════════════════════════════
+   PASEAR POR PASEAR — comportamiento del sitio
+   ══════════════════════════════════════════════════════════════ */
+(function () {
+  'use strict';
 
-// Mobile nav toggle
-function toggleNav() {
-    document.getElementById('navLinks')?.classList.toggle('open');
-    document.getElementById('hamburger')?.classList.toggle('open');
-}
-function closeNav() {
-    document.getElementById('navLinks')?.classList.remove('open');
-    document.getElementById('hamburger')?.classList.remove('open');
-}
+  // ── Menú desplegable en pantallas chicas ──────────────────────
+  var ham = document.getElementById('hamburguesa');
+  var nav = document.getElementById('nav');
 
-// Close nav on outside click
-document.addEventListener('click', (e) => {
-    const nav = document.querySelector('.navbar');
-    if (nav && !nav.contains(e.target)) closeNav();
-});
+  if (ham && nav) {
+    ham.addEventListener('click', function (e) {
+      e.stopPropagation();
+      var abierto = nav.classList.toggle('abierta');
+      ham.setAttribute('aria-expanded', abierto ? 'true' : 'false');
+    });
 
-// Scroll reveal
-document.addEventListener('DOMContentLoaded', () => {
-    const observer = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-            if (entry.isIntersecting) {
-                entry.target.classList.add('visible');
-                observer.unobserve(entry.target);
-            }
-        });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    // Cerrar al tocar fuera
+    document.addEventListener('click', function (e) {
+      if (!nav.classList.contains('abierta')) return;
+      if (nav.contains(e.target) || ham.contains(e.target)) return;
+      nav.classList.remove('abierta');
+      ham.setAttribute('aria-expanded', 'false');
+    });
 
-    document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
-});
+    // Cerrar con Escape y devolver el foco al botón
+    document.addEventListener('keydown', function (e) {
+      if (e.key !== 'Escape' || !nav.classList.contains('abierta')) return;
+      nav.classList.remove('abierta');
+      ham.setAttribute('aria-expanded', 'false');
+      ham.focus();
+    });
+  }
 
-// Language switch
-function setLanguage(culture) {
-    const form = document.createElement('form');
+  // ── Cambio de idioma ──────────────────────────────────────────
+  window.setLanguage = function (culture) {
+    var form = document.createElement('form');
     form.method = 'POST';
     form.action = '/Language/SetLanguage';
 
-    const cultureInput = document.createElement('input');
-    cultureInput.type = 'hidden';
-    cultureInput.name = 'culture';
-    cultureInput.value = culture;
-    form.appendChild(cultureInput);
-
-    const returnInput = document.createElement('input');
-    returnInput.type = 'hidden';
-    returnInput.name = 'returnUrl';
-    returnInput.value = window.location.pathname + window.location.search;
-    form.appendChild(returnInput);
-
-    // Anti-forgery token
-    const token = document.querySelector('input[name="__RequestVerificationToken"]');
-    if (token) {
-        const tokenInput = document.createElement('input');
-        tokenInput.type = 'hidden';
-        tokenInput.name = '__RequestVerificationToken';
-        tokenInput.value = token.value;
-        form.appendChild(tokenInput);
+    function campo(nombre, valor) {
+      var i = document.createElement('input');
+      i.type = 'hidden';
+      i.name = nombre;
+      i.value = valor;
+      form.appendChild(i);
     }
+
+    campo('culture', culture);
+    campo('returnUrl', window.location.pathname + window.location.search);
+
+    var token = document.querySelector('#langForm input[name="__RequestVerificationToken"]');
+    if (token) campo('__RequestVerificationToken', token.value);
 
     document.body.appendChild(form);
     form.submit();
-}
+  };
 
-// Simple rich text editor helpers
-function execCmd(command, value = null) {
-    document.execCommand(command, false, value);
-}
+  // ── Filtros por barrio (archivo y cartelera) ──────────────────
+  // Sin recargar cuando el filtrado es sólo visual; si el grupo lleva
+  // data-servidor, se deja pasar el enlace y filtra el controlador.
+  document.querySelectorAll('.filtros[data-cliente]').forEach(function (grupo) {
+    var destino = document.querySelector(grupo.dataset.cliente);
+    if (!destino) return;
 
-function insertLink() {
-    const url = prompt('URL:');
-    if (url) execCmd('createLink', url);
-}
+    grupo.addEventListener('click', function (e) {
+      var boton = e.target.closest('.filtro');
+      if (!boton) return;
 
-// Sync contenteditable div to hidden textarea
-function syncEditor(editorId, textareaId) {
-    const editor = document.getElementById(editorId);
-    const textarea = document.getElementById(textareaId);
-    if (editor && textarea) {
-        textarea.value = editor.innerHTML;
-    }
-}
+      grupo.querySelectorAll('.filtro').forEach(function (b) {
+        b.setAttribute('aria-pressed', 'false');
+      });
+      boton.setAttribute('aria-pressed', 'true');
 
-// Initialize editors on page
-document.addEventListener('DOMContentLoaded', () => {
-    // Load content from hidden textareas into editors
-    document.querySelectorAll('[data-editor-for]').forEach(editor => {
-        const textareaId = editor.dataset.editorFor;
-        const textarea = document.getElementById(textareaId);
-        if (textarea) {
-            editor.innerHTML = textarea.value;
-            // Live sync on every keystroke
-            editor.addEventListener('input', () => {
-                textarea.value = editor.innerHTML;
-            });
-            editor.addEventListener('blur', () => {
-                textarea.value = editor.innerHTML;
-            });
-            // Also sync on paste
-            editor.addEventListener('paste', () => {
-                setTimeout(() => { textarea.value = editor.innerHTML; }, 50);
-            });
-        }
+      var barrio = boton.dataset.barrio || '';
+      destino.querySelectorAll('[data-barrio]').forEach(function (item) {
+        item.hidden = barrio !== '' && item.dataset.barrio !== barrio;
+      });
     });
-
-    // Intercept ALL form submissions to sync editors BEFORE submit
-    document.addEventListener('submit', (e) => {
-        const form = e.target;
-        if (!form || form.tagName !== 'FORM') return;
-        
-        // Sync all editors within this form (or on the page)
-        document.querySelectorAll('[data-editor-for]').forEach(editor => {
-            const textareaId = editor.dataset.editorFor;
-            const textarea = document.getElementById(textareaId);
-            if (textarea) {
-                // If editor is empty or just has <br>, set a space to avoid empty validation
-                const content = editor.innerHTML.trim();
-                textarea.value = (content === '' || content === '<br>') ? '' : content;
-            }
-        });
-    }, true); // Use capture phase to run BEFORE the form submits
-});
-
-// Image preview on file input change
-document.addEventListener('DOMContentLoaded', () => {
-    document.querySelectorAll('input[type="file"][data-preview]').forEach(input => {
-        input.addEventListener('change', (e) => {
-            const previewId = input.dataset.preview;
-            const preview = document.getElementById(previewId);
-            if (preview && e.target.files[0]) {
-                const reader = new FileReader();
-                reader.onload = (ev) => {
-                    preview.src = ev.target.result;
-                    preview.style.display = 'block';
-                };
-                reader.readAsDataURL(e.target.files[0]);
-            }
-        });
-    });
-});
-
-// Confirm delete
-function confirmDelete(formId, message) {
-    if (confirm(message || '¿Estás seguro de que querés eliminar esto?')) {
-        document.getElementById(formId).submit();
-    }
-}
+  });
+})();

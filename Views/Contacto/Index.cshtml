@@ -1,0 +1,93 @@
+@model ContactoVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/ventana-3.webp" alt="" width="300" height="417" />
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+    </div>
+</section>
+
+<section class="banda banda--crema" style="padding-top:0">
+    <div class="contenedor">
+        <div class="duo" style="align-items:start">
+
+            <form asp-controller="Contacto" asp-action="Index" method="post">
+                <div asp-validation-summary="ModelOnly" class="aviso aviso--error" role="alert"></div>
+
+                <div class="dos-columnas">
+                    <div class="campo">
+                        <label asp-for="Mensaje.Nombre">@(esPortugues ? "Seu nome" : esIngles ? "Your name" : "Tu nombre")</label>
+                        <input asp-for="Mensaje.Nombre" autocomplete="name" required maxlength="150" />
+                        <span asp-validation-for="Mensaje.Nombre" class="pista"></span>
+                    </div>
+                    <div class="campo">
+                        <label asp-for="Mensaje.Email">@(esPortugues ? "Seu e-mail" : esIngles ? "Your email" : "Tu correo")</label>
+                        <input asp-for="Mensaje.Email" type="email" autocomplete="email" required maxlength="200" />
+                        <span asp-validation-for="Mensaje.Email" class="pista"></span>
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Mensaje.Asunto">@(esPortugues ? "Sobre o que escreve" : esIngles ? "What it is about" : "Sobre qué escribís")</label>
+                    <select asp-for="Mensaje.Asunto">
+                        <option value="@(esPortugues ? "Entrar num passeio do Clubcito" : esIngles ? "Join a Clubcito walk" : "Sumarme a una salida del Clubcito")">@(esPortugues ? "Entrar num passeio do Clubcito" : esIngles ? "Join a Clubcito walk" : "Sumarme a una salida del Clubcito")</option>
+                        <option value="@(esPortugues ? "Pedir um percurso personalizado" : esIngles ? "Ask for a private walk" : "Pedir un recorrido personalizado")">@(esPortugues ? "Pedir um percurso personalizado" : esIngles ? "Ask for a private walk" : "Pedir un recorrido personalizado")</option>
+                        <option value="@(esPortugues ? "Enviar um cartaz ao mural" : esIngles ? "Send a poster to the board" : "Mandar un afiche a la cartelera")">@(esPortugues ? "Enviar um cartaz ao mural" : esIngles ? "Send a poster to the board" : "Mandar un afiche a la cartelera")</option>
+                        <option value="@(esPortugues ? "Propor um bairro ou uma fachada" : esIngles ? "Suggest a neighbourhood or a facade" : "Proponer un barrio o una fachada")">@(esPortugues ? "Propor um bairro ou uma fachada" : esIngles ? "Suggest a neighbourhood or a facade" : "Proponer un barrio o una fachada")</option>
+                        <option value="@(esPortugues ? "Imprensa ou colaboração" : esIngles ? "Press or collaboration" : "Prensa o colaboración")">@(esPortugues ? "Imprensa ou colaboração" : esIngles ? "Press or collaboration" : "Prensa o colaboración")</option>
+                        <option value="@(esPortugues ? "Outra coisa" : esIngles ? "Something else" : "Otra cosa")">@(esPortugues ? "Outra coisa" : esIngles ? "Something else" : "Otra cosa")</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label asp-for="Mensaje.Mensaje">@(esPortugues ? "Mensagem" : esIngles ? "Message" : "Mensaje")</label>
+                    <textarea asp-for="Mensaje.Mensaje" required maxlength="2000"></textarea>
+                    <span asp-validation-for="Mensaje.Mensaje" class="pista"></span>
+                    <p class="pista">@(esPortugues ? "Respondemos em alguns dias. Nem sempre na hora, mas respondemos." : esIngles ? "We reply in a few days. Not always right away, but we reply." : "Contestamos en unos días. No siempre enseguida, pero contestamos.")</p>
+                </div>
+
+                <button class="boton boton--principal" type="submit">@(esPortugues ? "Enviar a mensagem" : esIngles ? "Send the message" : "Enviar el mensaje")</button>
+            </form>
+
+            <div>
+                <ul class="datos">
+                    <li>
+                        <strong>@(esPortugues ? "E-mail" : esIngles ? "Email" : "Correo")</strong>
+                        <a href="mailto:@Model.CorreoContacto">@Model.CorreoContacto</a>
+                    </li>
+                    <li>
+                        <strong>@(esPortugues ? "Mural" : esIngles ? "Board" : "Cartelera")</strong>
+                        @(esPortugues ? "Assunto «cartelera de barrio»" : esIngles ? "Subject «cartelera de barrio»" : "Asunto «cartelera de barrio»")
+                    </li>
+                    <li>
+                        <strong>@(esPortugues ? "Onde estamos" : esIngles ? "Where we are" : "Dónde estamos")</strong>
+                        Montevideo, Uruguay
+                    </li>
+                    <li>
+                        <strong>@(esPortugues ? "Redes" : esIngles ? "Social" : "Redes")</strong>
+                        <a href="https://www.instagram.com/pasearporpasear/" target="_blank" rel="noopener">Instagram</a> ·
+                        <a href="https://www.tiktok.com/@@pasearporpasear" target="_blank" rel="noopener">TikTok</a> ·
+                        <a href="https://www.threads.com/@@pasearporpasear" target="_blank" rel="noopener">Threads</a>
+                        @if (!string.IsNullOrEmpty(Model.CanalWhatsApp))
+                        {
+                            <text> · </text><a href="@Model.CanalWhatsApp" target="_blank" rel="noopener">@(esPortugues ? "Canal do WhatsApp" : esIngles ? "WhatsApp channel" : "Canal de WhatsApp")</a>
+                        }
+                    </li>
+                </ul>
+
+                <div id="buzon" style="margin-top:34px">
+                    <partial name="_BloqueBuzon" model="Model.Buzon" />
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

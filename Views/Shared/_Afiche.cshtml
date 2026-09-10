@@ -1,0 +1,31 @@
+@model CarteleraAfiche
+@*
+    Afiche de la cartelera, en uno de los seis diseños del manual de marca.
+    Los afiches van en un solo idioma: los manda el barrio.
+*@
+@{
+    var clase = Model.Color switch
+    {
+        ColorAfiche.Mostaza  => "afiche--mostaza",
+        ColorAfiche.Petroleo => "afiche--petroleo",
+        ColorAfiche.Coral    => "afiche--coral",
+        ColorAfiche.Durazno  => "afiche--durazno",
+        ColorAfiche.Rayas    => "afiche--rayas",
+        _                    => "afiche--crema"
+    };
+}
+<div class="afiche @clase">
+    <div class="afiche-marco">
+        <partial name="_Filete" />
+        <h3>@Model.Titulo</h3>
+        <p>@Model.Texto</p>
+        @{
+            var pie = string.Join(" · ", new[] { Model.Barrio, Model.Contacto }
+                .Where(x => !string.IsNullOrWhiteSpace(x)));
+        }
+        @if (!string.IsNullOrEmpty(pie))
+        {
+            <span class="dato">@pie</span>
+        }
+    </div>
+</div>

@@ -1,0 +1,65 @@
+@model CarteleraVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+    var asunto = Uri.EscapeDataString("cartelera de barrio");
+    var mailto = $"mailto:{Model.CorreoCartelera}?subject={asunto}";
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" />
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+    </div>
+</section>
+
+<section class="banda banda--mostaza banda--ajustada">
+    <div class="contenedor">
+        <h2 style="font-size:var(--t-xl)">@(esPortugues ? "Como colar seu cartaz" : esIngles ? "How to put your poster up" : "Cómo pegar tu afiche")</h2>
+        <ol class="pasos">
+            <li>
+                <h3>@(esPortugues ? "Escreva" : esIngles ? "Write to us" : "Escribinos")</h3>
+                <p>
+                    @(esPortugues ? "Mande um e-mail para" : esIngles ? "Send an email to" : "Mandá un correo a")
+                    <strong>@Model.CorreoCartelera</strong>
+                    @(esPortugues ? "com o assunto «cartelera de barrio»." : esIngles ? "with the subject «cartelera de barrio»." : "con el asunto «cartelera de barrio».")
+                </p>
+            </li>
+            <li>
+                <h3>@(esPortugues ? "Conte o que é" : esIngles ? "Tell us what it is" : "Contanos qué es")</h3>
+                <p>@(esPortugues ? "O que acontece, quando, onde e como entram em contato. Se tiver uma foto ou um cartaz pronto, mande também." : esIngles ? "What is happening, when, where and how to reach you. If you have a photo or a finished poster, send that too." : "Qué pasa, cuándo, dónde y cómo te contactan. Si tenés una foto o un afiche hecho, mandalo también.")</p>
+            </li>
+            <li>
+                <h3>@(esPortugues ? "A gente cola" : esIngles ? "We put it up" : "Lo pegamos")</h3>
+                <p>@(esPortugues ? "Publicamos aqui e fica até passar a data. É grátis e não é preciso ser ninguém em especial." : esIngles ? "We publish it here and it stays until the date passes. It is free and you do not need to be anyone in particular." : "Lo publicamos acá y queda hasta que pase la fecha. Es gratis y no hay que ser nadie en particular.")</p>
+            </li>
+        </ol>
+        <div class="acciones">
+            <a class="boton boton--principal" href="@mailto">@(esPortugues ? "Enviar meu cartaz" : esIngles ? "Send my poster" : "Mandar mi afiche")</a>
+        </div>
+    </div>
+</section>
+
+<section class="banda banda--crema2">
+    <div class="contenedor">
+        <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "O que está colado agora" : esIngles ? "What is up right now" : "Lo que está pegado ahora")</h2>
+        @if (Model.Afiches.Count == 0)
+        {
+            <p class="bajada">@(esPortugues ? "Por enquanto o mural está vazio. O primeiro cartaz pode ser o seu." : esIngles ? "The board is empty for now. The first poster could be yours." : "Por ahora la cartelera está vacía. El primer afiche puede ser el tuyo.")</p>
+        }
+        else
+        {
+            <div class="muro" style="margin-top:38px">
+                @foreach (var a in Model.Afiches)
+                {
+                    <partial name="_Afiche" model="a" />
+                }
+            </div>
+        }
+    </div>
+</section>

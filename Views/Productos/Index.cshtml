@@ -1,0 +1,60 @@
+@model ProductosVm
+@{
+    var esIngles = Model.Idioma == "en";
+    var esPortugues = Model.Idioma == "pt";
+}
+
+<section class="encabezado banda--crema">
+    <div class="contenedor">
+        <img class="adorno" src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" />
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
+        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        {
+            <p class="bajada">@Model.BajadaSeccion</p>
+        }
+    </div>
+</section>
+
+<section class="banda banda--crema" style="padding-top:0">
+    <div class="contenedor">
+        <div class="productos">
+            @foreach (var p in Model.Productos)
+            {
+                <article class="producto @p.ClasePanel">
+                    <div class="producto-imagen">
+                        <img src="@p.ImagenSrc" alt="@p.ImagenAlt" loading="lazy" />
+                    </div>
+                    <div class="producto-cuerpo">
+                        <h2>@p.Titulo</h2>
+                        @if (!string.IsNullOrEmpty(p.Descripcion))
+                        {
+                            <p>@p.Descripcion</p>
+                        }
+                        <div class="precio">
+                            @if (p.Estado == EstadoProducto.DescargaGratis)
+                            {
+                                <b>@(esPortugues ? "Grátis" : esIngles ? "Free" : "Gratis")</b>
+                                <a class="boton boton--borde" href="@(p.ArchivoUrl ?? "/Contacto")">@(esPortugues ? "Baixar" : esIngles ? "Download" : "Descargar")</a>
+                            }
+                            else if (p.Estado == EstadoProducto.ALaVenta)
+                            {
+                                <b>$ @p.Precio?.ToString("N0")</b>
+                                <a class="boton boton--principal" href="/Contacto">@(esPortugues ? "Pedir" : esIngles ? "Order" : "Pedir")</a>
+                            }
+                            else
+                            {
+                                <b>@(esPortugues ? "Em breve" : esIngles ? "Soon" : "Pronto")</b>
+                                <span class="pendiente" style="margin:0">@(esPortugues ? "Em preparação" : esIngles ? "In the works" : "En preparación")</span>
+                            }
+                        </div>
+                    </div>
+                </article>
+            }
+        </div>
+
+        <div style="margin-top:52px">
+            <partial name="_BloqueBuzon" model="Model.Buzon" />
+        </div>
+    </div>
+</section>

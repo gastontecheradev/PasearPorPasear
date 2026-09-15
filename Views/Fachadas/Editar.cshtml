@@ -1,0 +1,141 @@
+@model Fachada
+@{
+    Layout = "_AdminLayout";
+    var esNueva = Model.Id == 0;
+    var sello = Model.ActualizadaEn ?? Model.CreadaEn;
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+
+    // Los modelos de los parciales se arman acá: un inicializador multilínea
+    // dentro del atributo de un tag helper es frágil en Razor.
+    var campoTitulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Título",
+        Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt,
+        Pista = "Suele ser la esquina o la dirección: «Rivera casi Comercio»."
+    };
+    var campoExtracto = new CamposIdiomaVm
+    {
+        Nombre = "Extracto", Etiqueta = "Extracto", Largo = true,
+        Es = Model.Extracto, En = Model.ExtractoEn, Pt = Model.ExtractoPt,
+        Pista = "Una o dos líneas. Hasta 600 caracteres."
+    };
+    var campoContenido = new CamposIdiomaVm
+    {
+        Nombre = "Contenido", Etiqueta = "Contenido", Largo = true,
+        Es = Model.Contenido, En = Model.ContenidoEn, Pt = Model.ContenidoPt,
+        Pista = "Admite HTML: los párrafos van entre etiquetas p."
+    };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Fachada/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>@(esNueva ? "Fachada nueva" : Model.Titulo)</h1>
+        <p>
+            @if (esNueva)
+            {
+                <text>Va a quedar como ficha N.º @Model.Numero del archivo.</text>
+            }
+            else
+            {
+                <text>Ficha N.º @Model.Numero · <a href="/Archivo/Ficha/@Model.Slug" target="_blank" rel="noopener">ver en el sitio</a></text>
+            }
+        </p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Fachadas">Volver al listado</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Fachadas/Guardar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>Identificación</h2>
+                <p>Lo que aparece en el listado y en la ficha.</p>
+
+                <div class="admin-fila--tres admin-fila">
+                    <div class="campo">
+                        <label for="Numero">Número de ficha</label>
+                        <input id="Numero" name="Numero" type="number" min="1" value="@Model.Numero" required />
+                    </div>
+                    <div class="campo">
+                        <label for="Barrio">Barrio</label>
+                        <input id="Barrio" name="Barrio" type="text" value="@Model.Barrio" required maxlength="120" />
+                    </div>
+                    <div class="campo">
+                        <label for="AnioConstruccion">Año de construcción</label>
+                        <input id="AnioConstruccion" name="AnioConstruccion" type="number" min="1700" max="2100"
+                               value="@(Model.AnioConstruccion?.ToString())" />
+                        <p class="pista">Opcional.</p>
+                    </div>
+                </div>
+
+                <partial name="_CamposIdioma" model="campoTitulo" />
+
+                <div class="campo">
+                    <label for="Calle">Calle</label>
+                    <input id="Calle" name="Calle" type="text" value="@Model.Calle" maxlength="200" />
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <h2>Texto</h2>
+                <p>El extracto va debajo de la foto principal; el contenido es la ficha completa.</p>
+
+                <partial name="_CamposIdioma" model="campoExtracto" />
+
+                <partial name="_CamposIdioma" model="campoContenido" />
+            </div>
+
+            <div class="admin-panel">
+                <h2>Mapa</h2>
+                <p>Opcional. En Google Maps: Compartir → Insertar un mapa → copiar sólo la dirección del src.</p>
+                <div class="campo">
+                    <label for="MapaEmbedUrl">Dirección del mapa</label>
+                    <input id="MapaEmbedUrl" name="MapaEmbedUrl" type="url" value="@Model.MapaEmbedUrl" maxlength="600" />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Publicación</h2>
+                <p>Mientras esté en borrador no se ve en el sitio.</p>
+
+                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
+                    <input type="checkbox" name="Publicada" value="true" style="width:auto" @(Model.Publicada ? "checked" : "") />
+                    Publicada
+                </label>
+
+                <div class="campo">
+                    <label for="FechaEncontrada">La encontré el</label>
+                    <input id="FechaEncontrada" name="FechaEncontrada" type="date"
+                           value="@Model.FechaEncontrada.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="campo">
+                    <label for="FechaPublicacion">Fecha de publicación</label>
+                    <input id="FechaPublicacion" name="FechaPublicacion" type="date"
+                           value="@Model.FechaPublicacion.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
+                    @(esNueva ? "Crear la ficha" : "Guardar cambios")
+                </button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

@@ -1,0 +1,60 @@
+@model List<SuscriptorBuzon>
+@{
+    Layout = "_AdminLayout";
+    var activos = Model.Count(s => s.Activo);
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>El buzón de la Casita</h1>
+        <p>@activos suscriptor(es) activo(s) de @Model.Count en total.</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--principal" href="/Admin/Bandejas/Buzon/Csv">Descargar los correos</a>
+        <a class="boton boton--borde" href="/Admin/Bandejas">Mensajes</a>
+    </div>
+</div>
+
+<div class="admin-barra">
+    <input class="buscador" type="search" placeholder="Buscar por correo…" aria-label="Buscar" />
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="admin-vacio">Todavía no se suscribió nadie.</p>
+}
+else
+{
+    <div class="admin-tabla-envoltura">
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>Correo</th>
+                    <th style="width:150px">Desde dónde</th>
+                    <th style="width:140px">Fecha</th>
+                    <th style="width:110px">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var s in Model)
+                {
+                    <tr>
+                        <td><span class="principal">@s.Email</span></td>
+                        <td>@(s.Origen ?? "—")</td>
+                        <td>@s.SuscritoEn.ToString("dd/MM/yyyy")</td>
+                        <td>
+                            @if (s.Activo)
+                            {
+                                <span class="pastilla pastilla--activo">Activo</span>
+                            }
+                            else
+                            {
+                                <span class="pastilla pastilla--vencido">De baja</span>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

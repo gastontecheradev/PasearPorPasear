@@ -57,15 +57,22 @@
 <section class="banda banda--crema" style="padding-top:calc(var(--aire) * .5)">
     <div class="contenedor">
         <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h2 class="titulo-seccion">@(esPortugues ? "Por onde quer começar?" : esIngles ? "Where do you want to start?" : "¿Por dónde querés empezar?")</h2>
-        <p class="bajada">@(esPortugues ? "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra." : esIngles ? "There are four ways into this. None is better than the others." : "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.")</p>
+        @*
+            El título, la bajada y las cuatro tarjetas salen de EncabezadoSeccion
+            (claves pilares / pilar-clubcito / pilar-archivo / pilar-productos /
+            pilar-cartelera) y se editan desde /Admin/Paginas/Encabezados. El
+            texto de los enlaces «Ver…» y las imágenes quedan fijos: son
+            navegación del sitio, no contenido de la página.
+        *@
+        <h2 class="titulo-seccion">@Model.TituloPilar("pilares", esPortugues ? "Por onde quer começar?" : esIngles ? "Where do you want to start?" : "¿Por dónde querés empezar?")</h2>
+        <p class="bajada">@Model.BajadaPilar("pilares", esPortugues ? "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra." : esIngles ? "There are four ways into this. None is better than the others." : "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.")</p>
 
         <div class="pilares" style="margin-top:48px">
             <a class="pilar pilar--mostaza" href="/Paseos">
                 <div class="pilar-imagen"><img src="~/img/marca/casita.webp" alt="" width="380" height="447" loading="lazy" /></div>
                 <div class="pilar-cuerpo">
-                    <h3>@(esPortugues ? "Passeia comigo?" : esIngles ? "Walk with me?" : "¿Paseás conmigo?")</h3>
-                    <p>@(esPortugues ? "El Clubcito, percursos criativos e saídas montadas sob encomenda." : esIngles ? "El Clubcito, creative walks and outings built on request." : "El Clubcito, recorridos creativos y salidas armadas a pedido.")</p>
+                    <h3>@Model.TituloPilar("pilar-clubcito", "¿Paseás conmigo?")</h3>
+                    <p>@Model.BajadaPilar("pilar-clubcito", "El Clubcito, recorridos creativos y salidas armadas a pedido.")</p>
                     <span class="ver">@(esPortugues ? "Ver as quatro propostas" : esIngles ? "See the four offerings" : "Ver las cuatro propuestas")</span>
                 </div>
             </a>
@@ -73,8 +80,8 @@
             <a class="pilar pilar--durazno" href="/Archivo">
                 <div class="pilar-imagen"><img src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" loading="lazy" /></div>
                 <div class="pilar-cuerpo">
-                    <h3>#ArchivoDeFachadas</h3>
-                    <p>@(esPortugues ? "O arquivo das casas de Montevidéu, com sua rua, seu bairro e sua data." : esIngles ? "The archive of Montevideo's houses, with street, neighbourhood and date." : "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.")</p>
+                    <h3>@Model.TituloPilar("pilar-archivo", "#ArchivoDeFachadas")</h3>
+                    <p>@Model.BajadaPilar("pilar-archivo", "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.")</p>
                     <span class="ver">@(esPortugues ? "Entrar no arquivo" : esIngles ? "Enter the archive" : "Entrar al archivo")</span>
                 </div>
             </a>
@@ -82,8 +89,8 @@
             <a class="pilar pilar--crema2" href="/Productos">
                 <div class="pilar-imagen"><img src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" loading="lazy" /></div>
                 <div class="pilar-cuerpo">
-                    <h3>@(esPortugues ? "Produtos" : esIngles ? "Shop" : "Productos")</h3>
-                    <p>@(esPortugues ? "As ilustrações da marca, impressas. Ainda não saíram à venda." : esIngles ? "The brand illustrations, printed. Not on sale yet." : "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.")</p>
+                    <h3>@Model.TituloPilar("pilar-productos", esPortugues ? "Produtos" : esIngles ? "Shop" : "Productos")</h3>
+                    <p>@Model.BajadaPilar("pilar-productos", "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.")</p>
                     <span class="ver">@(esPortugues ? "Ver o que vem" : esIngles ? "See what is coming" : "Ver lo que viene")</span>
                 </div>
             </a>
@@ -91,8 +98,8 @@
             <a class="pilar pilar--piedra" href="/Cartelera">
                 <div class="pilar-imagen"><img src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" /></div>
                 <div class="pilar-cuerpo">
-                    <h3>@(esPortugues ? "Mural do bairro" : esIngles ? "Neighbourhood board" : "Cartelera de barrio")</h3>
-                    <p>@(esPortugues ? "Uma parede para colar seu cartaz. Eventos, ofícios e pedidos de ajuda." : esIngles ? "A wall to put your poster up. Events, trades and requests for help." : "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.")</p>
+                    <h3>@Model.TituloPilar("pilar-cartelera", esPortugues ? "Mural do bairro" : esIngles ? "Neighbourhood board" : "Cartelera de barrio")</h3>
+                    <p>@Model.BajadaPilar("pilar-cartelera", "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.")</p>
                     <span class="ver">@(esPortugues ? "Ver o mural" : esIngles ? "See the board" : "Ver la cartelera")</span>
                 </div>
             </a>

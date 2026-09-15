@@ -1,0 +1,53 @@
+@model List<Ajuste>
+@{
+    Layout = "_AdminLayout";
+    var nombres = new Dictionary<string, string>
+    {
+        ["EmailContacto"] = "Correo de contacto",
+        ["CanalWhatsApp"] = "Canal de WhatsApp",
+        ["BuzonTexto"] = "Texto del buzón de la Casita",
+        ["MailchimpFormUrl"] = "Formulario de Mailchimp"
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Ajustes</h1>
+        <p>Datos sueltos que usan varias páginas.</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Paginas/Sobre">Sobre PPP</a>
+        <a class="boton boton--borde" href="/Admin/Paginas/Encabezados">Títulos de sección</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Paginas/Ajustes">
+    @Html.AntiForgeryToken()
+
+    @foreach (var a in Model)
+    {
+        <div class="admin-panel">
+            <h2>@(nombres.TryGetValue(a.Clave, out var n) ? n : a.Clave)</h2>
+            <p>Clave: <code>@a.Clave</code></p>
+
+            <input type="hidden" name="id" value="@a.Id" />
+
+            <div class="campo">
+                <label>Valor</label>
+                <input name="valor" type="text" value="@a.Valor" />
+            </div>
+            <div class="admin-fila">
+                <div class="campo">
+                    <label>Inglés</label>
+                    <input name="valorEn" type="text" value="@a.ValorEn" />
+                </div>
+                <div class="campo">
+                    <label>Portugués</label>
+                    <input name="valorPt" type="text" value="@a.ValorPt" />
+                </div>
+            </div>
+        </div>
+    }
+
+    <button class="boton boton--principal" type="submit">Guardar todos los ajustes</button>
+</form>

@@ -1,0 +1,128 @@
+@model CarteleraAfiche
+@{
+    Layout = "_AdminLayout";
+    var esNuevo = Model.Id == 0;
+    var sello = Model.ActualizadoEn ?? Model.CreadoEn;
+    var colores = new (ColorAfiche Valor, string Nombre)[]
+    {
+        (ColorAfiche.Crema, "Crema con marco mostaza"),
+        (ColorAfiche.Mostaza, "Mostaza"),
+        (ColorAfiche.Petroleo, "Petróleo"),
+        (ColorAfiche.Coral, "Coral"),
+        (ColorAfiche.Durazno, "Durazno"),
+        (ColorAfiche.Rayas, "Rayado celeste")
+    };
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Afiche/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>@(esNuevo ? "Afiche nuevo" : Model.Titulo)</h1>
+        <p>Los afiches van en un solo idioma: los manda el barrio.</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Cartelera">Volver al listado</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Cartelera/Guardar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>El afiche</h2>
+                <p>Lo que se lee en la cartelera.</p>
+
+                <div class="admin-fila">
+                    <div class="campo">
+                        <label for="Titulo">Título</label>
+                        <input id="Titulo" name="Titulo" type="text" value="@Model.Titulo" required maxlength="120" />
+                    </div>
+                    <div class="campo">
+                        <label for="Barrio">Barrio</label>
+                        <input id="Barrio" name="Barrio" type="text" value="@Model.Barrio" maxlength="120" />
+                    </div>
+                </div>
+
+                <div class="campo">
+                    <label for="Texto">Texto</label>
+                    <textarea id="Texto" name="Texto" required maxlength="400" style="min-height:120px">@Model.Texto</textarea>
+                    <p class="pista">Cuatro o cinco líneas como máximo, para que entre en el afiche.</p>
+                </div>
+
+                <div class="campo">
+                    <label for="Contacto">Cómo lo contactan</label>
+                    <input id="Contacto" name="Contacto" type="text" value="@Model.Contacto" maxlength="200" />
+                    <p class="pista">Teléfono, nombre, día y hora: lo que haya mandado.</p>
+                </div>
+
+                <div class="campo">
+                    <label for="EmailRemitente">Correo de quien lo mandó</label>
+                    <input id="EmailRemitente" name="EmailRemitente" type="email" value="@Model.EmailRemitente" maxlength="200" />
+                    <p class="pista">No se publica. Sirve para poder contestarle.</p>
+                </div>
+            </div>
+
+            <div class="admin-panel">
+                <h2>Diseño</h2>
+                <p>Los seis diseños del manual de marca.</p>
+
+                <div class="admin-fila">
+                    <div class="campo">
+                        <label for="Color">Color del afiche</label>
+                        <select id="Color" name="Color">
+                            @foreach (var c in colores)
+                            {
+                                <option value="@((int)c.Valor)" selected="@(Model.Color == c.Valor)">@c.Nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="Orden">Orden</label>
+                        <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                        <p class="pista">Más chico, más arriba en el muro.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Publicación</h2>
+                <p>Sólo se ve en el sitio si está publicado y no venció.</p>
+
+                <div class="campo">
+                    <label for="Estado">Estado</label>
+                    <select id="Estado" name="Estado">
+                        <option value="@((int)EstadoAfiche.PorRevisar)" selected="@(Model.Estado == EstadoAfiche.PorRevisar)">Por revisar</option>
+                        <option value="@((int)EstadoAfiche.Publicado)" selected="@(Model.Estado == EstadoAfiche.Publicado)">Publicado</option>
+                        <option value="@((int)EstadoAfiche.Archivado)" selected="@(Model.Estado == EstadoAfiche.Archivado)">Archivado</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="VigenteHasta">Vigente hasta</label>
+                    <input id="VigenteHasta" name="VigenteHasta" type="date"
+                           value="@(Model.VigenteHasta?.ToString("yyyy-MM-dd"))" />
+                    <p class="pista">Dejalo vacío si no vence, como un oficio.</p>
+                </div>
+
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
+                    @(esNuevo ? "Pegar el afiche" : "Guardar cambios")
+                </button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

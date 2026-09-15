@@ -1,0 +1,55 @@
+@model PasearPorPasear.ViewModels.CamposIdiomaVm
+@*
+    Tres pestañas —español, inglés, portugués— para un mismo campo.
+    El español es obligatorio; si falta una traducción, la vista pública
+    cae al español, así que no pasa nada por dejarlas vacías.
+*@
+<div>
+    <div class="idioma-pestanas" role="tablist" aria-label="Idioma de @Model.Etiqueta">
+        <button type="button" data-idioma="es" aria-selected="true">ES</button>
+        <button type="button" data-idioma="en" aria-selected="false">EN</button>
+        <button type="button" data-idioma="pt" aria-selected="false">PT</button>
+    </div>
+
+    <div class="idioma-panel campo" data-idioma="es">
+        <label for="@(Model.Nombre)">@Model.Etiqueta</label>
+        @if (Model.Largo)
+        {
+            <textarea id="@(Model.Nombre)" name="@(Model.Nombre)" style="min-height:160px">@Model.Es</textarea>
+        }
+        else
+        {
+            <input id="@(Model.Nombre)" name="@(Model.Nombre)" type="text" value="@Model.Es" />
+        }
+        @if (!string.IsNullOrEmpty(Model.Pista))
+        {
+            <p class="pista">@Model.Pista</p>
+        }
+    </div>
+
+    <div class="idioma-panel campo" data-idioma="en" hidden>
+        <label for="@(Model.Nombre)En">@Model.Etiqueta — inglés</label>
+        @if (Model.Largo)
+        {
+            <textarea id="@(Model.Nombre)En" name="@(Model.Nombre)En" style="min-height:160px">@Model.En</textarea>
+        }
+        else
+        {
+            <input id="@(Model.Nombre)En" name="@(Model.Nombre)En" type="text" value="@Model.En" />
+        }
+        <p class="pista">Si queda vacío se muestra el español.</p>
+    </div>
+
+    <div class="idioma-panel campo" data-idioma="pt" hidden>
+        <label for="@(Model.Nombre)Pt">@Model.Etiqueta — portugués</label>
+        @if (Model.Largo)
+        {
+            <textarea id="@(Model.Nombre)Pt" name="@(Model.Nombre)Pt" style="min-height:160px">@Model.Pt</textarea>
+        }
+        else
+        {
+            <input id="@(Model.Nombre)Pt" name="@(Model.Nombre)Pt" type="text" value="@Model.Pt" />
+        }
+        <p class="pista">Si queda vacío se muestra el español.</p>
+    </div>
+</div>

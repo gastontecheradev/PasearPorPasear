@@ -1,0 +1,57 @@
+@model List<EncabezadoSeccion>
+@{
+    Layout = "_AdminLayout";
+    var nombres = new Dictionary<string, string>
+    {
+        ["portada"] = "Portada — frase y entrada",
+        ["definicion"] = "Portada — qué es Pasear por Pasear",
+        ["paseos"] = "¿Paseás conmigo?",
+        ["clubcito"] = "El Clubcito",
+        ["archivo"] = "#ArchivoDeFachadas",
+        ["productos"] = "Productos",
+        ["cartelera"] = "Cartelera de barrio",
+        ["contacto"] = "Contacto",
+        ["pilares"] = "Portada — intro de «¿Por dónde querés empezar?»",
+        ["pilar-clubcito"] = "Portada — tarjeta ¿Paseás conmigo?",
+        ["pilar-archivo"] = "Portada — tarjeta #ArchivoDeFachadas",
+        ["pilar-productos"] = "Portada — tarjeta Productos",
+        ["pilar-cartelera"] = "Portada — tarjeta Cartelera de barrio"
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Títulos de sección</h1>
+        <p>El título y la bajada que encabezan cada página del sitio.</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Paginas/Sobre">Sobre PPP</a>
+        <a class="boton boton--borde" href="/Admin/Paginas/Ajustes">Ajustes</a>
+    </div>
+</div>
+
+@foreach (var e in Model)
+{
+    var titulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Título",
+        Es = e.Titulo, En = e.TituloEn, Pt = e.TituloPt
+    };
+    var bajada = new CamposIdiomaVm
+    {
+        Nombre = "Bajada", Etiqueta = "Bajada", Largo = true,
+        Es = e.Bajada, En = e.BajadaEn, Pt = e.BajadaPt,
+        Pista = "La definición de la portada admite HTML; el resto es texto suelto."
+    };
+
+    <form method="post" action="/Admin/Paginas/Encabezados/@e.Id" class="admin-panel">
+        @Html.AntiForgeryToken()
+        <h2>@(nombres.TryGetValue(e.Clave, out var n) ? n : e.Clave)</h2>
+        <p>Clave: <code>@e.Clave</code></p>
+
+        <partial name="_CamposIdioma" model="titulo" />
+        <partial name="_CamposIdioma" model="bajada" />
+
+        <button class="boton boton--principal boton--chico" type="submit">Guardar esta sección</button>
+    </form>
+}

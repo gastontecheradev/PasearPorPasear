@@ -1,0 +1,152 @@
+@model Propuesta
+@{
+    Layout = "_AdminLayout";
+    var sello = Model.ActualizadaEn ?? Model.CreadaEn;
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+    var datos = Model.Datos.OrderBy(d => d.Orden).ToList();
+
+    var campoTitulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Título",
+        Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt
+    };
+    var campoEtiqueta = new CamposIdiomaVm
+    {
+        Nombre = "Etiqueta", Etiqueta = "Pastilla",
+        Es = Model.Etiqueta, En = Model.EtiquetaEn, Pt = Model.EtiquetaPt,
+        Pista = "El rótulo chico de arriba: «Todos los meses», «A pedido»."
+    };
+    var campoDescripcion = new CamposIdiomaVm
+    {
+        Nombre = "Descripcion", Etiqueta = "Descripción", Largo = true,
+        Es = Model.Descripcion, En = Model.DescripcionEn, Pt = Model.DescripcionPt,
+        Pista = "Admite HTML: los párrafos van entre etiquetas p."
+    };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Propuesta/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+
+    // Cuatro casilleros fijos: el diseño de la tabla no aguanta más.
+    // Los que sobran salen vacíos y el controlador los descarta al guardar.
+    Func<int, PropuestaDato> casillero = i => i < datos.Count ? datos[i] : new PropuestaDato();
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>@Model.Titulo</h1>
+        <p>Propuesta de ¿Paseás conmigo?</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Propuestas">Volver al listado</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Propuestas/Guardar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>La propuesta</h2>
+                <p>Lo que se lee en la tarjeta.</p>
+                <partial name="_CamposIdioma" model="campoTitulo" />
+                <partial name="_CamposIdioma" model="campoEtiqueta" />
+                <partial name="_CamposIdioma" model="campoDescripcion" />
+            </div>
+
+            <div class="admin-panel">
+                <h2>Casilleros de datos</h2>
+                <p>La tabla chica de la tarjeta: valor arriba, etiqueta abajo. Un casillero con el valor o la etiqueta vacíos no se guarda.</p>
+
+                <div class="idioma-pestanas" role="tablist" aria-label="Idioma de los casilleros">
+                    <button type="button" data-idioma="es" aria-selected="true">ES</button>
+                    <button type="button" data-idioma="en" aria-selected="false">EN</button>
+                    <button type="button" data-idioma="pt" aria-selected="false">PT</button>
+                </div>
+
+                <div class="idioma-panel" data-idioma="es">
+                    @for (var i = 0; i < 4; i++)
+                    {
+                        var d = casillero(i);
+                        <div class="admin-fila">
+                            <div class="campo">
+                                <label>Valor @(i + 1)</label>
+                                <input name="datoValor" type="text" value="@d.Valor" maxlength="80" placeholder="1 vez al mes" />
+                            </div>
+                            <div class="campo">
+                                <label>Etiqueta @(i + 1)</label>
+                                <input name="datoEtiqueta" type="text" value="@d.Etiqueta" maxlength="80" placeholder="frecuencia" />
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="idioma-panel" data-idioma="en" hidden>
+                    @for (var i = 0; i < 4; i++)
+                    {
+                        var d = casillero(i);
+                        <div class="admin-fila">
+                            <div class="campo">
+                                <label>Valor @(i + 1) — inglés</label>
+                                <input name="datoValorEn" type="text" value="@d.ValorEn" maxlength="80" />
+                            </div>
+                            <div class="campo">
+                                <label>Etiqueta @(i + 1) — inglés</label>
+                                <input name="datoEtiquetaEn" type="text" value="@d.EtiquetaEn" maxlength="80" />
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <div class="idioma-panel" data-idioma="pt" hidden>
+                    @for (var i = 0; i < 4; i++)
+                    {
+                        var d = casillero(i);
+                        <div class="admin-fila">
+                            <div class="campo">
+                                <label>Valor @(i + 1) — portugués</label>
+                                <input name="datoValorPt" type="text" value="@d.ValorPt" maxlength="80" />
+                            </div>
+                            <div class="campo">
+                                <label>Etiqueta @(i + 1) — portugués</label>
+                                <input name="datoEtiquetaPt" type="text" value="@d.EtiquetaPt" maxlength="80" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Estado</h2>
+                <p>Mientras esté pendiente de definir, la tarjeta muestra el aviso en vez de los datos.</p>
+
+                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:14px">
+                    <input type="checkbox" name="PendienteDeDefinir" value="true" style="width:auto" @(Model.PendienteDeDefinir ? "checked" : "") />
+                    Falta definir el contenido
+                </label>
+
+                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
+                    <input type="checkbox" name="Activa" value="true" style="width:auto" @(Model.Activa ? "checked" : "") />
+                    Activa en el sitio
+                </label>
+
+                <div class="campo">
+                    <label for="Orden">Orden</label>
+                    <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                </div>
+
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">Guardar cambios</button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

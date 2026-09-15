@@ -1,0 +1,115 @@
+@model List<CarteleraAfiche>
+@{
+    Layout = "_AdminLayout";
+    var porRevisar = Model.Count(a => a.Estado == EstadoAfiche.PorRevisar);
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Cartelera de barrio</h1>
+        <p>
+            @Model.Count afiche(s).
+            @if (porRevisar > 0)
+            {
+                <text><strong>@porRevisar esperando revisión.</strong></text>
+            }
+        </p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Afiche nuevo</a>
+    </div>
+</div>
+
+<div class="admin-barra">
+    <input class="buscador" type="search" placeholder="Buscar por título, barrio o texto…" aria-label="Buscar" />
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="admin-vacio">La cartelera está vacía.</p>
+}
+else
+{
+    <div class="admin-tabla-envoltura">
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>Afiche</th>
+                    <th style="width:130px">Barrio</th>
+                    <th style="width:130px">Vigencia</th>
+                    <th style="width:120px">Estado</th>
+                    <th style="width:250px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var a in Model)
+                {
+                    var vencido = a.EstaVencido;
+                    <tr class="@(a.Estado == EstadoAfiche.PorRevisar ? "bandeja-sin-leer" : "")">
+                        <td>
+                            <span class="principal">@a.Titulo</span>
+                            <span class="secundario">@(a.Texto.Length > 70 ? a.Texto.Substring(0, 70) + "…" : a.Texto)</span>
+                        </td>
+                        <td>@a.Barrio</td>
+                        <td>
+                            @if (a.VigenteHasta is null)
+                            {
+                                <text>sin fecha</text>
+                            }
+                            else if (vencido)
+                            {
+                                <text>venció @a.VigenteHasta.Value.ToString("dd/MM")</text>
+                            }
+                            else
+                            {
+                                <text>hasta @a.VigenteHasta.Value.ToString("dd/MM")</text>
+                            }
+                        </td>
+                        <td>
+                            @if (a.Estado == EstadoAfiche.PorRevisar)
+                            {
+                                <span class="pastilla pastilla--espera">Por revisar</span>
+                            }
+                            else if (a.Estado == EstadoAfiche.Archivado)
+                            {
+                                <span class="pastilla pastilla--vencido">Archivado</span>
+                            }
+                            else if (vencido)
+                            {
+                                <span class="pastilla pastilla--vencido">Vencido</span>
+                            }
+                            else
+                            {
+                                <span class="pastilla pastilla--activo">Publicado</span>
+                            }
+                        </td>
+                        <td>
+                            @if (a.Estado != EstadoAfiche.Publicado)
+                            {
+                                <form method="post" action="/Admin/Cartelera/Estado/@a.Id" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="estado" value="@((int)EstadoAfiche.Publicado)" />
+                                    <button type="submit" class="boton boton--principal boton--chico">Publicar</button>
+                                </form>
+                            }
+                            else
+                            {
+                                <form method="post" action="/Admin/Cartelera/Estado/@a.Id" style="display:inline">
+                                    @Html.AntiForgeryToken()
+                                    <input type="hidden" name="estado" value="@((int)EstadoAfiche.Archivado)" />
+                                    <button type="submit" class="boton boton--borde boton--chico">Archivar</button>
+                                </form>
+                            }
+                            <a class="boton boton--borde boton--chico" href="/Admin/Cartelera/Editar/@a.Id">Editar</a>
+                            <form method="post" action="/Admin/Cartelera/Borrar/@a.Id" style="display:inline"
+                                  data-confirmar="¿Borrar «@a.Titulo»? No se puede deshacer.">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="boton boton--peligro boton--chico">Borrar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

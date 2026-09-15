@@ -1,0 +1,90 @@
+@{
+    var seccion = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
+    Func<string, string?> activo = c => seccion == c ? "page" : null;
+}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>@ViewData["Title"] — Panel</title>
+
+    <link rel="preload" href="~/fonts/golos-400.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="~/fonts/golos-800.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
+    <link rel="icon" type="image/png" href="~/img/marca/favicon.png" asp-append-version="true" />
+    @await RenderSectionAsync("Styles", required: false)
+</head>
+<body>
+
+<header class="admin-cabecera">
+    <div class="admin-cabecera-int">
+        <a class="admin-marca" href="/Admin/Dashboard">
+            <img src="~/img/marca/casita-sm.webp" alt="" width="120" height="141" />
+            <b>Panel</b>
+        </a>
+
+        <ul class="admin-nav">
+            <li><a href="/Admin/Dashboard" aria-current="@activo("Admin")">Inicio</a></li>
+            <li><a href="/Admin/Fachadas" aria-current="@activo("Fachadas")">Fachadas</a></li>
+            <li><a href="/Admin/Encuentros" aria-current="@activo("Encuentros")">Clubcito</a></li>
+            <li><a href="/Admin/Propuestas" aria-current="@activo("Propuestas")">Propuestas</a></li>
+            <li><a href="/Admin/Productos" aria-current="@activo("ProductosAdmin")">Productos</a></li>
+            <li><a href="/Admin/Cartelera" aria-current="@activo("CarteleraAdmin")">Cartelera</a></li>
+            <li><a href="/Admin/Paginas/Sobre" aria-current="@activo("Paginas")">Páginas</a></li>
+            <li><a href="/Admin/Bandejas" aria-current="@activo("Bandejas")">Bandejas</a></li>
+        </ul>
+
+        <div class="admin-salida">
+            <a href="/" target="_blank" rel="noopener">Ver el sitio</a>
+            <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
+                <button type="submit" class="pie-salir">Salir</button>
+            </form>
+        </div>
+    </div>
+</header>
+
+<main class="admin-cuerpo">
+    @if (TempData["Success"] is string s1) { <p class="aviso aviso--ok" role="status">@s1</p> }
+    @if (TempData["Error"] is string s2) { <p class="aviso aviso--error" role="alert">@s2</p> }
+    @if (TempData["Info"] is string s3) { <p class="aviso aviso--info" role="status">@s3</p> }
+
+    @RenderBody()
+</main>
+
+<script>
+// Pestañas de idioma de los formularios
+document.querySelectorAll('.idioma-pestanas').forEach(function (grupo) {
+  grupo.addEventListener('click', function (e) {
+    var boton = e.target.closest('button');
+    if (!boton) return;
+    var contenedor = grupo.parentElement;
+    grupo.querySelectorAll('button').forEach(function (b) { b.setAttribute('aria-selected', 'false'); });
+    boton.setAttribute('aria-selected', 'true');
+    contenedor.querySelectorAll('.idioma-panel').forEach(function (p) {
+      p.hidden = p.dataset.idioma !== boton.dataset.idioma;
+    });
+  });
+});
+
+// Filtro en vivo de los listados
+document.querySelectorAll('.buscador').forEach(function (campo) {
+  campo.addEventListener('input', function () {
+    var texto = campo.value.trim().toLowerCase();
+    document.querySelectorAll('.admin-tabla tbody tr').forEach(function (fila) {
+      fila.hidden = texto !== '' && !fila.textContent.toLowerCase().includes(texto);
+    });
+  });
+});
+
+// Confirmación antes de borrar
+document.querySelectorAll('form[data-confirmar]').forEach(function (f) {
+  f.addEventListener('submit', function (e) {
+    if (!confirm(f.dataset.confirmar)) e.preventDefault();
+  });
+});
+</script>
+@await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

@@ -1,0 +1,139 @@
+@model ClubcitoEncuentro
+@{
+    Layout = "_AdminLayout";
+    var esNuevo = Model.Id == 0;
+    var sello = Model.ActualizadoEn ?? Model.CreadoEn;
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+
+    var campoTitulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Título",
+        Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt,
+        Pista = "El nombre de la salida: «Reus al Norte»."
+    };
+    var campoPunto = new CamposIdiomaVm
+    {
+        Nombre = "PuntoEncuentro", Etiqueta = "Punto de encuentro",
+        Es = Model.PuntoEncuentro, En = Model.PuntoEncuentroEn, Pt = Model.PuntoEncuentroPt,
+        Pista = "Dónde se junta la gente: «Nicaragua y Galicia»."
+    };
+    var campoExtracto = new CamposIdiomaVm
+    {
+        Nombre = "Extracto", Etiqueta = "Extracto", Largo = true,
+        Es = Model.Extracto, En = Model.ExtractoEn, Pt = Model.ExtractoPt,
+        Pista = "Una o dos líneas. Es lo que se ve en el listado."
+    };
+    var campoContenido = new CamposIdiomaVm
+    {
+        Nombre = "Contenido", Etiqueta = "La crónica", Largo = true,
+        Es = Model.Contenido, En = Model.ContenidoEn, Pt = Model.ContenidoPt,
+        Pista = "Se escribe después de la salida. Admite HTML."
+    };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Encuentro/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>@(esNuevo ? "Encuentro nuevo" : Model.Titulo)</h1>
+        <p>
+            @if (esNuevo)
+            {
+                <text>Las salidas se avisan por el buzón de la Casita.</text>
+            }
+            else
+            {
+                <text><a href="/Clubcito/Encuentro/@Model.Slug" target="_blank" rel="noopener">Ver en el sitio</a></text>
+            }
+        </p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Encuentros">Volver al listado</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Encuentros/Guardar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>La salida</h2>
+                <p>Qué barrio se camina y desde dónde se sale.</p>
+
+                <partial name="_CamposIdioma" model="campoTitulo" />
+
+                <div class="admin-fila">
+                    <div class="campo">
+                        <label for="Barrio">Barrio</label>
+                        <input id="Barrio" name="Barrio" type="text" value="@Model.Barrio" maxlength="120" />
+                    </div>
+                    <div class="campo">
+                        <label for="Asistentes">Cuánta gente fue</label>
+                        <input id="Asistentes" name="Asistentes" type="number" min="0"
+                               value="@(Model.Asistentes?.ToString())" />
+                        <p class="pista">Se carga después de la salida.</p>
+                    </div>
+                </div>
+
+                <partial name="_CamposIdioma" model="campoPunto" />
+            </div>
+
+            <div class="admin-panel">
+                <h2>Texto</h2>
+                <p>El extracto va en el listado; la crónica es la página de la salida.</p>
+                <partial name="_CamposIdioma" model="campoExtracto" />
+                <partial name="_CamposIdioma" model="campoContenido" />
+            </div>
+
+            <div class="admin-panel">
+                <h2>Mapa</h2>
+                <p>Opcional. En Google Maps: Compartir, Insertar un mapa, copiar la dirección del src.</p>
+                <div class="campo">
+                    <label for="MapaEmbedUrl">Dirección del mapa</label>
+                    <input id="MapaEmbedUrl" name="MapaEmbedUrl" type="url" value="@Model.MapaEmbedUrl" maxlength="600" />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Cuándo y cómo</h2>
+                <p>La fecha decide si aparece en «lo que viene» o en «dónde estuvimos».</p>
+
+                <div class="campo">
+                    <label for="Fecha">Fecha de la salida</label>
+                    <input id="Fecha" name="Fecha" type="date" value="@Model.Fecha.ToString("yyyy-MM-dd")" required />
+                </div>
+
+                <div class="campo">
+                    <label for="Estado">Estado</label>
+                    <select id="Estado" name="Estado">
+                        <option value="@((int)EstadoEncuentro.Proximo)" selected="@(Model.Estado == EstadoEncuentro.Proximo)">Normal</option>
+                        <option value="@((int)EstadoEncuentro.SinDefinir)" selected="@(Model.Estado == EstadoEncuentro.SinDefinir)">Barrio sin definir</option>
+                        <option value="@((int)EstadoEncuentro.Realizado)" selected="@(Model.Estado == EstadoEncuentro.Realizado)">Realizado</option>
+                    </select>
+                    <p class="pista">«Sin definir» muestra el aviso de que el barrio se vota por el buzón.</p>
+                </div>
+
+                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
+                    <input type="checkbox" name="Publicado" value="true" style="width:auto" @(Model.Publicado ? "checked" : "") />
+                    Publicado
+                </label>
+
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
+                    @(esNuevo ? "Crear el encuentro" : "Guardar cambios")
+                </button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

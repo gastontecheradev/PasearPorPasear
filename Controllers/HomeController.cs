@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
+using PasearPorPasear.Models;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
@@ -15,6 +16,11 @@ public class HomeController : ControladorPublico
 
         vm.Definicion = await Ctx.EncabezadosSeccion.AsNoTracking()
             .FirstOrDefaultAsync(e => e.Clave == "definicion");
+
+        var clavesPilares = new[] { "pilares", "pilar-clubcito", "pilar-archivo", "pilar-productos", "pilar-cartelera" };
+        vm.Pilares = await Ctx.EncabezadosSeccion.AsNoTracking()
+            .Where(e => clavesPilares.Contains(e.Clave))
+            .ToDictionaryAsync(e => e.Clave);
 
         // Tira de fachadas. Se proyecta el flag, nunca los bytes.
         var fachadas = await Ctx.Fachadas.AsNoTracking()
@@ -52,7 +58,7 @@ public class HomeController : ControladorPublico
 
         if (sobre is not null)
         {
-            vm.Sobre = new Models.PaginaSobre
+            vm.Sobre = new PaginaSobre
             {
                 Id = sobre.Id,
                 Titulo = sobre.Titulo, TituloEn = sobre.TituloEn, TituloPt = sobre.TituloPt,

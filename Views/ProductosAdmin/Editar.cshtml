@@ -1,0 +1,121 @@
+@model Producto
+@{
+    Layout = "_AdminLayout";
+    var esNuevo = Model.Id == 0;
+    var sello = Model.ActualizadoEn ?? Model.CreadoEn;
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+
+    var campoTitulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Nombre",
+        Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt
+    };
+    var campoDescripcion = new CamposIdiomaVm
+    {
+        Nombre = "Descripcion", Etiqueta = "Descripción", Largo = true,
+        Es = Model.Descripcion, En = Model.DescripcionEn, Pt = Model.DescripcionPt,
+        Pista = "Dos o tres líneas. Hasta 600 caracteres."
+    };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Producto/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+    var colores = new (ColorAfiche Valor, string Nombre)[]
+    {
+        (ColorAfiche.Mostaza, "Mostaza"),
+        (ColorAfiche.Durazno, "Durazno"),
+        (ColorAfiche.Rayas, "Piedra"),
+        (ColorAfiche.Petroleo, "Petróleo"),
+        (ColorAfiche.Crema, "Crema")
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>@(esNuevo ? "Producto nuevo" : Model.Titulo)</h1>
+        <p>El panel de color es el fondo detrás de la ilustración.</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Productos">Volver al listado</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Productos/Guardar" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="Id" value="@Model.Id" />
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>El producto</h2>
+                <p>Lo que se lee en la tarjeta.</p>
+                <partial name="_CamposIdioma" model="campoTitulo" />
+                <partial name="_CamposIdioma" model="campoDescripcion" />
+            </div>
+
+            <div class="admin-panel">
+                <h2>Descarga</h2>
+                <p>Sólo para los productos gratis, como la cartelera imprimible.</p>
+                <div class="campo">
+                    <label for="ArchivoUrl">Dirección del archivo</label>
+                    <input id="ArchivoUrl" name="ArchivoUrl" type="text" value="@Model.ArchivoUrl" maxlength="500" />
+                    <p class="pista">Por ejemplo /descargas/cartelera-a5.pdf, con el PDF en wwwroot.</p>
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Venta y orden</h2>
+                <p>Mientras esté en preparación no se muestra precio.</p>
+
+                <div class="campo">
+                    <label for="Estado">Estado</label>
+                    <select id="Estado" name="Estado">
+                        <option value="@((int)EstadoProducto.EnPreparacion)" selected="@(Model.Estado == EstadoProducto.EnPreparacion)">En preparación</option>
+                        <option value="@((int)EstadoProducto.ALaVenta)" selected="@(Model.Estado == EstadoProducto.ALaVenta)">A la venta</option>
+                        <option value="@((int)EstadoProducto.DescargaGratis)" selected="@(Model.Estado == EstadoProducto.DescargaGratis)">Descarga gratis</option>
+                    </select>
+                </div>
+
+                <div class="campo">
+                    <label for="Precio">Precio</label>
+                    <input id="Precio" name="Precio" type="number" step="1" min="0"
+                           value="@(Model.Precio?.ToString("0"))" />
+                    <p class="pista">En pesos. Sólo si está a la venta.</p>
+                </div>
+
+                <div class="admin-fila">
+                    <div class="campo">
+                        <label for="ColorPanel">Panel de color</label>
+                        <select id="ColorPanel" name="ColorPanel">
+                            @foreach (var c in colores)
+                            {
+                                <option value="@((int)c.Valor)" selected="@(Model.ColorPanel == c.Valor)">@c.Nombre</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="campo">
+                        <label for="Orden">Orden</label>
+                        <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                    </div>
+                </div>
+
+                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
+                    <input type="checkbox" name="Visible" value="true" style="width:auto" @(Model.Visible ? "checked" : "") />
+                    Visible en el sitio
+                </label>
+
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
+                    @(esNuevo ? "Crear el producto" : "Guardar cambios")
+                </button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

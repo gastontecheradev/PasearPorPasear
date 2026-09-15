@@ -1,48 +1,78 @@
 @model PasearPorPasear.Controllers.AdminController.TableroVm
 @{
+    Layout = "_AdminLayout";
     ViewData["Title"] = "Panel";
 }
 
-<section class="banda banda--crema">
-    <div class="contenedor">
-        <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h1 class="titulo-seccion">Panel</h1>
-        <p class="bajada">Cómo está el sitio hoy.</p>
-
-        <div class="contador" style="max-width:none;margin-block:40px">
-            <div><b>@Model.Fachadas</b><span>fachadas publicadas</span></div>
-            <div><b>@Model.ProximosEncuentros</b><span>encuentros por venir</span></div>
-            <div><b>@Model.AfichesPublicados</b><span>afiches en la cartelera</span></div>
-            <div><b>@Model.SuscriptoresBuzon</b><span>en el buzón</span></div>
-        </div>
-
-        @if (Model.AfichesPorRevisar > 0 || Model.MensajesSinLeer > 0 || Model.ConsultasPendientes > 0)
-        {
-            <h2 style="font-size:var(--t-xl);margin-bottom:16px">Esperando tu respuesta</h2>
-            <ul class="datos" style="max-width:560px">
-                @if (Model.AfichesPorRevisar > 0)
-                {
-                    <li><strong>Cartelera</strong>@Model.AfichesPorRevisar afiche(s) por revisar</li>
-                }
-                @if (Model.MensajesSinLeer > 0)
-                {
-                    <li><strong>Contacto</strong>@Model.MensajesSinLeer mensaje(s) sin leer</li>
-                }
-                @if (Model.ConsultasPendientes > 0)
-                {
-                    <li><strong>Paseos</strong>@Model.ConsultasPendientes consulta(s) pendiente(s)</li>
-                }
-            </ul>
-        }
-        else
-        {
-            <p class="bajada">No hay nada pendiente.</p>
-        }
-
-        <div class="recuadro" style="background:var(--crema-2);margin-top:44px">
-            <h2>Las pantallas de edición están en camino</h2>
-            <p>Por ahora el contenido se carga desde la base. Las altas y ediciones
-               de fachadas, encuentros, afiches y productos llegan en la próxima entrega.</p>
-        </div>
+<div class="admin-titulo">
+    <div>
+        <h1>Hola, Rosalía</h1>
+        <p>Cómo está el sitio hoy.</p>
     </div>
-</section>
+    <div class="admin-acciones">
+        <a class="boton boton--principal" href="/Admin/Fachadas/Nueva">Fachada nueva</a>
+        <a class="boton boton--borde" href="/Admin/Cartelera/Nuevo">Afiche nuevo</a>
+    </div>
+</div>
+
+<div class="contador" style="max-width:none;margin-bottom:40px">
+    <div><b>@Model.Fachadas</b><span>fachadas publicadas</span></div>
+    <div><b>@Model.ProximosEncuentros</b><span>encuentros por venir</span></div>
+    <div><b>@Model.AfichesPublicados</b><span>afiches en la cartelera</span></div>
+    <div><b>@Model.SuscriptoresBuzon</b><span>en el buzón</span></div>
+</div>
+
+@if (Model.AfichesPorRevisar > 0 || Model.MensajesSinLeer > 0 || Model.ConsultasPendientes > 0)
+{
+    <div class="admin-panel" style="border-color:var(--coral)">
+        <h2>Esperando tu respuesta</h2>
+        <p>Lo que llegó y todavía no miraste.</p>
+        <ul class="datos" style="max-width:620px">
+            @if (Model.AfichesPorRevisar > 0)
+            {
+                <li>
+                    <strong>Cartelera</strong>
+                    @Model.AfichesPorRevisar afiche(s) por revisar ·
+                    <a href="/Admin/Cartelera">ir a la cartelera</a>
+                </li>
+            }
+            @if (Model.MensajesSinLeer > 0)
+            {
+                <li>
+                    <strong>Contacto</strong>
+                    @Model.MensajesSinLeer mensaje(s) sin leer ·
+                    <a href="/Admin/Bandejas">ir a los mensajes</a>
+                </li>
+            }
+            @if (Model.ConsultasPendientes > 0)
+            {
+                <li>
+                    <strong>Paseos</strong>
+                    @Model.ConsultasPendientes consulta(s) pendiente(s) ·
+                    <a href="/Admin/Bandejas/Consultas">ir a las consultas</a>
+                </li>
+            }
+        </ul>
+    </div>
+}
+else
+{
+    <div class="admin-panel">
+        <h2>No hay nada pendiente</h2>
+        <p>Ningún afiche por revisar, ningún mensaje sin leer y ninguna consulta esperando.</p>
+    </div>
+}
+
+<div class="admin-panel">
+    <h2>Todo lo que se puede editar</h2>
+    <p>Cada sección del sitio tiene su pantalla.</p>
+    <ul class="datos" style="max-width:680px">
+        <li><strong>#ArchivoDeFachadas</strong><a href="/Admin/Fachadas">Alta, edición y borrado de fichas</a></li>
+        <li><strong>El Clubcito</strong><a href="/Admin/Encuentros">Encuentros, crónicas y asistentes</a></li>
+        <li><strong>¿Paseás conmigo?</strong><a href="/Admin/Propuestas">Las cuatro propuestas y sus casilleros de datos</a></li>
+        <li><strong>Productos</strong><a href="/Admin/Productos">Catálogo, precios y descargas</a></li>
+        <li><strong>Cartelera de barrio</strong><a href="/Admin/Cartelera">Publicar, archivar y editar afiches</a></li>
+        <li><strong>Sobre PPP y títulos</strong><a href="/Admin/Paginas/Sobre">La página Sobre, los títulos de sección y los ajustes</a></li>
+        <li><strong>Bandejas</strong><a href="/Admin/Bandejas">Mensajes, consultas de paseo y suscriptores del buzón</a></li>
+    </ul>
+</div>

@@ -100,9 +100,13 @@ public static class DbSeeder
     // ══════════════════════════════════════════════════════════
     private static void SeedEncabezados(ApplicationDbContext ctx)
     {
-        if (ctx.EncabezadosSeccion.Any()) return;
+        // Sin early-return: si el sitio ya está en producción con estas claves
+        // cargadas, igual tiene que poder sumarse una nueva sin tocar la base
+        // a mano. Se agrega sólo lo que falte, comparando por Clave.
+        var existentes = ctx.EncabezadosSeccion.Select(e => e.Clave).ToHashSet();
 
-        ctx.EncabezadosSeccion.AddRange(
+        var candidatos = new List<EncabezadoSeccion>
+        {
             new EncabezadoSeccion
             {
                 Clave = "portada",
@@ -182,7 +186,65 @@ public static class DbSeeder
                 Bajada = "Para proponer un barrio, sumarte a una salida, hacer un pedido o mandar tu afiche a la cartelera.",
                 BajadaEn = "To suggest a neighbourhood, join a walk, place an order or send your poster to the board.",
                 BajadaPt = "Para propor um bairro, entrar num passeio, fazer um pedido ou enviar seu cartaz ao mural."
-            });
+            },
+
+            // ── Portada: intro de los cuatro pilares y cada tarjeta ──
+            // Antes eran texto fijo en Home/Index.cshtml; ahora se editan
+            // desde /Admin/Paginas/Encabezados igual que el resto.
+            new EncabezadoSeccion
+            {
+                Clave = "pilares",
+                Titulo = "¿Por dónde querés empezar?",
+                TituloEn = "Where do you want to start?",
+                TituloPt = "Por onde quer começar?",
+                Bajada = "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.",
+                BajadaEn = "There are four ways into this. None is better than the others.",
+                BajadaPt = "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra."
+            },
+            new EncabezadoSeccion
+            {
+                Clave = "pilar-clubcito",
+                Titulo = "¿Paseás conmigo?",
+                TituloEn = "Walk with me?",
+                TituloPt = "Passeia comigo?",
+                Bajada = "El Clubcito, recorridos creativos y salidas armadas a pedido.",
+                BajadaEn = "El Clubcito, creative walks and outings built on request.",
+                BajadaPt = "El Clubcito, percursos criativos e saídas montadas sob encomenda."
+            },
+            new EncabezadoSeccion
+            {
+                Clave = "pilar-archivo",
+                Titulo = "#ArchivoDeFachadas",
+                TituloEn = "#ArchivoDeFachadas",
+                TituloPt = "#ArchivoDeFachadas",
+                Bajada = "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.",
+                BajadaEn = "The archive of Montevideo's houses, with street, neighbourhood and date.",
+                BajadaPt = "O arquivo das casas de Montevidéu, com sua rua, seu bairro e sua data."
+            },
+            new EncabezadoSeccion
+            {
+                Clave = "pilar-productos",
+                Titulo = "Productos",
+                TituloEn = "Shop",
+                TituloPt = "Produtos",
+                Bajada = "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.",
+                BajadaEn = "The brand illustrations, printed. Not on sale yet.",
+                BajadaPt = "As ilustrações da marca, impressas. Ainda não saíram à venda."
+            },
+            new EncabezadoSeccion
+            {
+                Clave = "pilar-cartelera",
+                Titulo = "Cartelera de barrio",
+                TituloEn = "Neighbourhood board",
+                TituloPt = "Mural do bairro",
+                Bajada = "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.",
+                BajadaEn = "A wall to put your poster up. Events, trades and requests for help.",
+                BajadaPt = "Uma parede para colar seu cartaz. Eventos, ofícios e pedidos de ajuda."
+            }
+        };
+
+        var nuevos = candidatos.Where(c => !existentes.Contains(c.Clave)).ToList();
+        if (nuevos.Count > 0) ctx.EncabezadosSeccion.AddRange(nuevos);
     }
 
     // ══════════════════════════════════════════════════════════

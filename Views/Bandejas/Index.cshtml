@@ -1,0 +1,72 @@
+@model List<MensajeContacto>
+@{
+    Layout = "_AdminLayout";
+    var sinLeer = Model.Count(m => !m.Leido);
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Mensajes</h1>
+        <p>@Model.Count mensaje(s)@(sinLeer > 0 ? $", {sinLeer} sin leer" : "").</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Bandejas/Consultas">Consultas de paseo</a>
+        <a class="boton boton--borde" href="/Admin/Bandejas/Buzon">El buzón</a>
+    </div>
+</div>
+
+<div class="admin-barra">
+    <input class="buscador" type="search" placeholder="Buscar por nombre, correo o texto…" aria-label="Buscar" />
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="admin-vacio">Todavía no llegó ningún mensaje.</p>
+}
+else
+{
+    <div class="admin-tabla-envoltura">
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>De</th>
+                    <th>Mensaje</th>
+                    <th style="width:120px">Fecha</th>
+                    <th style="width:230px"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var m in Model)
+                {
+                    <tr class="@(m.Leido ? "" : "bandeja-sin-leer")">
+                        <td>
+                            <span class="principal">@m.Nombre</span>
+                            <span class="secundario"><a href="mailto:@m.Email">@m.Email</a></span>
+                        </td>
+                        <td>
+                            @if (!string.IsNullOrEmpty(m.Asunto))
+                            {
+                                <span class="principal">@m.Asunto</span>
+                            }
+                            <span class="secundario">@(m.Mensaje.Length > 120 ? m.Mensaje.Substring(0, 120) + "…" : m.Mensaje)</span>
+                        </td>
+                        <td>@m.EnviadoEn.ToString("dd/MM/yyyy HH:mm")</td>
+                        <td>
+                            <a class="boton boton--principal boton--chico" href="mailto:@m.Email?subject=Re: @m.Asunto">Responder</a>
+                            <form method="post" action="/Admin/Bandejas/Leido/@m.Id" style="display:inline">
+                                @Html.AntiForgeryToken()
+                                <input type="hidden" name="leido" value="@((!m.Leido).ToString().ToLowerInvariant())" />
+                                <button type="submit" class="boton boton--borde boton--chico">@(m.Leido ? "Sin leer" : "Leído")</button>
+                            </form>
+                            <form method="post" action="/Admin/Bandejas/BorrarMensaje/@m.Id" style="display:inline"
+                                  data-confirmar="¿Borrar el mensaje de @m.Nombre?">
+                                @Html.AntiForgeryToken()
+                                <button type="submit" class="boton boton--peligro boton--chico">Borrar</button>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

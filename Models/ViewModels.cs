@@ -82,6 +82,21 @@ public class InicioVm : VistaBase
     public PaginaSobre? Sobre { get; set; }
     public string? SobreImagenSrc { get; set; }
     public BuzonVm Buzon { get; set; } = new();
+
+    /// <summary>
+    /// La intro de «¿Por dónde querés empezar?» y las cuatro tarjetas,
+    /// buscadas por Clave (pilares, pilar-clubcito, pilar-archivo,
+    /// pilar-productos, pilar-cartelera). Se editan desde
+    /// /Admin/Paginas/Encabezados igual que el resto de la portada.
+    /// </summary>
+    public Dictionary<string, EncabezadoSeccion> Pilares { get; set; } = new();
+
+    /// <summary>El fallback sólo entra en juego si el seed todavía no corrió.</summary>
+    public string TituloPilar(string clave, string fallback) =>
+        Pilares.TryGetValue(clave, out var e) ? T(e.Titulo, e.TituloEn, e.TituloPt) : fallback;
+
+    public string BajadaPilar(string clave, string fallback) =>
+        Pilares.TryGetValue(clave, out var e) ? (TO(e.Bajada, e.BajadaEn, e.BajadaPt) ?? fallback) : fallback;
 }
 
 // ── Sobre PPP ──
@@ -250,4 +265,64 @@ public class ProductosVm : VistaBase
     public List<ProductoVm> Productos { get; set; } = new();
     public BuzonVm Buzon { get; set; } = new();
     public bool HayAlgoALaVenta => Productos.Any(p => p.Estado == EstadoProducto.ALaVenta);
+}
+
+// ══════════════════════════════════════════════════════════════
+//  Panel de administración
+// ══════════════════════════════════════════════════════════════
+
+/// <summary>Un campo con sus tres idiomas, para el parcial _CamposIdioma.</summary>
+public class CamposIdiomaVm
+{
+    /// <summary>Nombre base del campo; las traducciones agregan En y Pt.</summary>
+    public string Nombre { get; set; } = string.Empty;
+    public string Etiqueta { get; set; } = string.Empty;
+    public string? Es { get; set; }
+    public string? En { get; set; }
+    public string? Pt { get; set; }
+    /// <summary>true para textarea, false para input de una línea.</summary>
+    public bool Largo { get; set; }
+    public string? Pista { get; set; }
+}
+
+/// <summary>Estado de la imagen de una entidad, para el parcial _CampoImagen.</summary>
+public class CampoImagenVm
+{
+    public string? Src { get; set; }
+    public string? Alt { get; set; }
+    /// <summary>true si la subió Rosalía; false si es la imagen estática del seed.</summary>
+    public bool EsCargada { get; set; }
+}
+
+/// <summary>Fila del listado del panel. Sirve para cualquier entidad con imagen.</summary>
+public class FilaAdminVm
+{
+    public int Id { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string? Detalle { get; set; }
+    public string? ImagenSrc { get; set; }
+    public string? Columna2 { get; set; }
+    public string? Columna3 { get; set; }
+    public string? Estado { get; set; }
+    public string? ClaseEstado { get; set; }
+}
+
+/// <summary>
+/// Listado genérico del panel. Fachadas, encuentros y productos comparten
+/// la misma pantalla: cambia el texto y las rutas, no la estructura.
+/// </summary>
+public class ListadoAdminVm
+{
+    public string Titulo { get; set; } = string.Empty;
+    public string? Subtitulo { get; set; }
+    /// <summary>Base de las rutas: «/Admin/Fachadas». De ahí salen Editar y Borrar.</summary>
+    public string UrlBase { get; set; } = string.Empty;
+    public string UrlNueva { get; set; } = string.Empty;
+    public string TextoNueva { get; set; } = string.Empty;
+    public string Buscador { get; set; } = "Buscar…";
+    public string Vacio { get; set; } = "Todavía no hay nada.";
+    public string EncabezadoPrincipal { get; set; } = "Nombre";
+    public string? Encabezado2 { get; set; }
+    public string? Encabezado3 { get; set; }
+    public List<FilaAdminVm> Filas { get; set; } = new();
 }

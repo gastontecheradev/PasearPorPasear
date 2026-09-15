@@ -1,0 +1,41 @@
+@model PasearPorPasear.ViewModels.CampoImagenVm
+@*
+    Imagen actual y reemplazo. Las imágenes se guardan en la base:
+    el aviso de peso no es decorativo, el límite son 6 MB por archivo.
+*@
+<div class="admin-panel admin-panel--lateral">
+    <h2>Imagen</h2>
+    <p>JPG, PNG, WEBP o GIF. Hasta 6 MB.</p>
+
+    <div class="admin-imagen">
+        @if (!string.IsNullOrEmpty(Model.Src))
+        {
+            <img src="@Model.Src" alt="" />
+            <span class="origen">@(Model.EsCargada ? "cargada desde el panel" : "imagen de arranque")</span>
+        }
+        else
+        {
+            <div class="sin-imagen">Todavía sin imagen</div>
+        }
+    </div>
+
+    <div class="campo" style="margin-top:18px">
+        <label for="imagen">Reemplazar</label>
+        <input id="imagen" name="imagen" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
+        <p class="pista">Conviene achicarla antes de subirla: las imágenes ocupan lugar en la base.</p>
+    </div>
+
+    <div class="campo">
+        <label for="ImagenAlt">Texto alternativo</label>
+        <input id="ImagenAlt" name="ImagenAlt" type="text" value="@Model.Alt" maxlength="300" />
+        <p class="pista">Qué se ve en la foto. Lo leen los lectores de pantalla.</p>
+    </div>
+
+    @if (Model.EsCargada)
+    {
+        <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-top:4px">
+            <input type="checkbox" name="borrarImagen" value="true" style="width:auto" />
+            Quitar la imagen cargada
+        </label>
+    }
+</div>

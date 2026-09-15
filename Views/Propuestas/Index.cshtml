@@ -1,0 +1,51 @@
+@model List<Propuesta>
+@{
+    Layout = "_AdminLayout";
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>¿Paseás conmigo?</h1>
+        <p>Las cuatro propuestas son fijas: se editan, no se crean ni se borran.</p>
+    </div>
+</div>
+
+<div class="admin-tabla-envoltura">
+    <table class="admin-tabla">
+        <thead>
+            <tr>
+                <th>Propuesta</th>
+                <th style="width:110px">Datos</th>
+                <th style="width:150px">Estado</th>
+                <th style="width:110px"></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in Model)
+            {
+                <tr>
+                    <td>
+                        <span class="principal">@p.Titulo</span>
+                        <span class="secundario">@p.Etiqueta</span>
+                    </td>
+                    <td>@p.Datos.Count casillero(s)</td>
+                    <td>
+                        @if (p.PendienteDeDefinir)
+                        {
+                            <span class="pastilla pastilla--espera">Falta definir</span>
+                        }
+                        else if (!p.Activa)
+                        {
+                            <span class="pastilla pastilla--vencido">Oculta</span>
+                        }
+                        else
+                        {
+                            <span class="pastilla pastilla--activo">Activa</span>
+                        }
+                    </td>
+                    <td><a class="boton boton--borde boton--chico" href="/Admin/Propuestas/Editar/@p.Id">Editar</a></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

@@ -1,0 +1,73 @@
+@model List<ConsultaPaseo>
+@{
+    Layout = "_AdminLayout";
+    var pendientes = Model.Count(c => c.Estado == EstadoConsulta.Pendiente);
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Consultas de paseo</h1>
+        <p>@Model.Count consulta(s)@(pendientes > 0 ? $", {pendientes} pendiente(s)" : "").</p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Bandejas">Mensajes</a>
+        <a class="boton boton--borde" href="/Admin/Bandejas/Buzon">El buzón</a>
+    </div>
+</div>
+
+<div class="admin-barra">
+    <input class="buscador" type="search" placeholder="Buscar por nombre o correo…" aria-label="Buscar" />
+</div>
+
+@if (Model.Count == 0)
+{
+    <p class="admin-vacio">Todavía no llegó ninguna consulta.</p>
+}
+else
+{
+    <div class="admin-tabla-envoltura">
+        <table class="admin-tabla">
+            <thead>
+                <tr>
+                    <th>De</th>
+                    <th style="width:180px">Propuesta</th>
+                    <th style="width:150px">Cuándo y cuántos</th>
+                    <th>Notas</th>
+                    <th style="width:180px">Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var c in Model)
+                {
+                    <tr class="@(c.Estado == EstadoConsulta.Pendiente ? "bandeja-sin-leer" : "")">
+                        <td>
+                            <span class="principal">@c.Nombre</span>
+                            <span class="secundario"><a href="mailto:@c.Email">@c.Email</a></span>
+                            @if (!string.IsNullOrEmpty(c.Telefono))
+                            {
+                                <span class="secundario">@c.Telefono</span>
+                            }
+                        </td>
+                        <td>@(c.Propuesta?.Titulo ?? "—")</td>
+                        <td>
+                            @(c.FechaDeseada?.ToString("dd/MM/yyyy") ?? "sin fecha")
+                            <span class="secundario">@c.CantidadPersonas persona(s)</span>
+                        </td>
+                        <td><span class="secundario">@c.Notas</span></td>
+                        <td>
+                            <form method="post" action="/Admin/Bandejas/Consulta/@c.Id">
+                                @Html.AntiForgeryToken()
+                                <select name="estado" onchange="this.form.submit()" style="font-size:var(--t-xs);padding:7px 10px">
+                                    <option value="@((int)EstadoConsulta.Pendiente)" selected="@(c.Estado == EstadoConsulta.Pendiente)">Pendiente</option>
+                                    <option value="@((int)EstadoConsulta.Contestada)" selected="@(c.Estado == EstadoConsulta.Contestada)">Contestada</option>
+                                    <option value="@((int)EstadoConsulta.Confirmada)" selected="@(c.Estado == EstadoConsulta.Confirmada)">Confirmada</option>
+                                    <option value="@((int)EstadoConsulta.Cancelada)" selected="@(c.Estado == EstadoConsulta.Cancelada)">Cancelada</option>
+                                </select>
+                            </form>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+}

@@ -1,0 +1,66 @@
+@model PaginaSobre
+@{
+    Layout = "_AdminLayout";
+    var cargada = Model.ImagenDatos is { Length: > 0 };
+
+    var campoTitulo = new CamposIdiomaVm
+    {
+        Nombre = "Titulo", Etiqueta = "Título",
+        Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt
+    };
+    var campoContenido = new CamposIdiomaVm
+    {
+        Nombre = "Contenido", Etiqueta = "Texto", Largo = true,
+        Es = Model.Contenido, En = Model.ContenidoEn, Pt = Model.ContenidoPt,
+        Pista = "Admite HTML: cada párrafo entre etiquetas p."
+    };
+    var campoImagen = new CampoImagenVm
+    {
+        Src = cargada ? $"/Imagenes/Sobre/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ImagenUrl,
+        Alt = Model.ImagenAlt,
+        EsCargada = cargada
+    };
+}
+
+<div class="admin-titulo">
+    <div>
+        <h1>Sobre PPP</h1>
+        <p>La página donde contás de qué se trata. <a href="/Sobre" target="_blank" rel="noopener">Ver en el sitio</a></p>
+    </div>
+    <div class="admin-acciones">
+        <a class="boton boton--borde" href="/Admin/Paginas/Encabezados">Títulos de sección</a>
+        <a class="boton boton--borde" href="/Admin/Paginas/Ajustes">Ajustes</a>
+    </div>
+</div>
+
+<form method="post" action="/Admin/Paginas/Sobre" enctype="multipart/form-data">
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <div class="admin-form">
+        <div>
+            <div class="admin-panel">
+                <h2>La página</h2>
+                <p>Es también el bloque «atrás de todo esto hay una persona» de la portada.</p>
+                <partial name="_CamposIdioma" model="campoTitulo" />
+                <partial name="_CamposIdioma" model="campoContenido" />
+
+                <div class="campo">
+                    <label for="Firma">Firma</label>
+                    <input id="Firma" name="Firma" type="text" value="@Model.Firma" maxlength="120" />
+                </div>
+            </div>
+        </div>
+
+        <div>
+            <div class="admin-panel admin-panel--lateral">
+                <h2>Guardar</h2>
+                <p>Última modificación: @Model.ActualizadaEn.ToString("dd/MM/yyyy HH:mm").</p>
+                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">Guardar cambios</button>
+            </div>
+
+            <partial name="_CampoImagen" model="campoImagen" />
+        </div>
+    </div>
+</form>

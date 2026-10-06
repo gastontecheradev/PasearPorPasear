@@ -4,3 +4,4 @@ obj/
 *.db
 appsettings.json
 appsettings.Development.json
+CLAUDE.md

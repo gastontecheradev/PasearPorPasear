@@ -15,11 +15,11 @@
                 </div>
                 <p class="firma">@Model.Pagina.Firma</p>
                 <p class="atributos" style="color:var(--petroleo)">
-                    @(esPortugues ? "Cotidiano" : esIngles ? "Everyday" : "Cotidiano")
+                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
                     <partial name="_Flor" />
-                    @(esPortugues ? "Caloroso" : esIngles ? "Warm" : "Cálido")
+                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
                     <partial name="_Flor" />
-                    @(esPortugues ? "Orgânico" : esIngles ? "Organic" : "Orgánico")
+                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
                 </p>
             </div>
             @if (!string.IsNullOrEmpty(Model.ImagenSrc))

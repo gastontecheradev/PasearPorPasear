@@ -7,7 +7,7 @@ using PasearPorPasear.Services;
 namespace PasearPorPasear.Controllers.Admin;
 
 /// <summary>
-/// Las cuatro propuestas de ¿Paseás conmigo? Son fijas: se editan, no se
+/// Las cuatro propuestas de ¿Paseamos? Son fijas: se editan, no se
 /// crean ni se borran, porque la portada y el menú cuentan con que estén.
 /// </summary>
 [Route("Admin/Propuestas")]

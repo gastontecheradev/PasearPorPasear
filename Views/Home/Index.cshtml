@@ -15,7 +15,7 @@
             <p class="entrada">@Model.BajadaSeccion</p>
         }
         <div class="acciones">
-            <a class="boton boton--principal" href="/Paseos">@(esPortugues ? "Passeia comigo" : esIngles ? "Walk with me" : "Paseá conmigo")</a>
+            <a class="boton boton--principal" href="/Paseos">@(esPortugues ? "Vamos passear?" : esIngles ? "Shall we walk?" : "¿Paseamos?")</a>
             <a class="boton boton--borde" href="/Archivo">@(esPortugues ? "Ver o arquivo" : esIngles ? "See the archive" : "Ver el archivo")</a>
         </div>
     </div>
@@ -44,143 +44,21 @@
                     <partial name="_Flor" />
                     @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
                 </p>
+                <div class="acciones">
+                    <a class="boton boton--claro" href="/Sobre">@(esPortugues ? "Sobre PPP" : esIngles ? "About PPP" : "Sobre PPP")</a>
+                </div>
             </div>
             <img class="casita-grande" src="~/img/marca/casita.webp" alt="" width="380" height="447" />
         </div>
     </div>
 </section>
 
-<div class="transicion" style="background:var(--petroleo)"><partial name="_Onda" model="@("var(--crema)")" /></div>
+<div class="transicion" style="background:var(--petroleo)"><partial name="_Onda" model="@("var(--durazno)")" /></div>
 }
-
-@* ── Los cuatro pilares ── *@
-<section class="banda banda--crema" style="padding-top:calc(var(--aire) * .5)">
-    <div class="contenedor">
-        <div class="regla regla--izq"><partial name="_Flor" /></div>
-        @*
-            El título, la bajada y las cuatro tarjetas salen de EncabezadoSeccion
-            (claves pilares / pilar-clubcito / pilar-archivo / pilar-productos /
-            pilar-cartelera) y se editan desde /Admin/Paginas/Encabezados. El
-            texto de los enlaces «Ver…» y las imágenes quedan fijos: son
-            navegación del sitio, no contenido de la página.
-        *@
-        <h2 class="titulo-seccion">@Model.TituloPilar("pilares", esPortugues ? "Por onde quer começar?" : esIngles ? "Where do you want to start?" : "¿Por dónde querés empezar?")</h2>
-        <p class="bajada">@Model.BajadaPilar("pilares", esPortugues ? "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra." : esIngles ? "There are four ways into this. None is better than the others." : "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.")</p>
-
-        <div class="pilares" style="margin-top:48px">
-            <a class="pilar pilar--mostaza" href="/Paseos">
-                <div class="pilar-imagen"><img src="~/img/marca/casita.webp" alt="" width="380" height="447" loading="lazy" /></div>
-                <div class="pilar-cuerpo">
-                    <h3>@Model.TituloPilar("pilar-clubcito", "¿Paseás conmigo?")</h3>
-                    <p>@Model.BajadaPilar("pilar-clubcito", "El Clubcito, recorridos creativos y salidas armadas a pedido.")</p>
-                    <span class="ver">@(esPortugues ? "Ver as quatro propostas" : esIngles ? "See the four offerings" : "Ver las cuatro propuestas")</span>
-                </div>
-            </a>
-
-            <a class="pilar pilar--durazno" href="/Archivo">
-                <div class="pilar-imagen"><img src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" loading="lazy" /></div>
-                <div class="pilar-cuerpo">
-                    <h3>@Model.TituloPilar("pilar-archivo", "#ArchivoDeFachadas")</h3>
-                    <p>@Model.BajadaPilar("pilar-archivo", "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.")</p>
-                    <span class="ver">@(esPortugues ? "Entrar no arquivo" : esIngles ? "Enter the archive" : "Entrar al archivo")</span>
-                </div>
-            </a>
-
-            <a class="pilar pilar--crema2" href="/Productos">
-                <div class="pilar-imagen"><img src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" loading="lazy" /></div>
-                <div class="pilar-cuerpo">
-                    <h3>@Model.TituloPilar("pilar-productos", esPortugues ? "Produtos" : esIngles ? "Shop" : "Productos")</h3>
-                    <p>@Model.BajadaPilar("pilar-productos", "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.")</p>
-                    <span class="ver">@(esPortugues ? "Ver o que vem" : esIngles ? "See what is coming" : "Ver lo que viene")</span>
-                </div>
-            </a>
-
-            <a class="pilar pilar--piedra" href="/Cartelera">
-                <div class="pilar-imagen"><img src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" /></div>
-                <div class="pilar-cuerpo">
-                    <h3>@Model.TituloPilar("pilar-cartelera", esPortugues ? "Mural do bairro" : esIngles ? "Neighbourhood board" : "Cartelera de barrio")</h3>
-                    <p>@Model.BajadaPilar("pilar-cartelera", "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.")</p>
-                    <span class="ver">@(esPortugues ? "Ver o mural" : esIngles ? "See the board" : "Ver la cartelera")</span>
-                </div>
-            </a>
-        </div>
-    </div>
-</section>
-
-@if (Model.TiraArchivo.Count > 0)
+else
 {
-    <div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--crema-2)")" /></div>
-
-    <section class="banda banda--crema2" style="padding-top:calc(var(--aire) * .5)">
-        <div class="contenedor">
-            <div class="regla regla--izq"><partial name="_Flor" /></div>
-            <h2 class="titulo-seccion">#ArchivoDeFachadas</h2>
-            <div class="archivo-tira" style="margin-top:38px">
-                @foreach (var f in Model.TiraArchivo)
-                {
-                    <a href="@f.Url"><img src="@f.ImagenSrc" alt="@f.ImagenAlt" loading="lazy" /></a>
-                }
-            </div>
-            <div class="acciones">
-                <a class="boton boton--borde" href="/Archivo">@(esPortugues ? "Entrar no arquivo completo" : esIngles ? "Enter the full archive" : "Entrar al archivo completo")</a>
-            </div>
-        </div>
-    </section>
+    <div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--durazno)")" /></div>
 }
-
-@if (Model.Afiches.Count > 0)
-{
-    <div class="transicion" style="background:var(--crema-2)"><partial name="_Onda" model="@("var(--mostaza)")" /></div>
-
-    <section class="banda banda--mostaza" style="padding-top:calc(var(--aire) * .5)">
-        <div class="contenedor">
-            <div class="regla regla--izq" style="color:var(--petroleo)"><partial name="_Flor" /></div>
-            <h2 class="titulo-seccion">@(esPortugues ? "O mural do bairro" : esIngles ? "The neighbourhood board" : "La cartelera de barrio")</h2>
-            <div class="muro" style="margin-top:48px">
-                @foreach (var a in Model.Afiches)
-                {
-                    <partial name="_Afiche" model="a" />
-                }
-            </div>
-            <div class="acciones" style="margin-top:50px">
-                <a class="boton boton--principal" href="/Cartelera">@(esPortugues ? "Como colar seu cartaz" : esIngles ? "How to put your poster up" : "Cómo pegar tu afiche")</a>
-            </div>
-        </div>
-    </section>
-}
-
-@if (Model.Sobre is not null)
-{
-    <div class="transicion" style="background:var(--mostaza)"><partial name="_Onda" model="@("var(--crema)")" /></div>
-
-    <section class="banda banda--crema" style="padding-top:calc(var(--aire) * .5)">
-        <div class="contenedor">
-            <div class="duo">
-                <div>
-                    <div class="regla regla--izq"><partial name="_Flor" /></div>
-                    <h2 class="titulo-seccion">@(esPortugues ? "Atrás de tudo isto há uma pessoa" : esIngles ? "There is a person behind all this" : "Atrás de todo esto hay una persona")</h2>
-                    <div class="texto" style="margin-top:20px">
-                        @Html.Raw(Model.T(Model.Sobre.Contenido, Model.Sobre.ContenidoEn, Model.Sobre.ContenidoPt))
-                    </div>
-                    <p class="firma">@Model.Sobre.Firma</p>
-                    <div class="acciones">
-                        <a class="boton boton--borde" href="/Sobre">@(esPortugues ? "Ler a história completa" : esIngles ? "Read the full story" : "Leer la historia completa")</a>
-                    </div>
-                </div>
-                @if (!string.IsNullOrEmpty(Model.SobreImagenSrc))
-                {
-                    <div class="columna-retrato">
-                        <div class="retrato">
-                            <img src="@Model.SobreImagenSrc" alt="@Model.Sobre.ImagenAlt" loading="lazy" />
-                        </div>
-                    </div>
-                }
-            </div>
-        </div>
-    </section>
-}
-
-<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--durazno)")" /></div>
 
 <section class="banda banda--durazno banda--ajustada" style="padding-top:calc(var(--aire) * .35)">
     <div class="contenedor">

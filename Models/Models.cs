@@ -100,7 +100,7 @@ public class Fachada : ITieneImagen
 }
 
 // ──────────────────────────────────────────────────────────────
-//  ¿Paseás conmigo? — las cuatro propuestas
+//  ¿Paseamos? — las cuatro propuestas
 // ──────────────────────────────────────────────────────────────
 public enum ClavePropuesta { Clubcito, AlSobre, RecorridosCreativos, Personalizados }
 
@@ -353,7 +353,13 @@ public class PaginaSobre : ITieneImagen
     public string ContenidoEn { get; set; } = string.Empty;
     public string ContenidoPt { get; set; } = string.Empty;
 
+    /// <summary>El nombre de Rosalía: es el título de la segunda sección de la página.</summary>
     [StringLength(120)] public string Firma { get; set; } = "Rosalía Souza";
+
+    /// <summary>La sección sobre Rosalía, debajo de la del proyecto.</summary>
+    public string ContenidoAutora { get; set; } = string.Empty;
+    public string ContenidoAutoraEn { get; set; } = string.Empty;
+    public string ContenidoAutoraPt { get; set; } = string.Empty;
 
     /// <summary>El retrato. Rosalía lo cambia desde el panel.</summary>
     public byte[]? ImagenDatos { get; set; }

@@ -17,7 +17,7 @@ public class HomeController : ControladorPublico
         vm.Definicion = await Ctx.EncabezadosSeccion.AsNoTracking()
             .FirstOrDefaultAsync(e => e.Clave == "definicion");
 
-        var clavesPilares = new[] { "pilares", "pilar-clubcito", "pilar-archivo", "pilar-productos", "pilar-cartelera" };
+        var clavesPilares = new[] { "pilares", "pilar-clubcito", "pilar-alsobre", "pilar-recorridos", "pilar-personalizados" };
         vm.Pilares = await Ctx.EncabezadosSeccion.AsNoTracking()
             .Where(e => clavesPilares.Contains(e.Clave))
             .ToDictionaryAsync(e => e.Clave);
@@ -73,9 +73,7 @@ public class HomeController : ControladorPublico
             Titulo = vm.T("El buzón de la Casita", "The Casita mailbox", "A caixa de correio da Casita"),
             Texto = await AjusteAsync("BuzonTexto") ?? string.Empty,
             EtiquetaBoton = vm.T("Suscribirme", "Subscribe", "Inscrever-me"),
-            Nota = vm.T("También hay canal de WhatsApp, si preferís que te llegue por ahí.",
-                        "There is also a WhatsApp channel, if you would rather get it there.",
-                        "Também há canal de WhatsApp, se preferir receber por lá."),
+            Nota = NotaCanalWhatsApp(vm, await CanalWhatsAppAsync()),
             Origen = "portada",
             VolverA = "/"
         };

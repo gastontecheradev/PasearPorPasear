@@ -85,8 +85,8 @@ public class InicioVm : VistaBase
 
     /// <summary>
     /// La intro de «¿Por dónde querés empezar?» y las cuatro tarjetas,
-    /// buscadas por Clave (pilares, pilar-clubcito, pilar-archivo,
-    /// pilar-productos, pilar-cartelera). Se editan desde
+    /// buscadas por Clave (pilares, pilar-clubcito, pilar-alsobre,
+    /// pilar-recorridos, pilar-personalizados). Se editan desde
     /// /Admin/Paginas/Encabezados igual que el resto de la portada.
     /// </summary>
     public Dictionary<string, EncabezadoSeccion> Pilares { get; set; } = new();
@@ -107,6 +107,7 @@ public class SobreVm : VistaBase
 
     public string Titulo => T(Pagina.Titulo, Pagina.TituloEn, Pagina.TituloPt);
     public string Contenido => T(Pagina.Contenido, Pagina.ContenidoEn, Pagina.ContenidoPt);
+    public string ContenidoAutora => T(Pagina.ContenidoAutora, Pagina.ContenidoAutoraEn, Pagina.ContenidoAutoraPt);
 }
 
 // ── Cartelera de barrio ──
@@ -126,7 +127,7 @@ public class ContactoVm : VistaBase
 }
 
 // ══════════════════════════════════════════════════════════════
-//  ¿Paseás conmigo?
+//  ¿Paseamos?
 // ══════════════════════════════════════════════════════════════
 public class DatoVm
 {

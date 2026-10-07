@@ -174,6 +174,12 @@ p+p{margin-top:1.05em}
   font-size:var(--t-sm);font-weight:700;letter-spacing:.19em;text-transform:uppercase;color:var(--mostaza);
 }
 .atributos .flor{color:var(--coral);width:15px;height:15px}
+/* En la columna de Sobre mí el ancho es la mitad: se aprieta el tracking para que las tres palabras entren en una línea */
+.duo .atributos{gap:10px 14px;letter-spacing:.1em}
+@media (max-width:520px){
+  .duo .atributos{font-size:var(--t-xs);gap:8px 10px;letter-spacing:.06em}
+  .duo .atributos .flor{width:12px;height:12px}
+}
 
 /* ── Tarjeta paseo = ventana con alféizar ───────────────────── */
 .grilla{display:grid;grid-template-columns:repeat(auto-fill,minmax(288px,1fr));gap:clamp(26px,3.4vw,44px)}
@@ -523,7 +529,7 @@ p+p{margin-top:1.05em}
   border:2px solid var(--petroleo);
 }
 
-/* ── ¿Paseás conmigo?: propuestas de paseo guiado ───────────── */
+/* ── ¿Paseamos?: propuestas de paseo guiado ───────────── */
 .propuestas{display:grid;gap:clamp(22px,2.6vw,32px)}
 .propuesta{
   display:grid;grid-template-columns:264px 1fr;gap:clamp(20px,3vw,38px);align-items:center;
@@ -589,6 +595,9 @@ p+p{margin-top:1.05em}
   color:var(--petroleo);background:var(--mostaza);padding:4px 12px;border-radius:99px;
 }
 .por-definir{color:var(--tinta-2);font-style:italic}
+.en-construccion{padding:clamp(24px,4vw,48px) 0;border-top:2px solid var(--petroleo)}
+.en-construccion h2{font-size:var(--t-xl);font-weight:800;letter-spacing:-.025em;color:var(--petroleo)}
+.en-construccion p{font-size:var(--t-sm);margin-top:10px;max-width:46ch}
 
 /* ── Bloque de newsletter reutilizable ──────────────────────── */
 .recuadro{

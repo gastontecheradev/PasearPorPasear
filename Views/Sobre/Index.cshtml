@@ -4,37 +4,48 @@
     var esPortugues = Model.Idioma == "pt";
 }
 
-<section class="banda banda--crema">
+<section class="banda banda--crema" aria-labelledby="sobre-proyecto">
     <div class="contenedor">
-        <div class="duo">
-            <div>
-                <div class="regla regla--izq"><partial name="_Flor" /></div>
-                <h1 class="titulo-seccion">@Model.Titulo</h1>
-                <div class="texto" style="margin-top:20px">
-                    @Html.Raw(Model.Contenido)
-                </div>
-                <p class="firma">@Model.Pagina.Firma</p>
-                <p class="atributos" style="color:var(--petroleo)">
-                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
-                    <partial name="_Flor" />
-                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
-                    <partial name="_Flor" />
-                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
-                </p>
-            </div>
-            @if (!string.IsNullOrEmpty(Model.ImagenSrc))
-            {
-                <div class="columna-retrato">
-                    <div class="retrato">
-                        <img src="@Model.ImagenSrc" alt="@Model.Pagina.ImagenAlt" />
-                    </div>
-                </div>
-            }
+        <div class="regla regla--izq"><partial name="_Flor" /></div>
+        <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
+        <div class="texto" style="margin-top:20px">
+            @Html.Raw(Model.Contenido)
         </div>
+        <p class="atributos" style="color:var(--petroleo)">
+            @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
+            <partial name="_Flor" />
+            @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
+            <partial name="_Flor" />
+            @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
+        </p>
     </div>
 </section>
 
-<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--petroleo)")" /></div>
+@if (!string.IsNullOrWhiteSpace(Model.ContenidoAutora))
+{
+    <section class="banda banda--crema2" aria-labelledby="sobre-autora">
+        <div class="contenedor">
+            <div class="duo">
+                @if (!string.IsNullOrEmpty(Model.ImagenSrc))
+                {
+                    <div class="columna-retrato">
+                        <div class="retrato">
+                            <img src="@Model.ImagenSrc" alt="@Model.Pagina.ImagenAlt" />
+                        </div>
+                    </div>
+                }
+                <div>
+                    <h2 class="titulo-seccion" id="sobre-autora">@Model.Pagina.Firma</h2>
+                    <div class="texto" style="margin-top:20px">
+                        @Html.Raw(Model.ContenidoAutora)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="transicion" style="background:@(string.IsNullOrWhiteSpace(Model.ContenidoAutora) ? "var(--crema)" : "var(--crema-2)")"><partial name="_Onda" model="@("var(--petroleo)")" /></div>
 
 <section class="banda banda--petroleo banda--ajustada" style="padding-top:calc(var(--aire) * .35)">
     <div class="contenedor">

@@ -39,7 +39,7 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             e.Property(f => f.FechaPublicacion).HasColumnType("datetime2");
         });
 
-        // ── ¿Paseás conmigo? ──
+        // ── ¿Paseamos? ──
         builder.Entity<Propuesta>(e =>
         {
             e.HasIndex(p => p.Slug).IsUnique();

@@ -6,7 +6,7 @@
     var isPt = culture == "pt";
 
     var controlador = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    // El Clubcito cuelga de ¿Paseás conmigo?: el menú marca la sección madre
+    // El Clubcito cuelga de ¿Paseamos?: el menú marca la sección madre
     var seccion = controlador == "Clubcito" ? "Paseos" : controlador;
     Func<string, string> activo = c => seccion == c ? "page" : null;
 
@@ -59,7 +59,7 @@
         <ul class="nav" id="nav">
             <li><a href="/" aria-current="@activo("Home")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
             <li><a href="/Sobre" aria-current="@activo("Sobre")">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
-            <li><a href="/Paseos" aria-current="@activo("Paseos")">@(isPt ? "Passeia comigo?" : isEn ? "Walk with me?" : "¿Paseás conmigo?")</a></li>
+            <li><a href="/Paseos" aria-current="@activo("Paseos")">@(isPt ? "Vamos passear?" : isEn ? "Shall we walk?" : "¿Paseamos?")</a></li>
                 @* El hashtag es parte de la marca: no se traduce en ningún idioma *@
             <li><a href="/Archivo" aria-current="@activo("Archivo")">#ArchivoDeFachadas</a></li>
             <li><a href="/Productos" aria-current="@activo("Productos")">@(isPt ? "Produtos" : isEn ? "Shop" : "Productos")</a></li>
@@ -108,7 +108,7 @@
                 <h4>@(isPt ? "Percorrer" : isEn ? "Explore" : "Recorrer")</h4>
                 <ul>
                 <li><a href="/Sobre">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
-                <li><a href="/Paseos">@(isPt ? "Passeia comigo?" : isEn ? "Walk with me?" : "¿Paseás conmigo?")</a></li>
+                <li><a href="/Paseos">@(isPt ? "Vamos passear?" : isEn ? "Shall we walk?" : "¿Paseamos?")</a></li>
                 <li><a href="/Clubcito">El Clubcito</a></li>
                 <li><a href="/Archivo">#ArchivoDeFachadas</a></li>
                 <li><a href="/Cartelera">@(isPt ? "Mural do bairro" : isEn ? "Neighbourhood board" : "Cartelera de barrio")</a></li>
@@ -127,9 +127,7 @@
                 <h4>@(isPt ? "Seguir" : isEn ? "Follow" : "Seguir")</h4>
                 <ul>
                     <li><a href="https://www.instagram.com/pasearporpasear/" target="_blank" rel="noopener">Instagram</a></li>
-                    <li><a href="https://www.tiktok.com/@@pasearporpasear" target="_blank" rel="noopener">TikTok</a></li>
-                    <li><a href="https://www.threads.com/@@pasearporpasear" target="_blank" rel="noopener">Threads</a></li>
-                    <li><a href="https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08" target="_blank" rel="noopener">@(isPt ? "Canal do WhatsApp" : isEn ? "WhatsApp channel" : "Canal de WhatsApp")</a></li>
+                    @await Component.InvokeAsync("CanalWhatsApp")
                 </ul>
             </div>
         </div>

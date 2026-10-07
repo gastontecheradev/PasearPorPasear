@@ -37,15 +37,13 @@ public class ContactoController : ControladorPublico
     {
         var vm = await PrepararAsync(new ContactoVm { Mensaje = mensaje }, "contacto");
         vm.CorreoContacto = await AjusteAsync("EmailContacto") ?? vm.CorreoContacto;
-        vm.CanalWhatsApp = await AjusteAsync("CanalWhatsApp");
+        vm.CanalWhatsApp = await CanalWhatsAppAsync();
         vm.Buzon = new BuzonVm
         {
             Titulo = vm.T("El buzón de la Casita", "The Casita mailbox", "A caixa de correio da Casita"),
             Texto = await AjusteAsync("BuzonTexto") ?? string.Empty,
             EtiquetaBoton = vm.T("Suscribirme", "Subscribe", "Inscrever-me"),
-            Nota = vm.T("También hay canal de WhatsApp, si preferís que te llegue por ahí.",
-                        "There is also a WhatsApp channel, if you would rather get it there.",
-                        "Também há canal de WhatsApp, se preferir receber por lá."),
+            Nota = NotaCanalWhatsApp(vm, vm.CanalWhatsApp),
             Origen = "contacto",
             VolverA = "/Contacto#buzon",
             Clase = "recuadro"

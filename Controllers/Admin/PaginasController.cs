@@ -52,6 +52,9 @@ public class PaginasController : ControladorAdmin
         p.ContenidoEn = entrada.ContenidoEn ?? string.Empty;
         p.ContenidoPt = entrada.ContenidoPt ?? string.Empty;
         p.Firma = entrada.Firma?.Trim() ?? string.Empty;
+        p.ContenidoAutora = entrada.ContenidoAutora ?? string.Empty;
+        p.ContenidoAutoraEn = entrada.ContenidoAutoraEn ?? string.Empty;
+        p.ContenidoAutoraPt = entrada.ContenidoAutoraPt ?? string.Empty;
         p.ImagenAlt = entrada.ImagenAlt?.Trim();
 
         if (!await AplicarImagenAsync(p, imagen, borrarImagen))

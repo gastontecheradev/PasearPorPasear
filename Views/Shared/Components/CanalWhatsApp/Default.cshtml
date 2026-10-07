@@ -1,0 +1,5 @@
+@model string
+@{
+    var culture = System.Globalization.CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+}
+<li><a href="@Model" target="_blank" rel="noopener">@(culture == "pt" ? "Canal do WhatsApp" : culture == "en" ? "WhatsApp channel" : "Canal de WhatsApp")</a></li>

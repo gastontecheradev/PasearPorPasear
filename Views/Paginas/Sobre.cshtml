@@ -14,6 +14,12 @@
         Es = Model.Contenido, En = Model.ContenidoEn, Pt = Model.ContenidoPt,
         Pista = "Admite HTML: cada párrafo entre etiquetas p."
     };
+    var campoAutora = new CamposIdiomaVm
+    {
+        Nombre = "ContenidoAutora", Etiqueta = "Texto", Largo = true,
+        Es = Model.ContenidoAutora, En = Model.ContenidoAutoraEn, Pt = Model.ContenidoAutoraPt,
+        Pista = "Admite HTML: cada párrafo entre etiquetas p."
+    };
     var campoImagen = new CampoImagenVm
     {
         Src = cargada ? $"/Imagenes/Sobre/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ImagenUrl,
@@ -41,15 +47,21 @@
     <div class="admin-form">
         <div>
             <div class="admin-panel">
-                <h2>La página</h2>
-                <p>Es también el bloque «atrás de todo esto hay una persona» de la portada.</p>
+                <h2>Sobre el proyecto</h2>
+                <p>La primera sección de la página: qué es Pasear por Pasear.</p>
                 <partial name="_CamposIdioma" model="campoTitulo" />
                 <partial name="_CamposIdioma" model="campoContenido" />
+            </div>
 
+            <div class="admin-panel">
+                <h2>Sobre vos</h2>
+                <p>La segunda sección, con tu retrato al lado.</p>
                 <div class="campo">
-                    <label for="Firma">Firma</label>
+                    <label for="Firma">Nombre</label>
                     <input id="Firma" name="Firma" type="text" value="@Model.Firma" maxlength="120" />
+                    <p class="pista">Es el título de esta sección.</p>
                 </div>
+                <partial name="_CamposIdioma" model="campoAutora" />
             </div>
         </div>
 

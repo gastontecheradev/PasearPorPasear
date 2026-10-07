@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 using System.Globalization;
 
@@ -47,6 +48,21 @@ public abstract class ControladorPublico : Controller
         var v = Traducir.Texto(Idioma, a.Valor, a.ValorEn, a.ValorPt);
         return string.IsNullOrWhiteSpace(v) ? null : v;
     }
+
+    /// <summary>
+    /// Canal de WhatsApp desde Ajustes, sólo si es una URL https válida.
+    /// Null si no hay canal: las vistas no lo enlazan ni lo mencionan.
+    /// </summary>
+    protected async Task<string?> CanalWhatsAppAsync() =>
+        EnlaceHelper.SoloHttps(await AjusteAsync("CanalWhatsApp"));
+
+    /// <summary>Nota del buzón que invita al canal; null si no hay canal.</summary>
+    protected static string? NotaCanalWhatsApp(VistaBase vm, string? canal) =>
+        canal is null
+            ? null
+            : vm.T("También hay canal de WhatsApp, si preferís que te llegue por ahí.",
+                   "There is also a WhatsApp channel, if you would rather get it there.",
+                   "Também há canal de WhatsApp, se preferir receber por lá.");
 
     /// <summary>Los afiches que se muestran en el muro, ya filtrados por vigencia.</summary>
     protected IQueryable<CarteleraAfiche> AfichesVigentes() =>

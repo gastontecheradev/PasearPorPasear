@@ -2,6 +2,9 @@
 @{
     var esIngles = Model.Idioma == "en";
     var esPortugues = Model.Idioma == "pt";
+    // Mientras la sección está en construcción no se muestra la grilla de productos.
+    // Para volver a publicarla, cambiar a false.
+    var enConstruccion = true;
 }
 
 <section class="encabezado banda--crema">
@@ -9,7 +12,7 @@
         <img class="adorno" src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
-        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        @if (!enConstruccion && !string.IsNullOrEmpty(Model.BajadaSeccion))
         {
             <p class="bajada">@Model.BajadaSeccion</p>
         }
@@ -18,6 +21,17 @@
 
 <section class="banda banda--crema" style="padding-top:0">
     <div class="contenedor">
+        @if (enConstruccion)
+        {
+            <div class="en-construccion">
+                <h2>@(esPortugues ? "Esta seção está em construção" : esIngles ? "This section is under construction" : "Esta sección está en construcción")</h2>
+                <p>@(esPortugues ? "Estamos preparando os produtos da Casita. Em breve estarão aqui."
+                     : esIngles ? "We are getting the Casita products ready. They will be here soon."
+                     : "Estamos preparando los productos de la Casita. Muy pronto van a estar acá.")</p>
+            </div>
+        }
+        else
+        {
         <div class="productos">
             @foreach (var p in Model.Productos)
             {
@@ -56,5 +70,6 @@
         <div style="margin-top:52px">
             <partial name="_BloqueBuzon" model="Model.Buzon" />
         </div>
+        }
     </div>
 </section>

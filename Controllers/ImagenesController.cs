@@ -57,6 +57,11 @@ public class ImagenesController : Controller
                 .Select(x => new Contenido(x.ImagenDatos, x.ImagenTipo))
                 .FirstOrDefaultAsync(ct),
 
+            "sobreproyecto" => await _ctx.PaginasSobre
+                .Where(x => x.Id == id)
+                .Select(x => new Contenido(x.ProyectoImagenDatos, x.ProyectoImagenTipo))
+                .FirstOrDefaultAsync(ct),
+
             _ => null
         };
 

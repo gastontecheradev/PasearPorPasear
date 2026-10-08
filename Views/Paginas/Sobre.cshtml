@@ -24,7 +24,19 @@
     {
         Src = cargada ? $"/Imagenes/Sobre/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ImagenUrl,
         Alt = Model.ImagenAlt,
-        EsCargada = cargada
+        EsCargada = cargada,
+        Titulo = "Tu retrato"
+    };
+    var proyectoCargada = Model.ProyectoImagenDatos is { Length: > 0 };
+    var campoImagenProyecto = new CampoImagenVm
+    {
+        Src = proyectoCargada ? $"/Imagenes/SobreProyecto/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ProyectoImagenUrl,
+        Alt = Model.ProyectoImagenAlt,
+        EsCargada = proyectoCargada,
+        Titulo = "Foto del proyecto",
+        CampoArchivo = "imagenProyecto",
+        CampoAlt = "ProyectoImagenAlt",
+        CampoBorrar = "borrarImagenProyecto"
     };
 }
 
@@ -48,7 +60,7 @@
         <div>
             <div class="admin-panel">
                 <h2>Sobre el proyecto</h2>
-                <p>La primera sección de la página: qué es Pasear por Pasear.</p>
+                <p>La primera sección de la página: qué es Pasear por Pasear, con una foto a la derecha.</p>
                 <partial name="_CamposIdioma" model="campoTitulo" />
                 <partial name="_CamposIdioma" model="campoContenido" />
             </div>
@@ -72,6 +84,7 @@
                 <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">Guardar cambios</button>
             </div>
 
+            <partial name="_CampoImagen" model="campoImagenProyecto" />
             <partial name="_CampoImagen" model="campoImagen" />
         </div>
     </div>

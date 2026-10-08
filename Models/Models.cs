@@ -345,13 +345,19 @@ public class PaginaSobre : ITieneImagen
 {
     public int Id { get; set; }
 
-    [Required] public string Titulo { get; set; } = "Sobre Pasear por Pasear";
+    [Required] public string Titulo { get; set; } = "Sobre Pasear Por Pasear";
     [Required] public string TituloEn { get; set; } = "About Pasear por Pasear";
-    public string TituloPt { get; set; } = "Sobre Pasear por Pasear";
+    public string TituloPt { get; set; } = "Sobre Pasear Por Pasear";
 
     public string Contenido { get; set; } = string.Empty;
     public string ContenidoEn { get; set; } = string.Empty;
     public string ContenidoPt { get; set; } = string.Empty;
+
+    /// <summary>La foto de la sección del proyecto, a la derecha del texto.</summary>
+    public byte[]? ProyectoImagenDatos { get; set; }
+    [StringLength(100)] public string? ProyectoImagenTipo { get; set; }
+    [StringLength(500)] public string? ProyectoImagenUrl { get; set; }
+    [StringLength(300)] public string? ProyectoImagenAlt { get; set; }
 
     /// <summary>El nombre de Rosalía: es el título de la segunda sección de la página.</summary>
     [StringLength(120)] public string Firma { get; set; } = "Rosalía Souza";

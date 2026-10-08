@@ -104,6 +104,7 @@ public class SobreVm : VistaBase
 {
     public PaginaSobre Pagina { get; set; } = new();
     public string? ImagenSrc { get; set; }
+    public string? ProyectoImagenSrc { get; set; }
 
     public string Titulo => T(Pagina.Titulo, Pagina.TituloEn, Pagina.TituloPt);
     public string Contenido => T(Pagina.Contenido, Pagina.ContenidoEn, Pagina.ContenidoPt);
@@ -293,6 +294,12 @@ public class CampoImagenVm
     public string? Alt { get; set; }
     /// <summary>true si la subió Rosalía; false si es la imagen estática del seed.</summary>
     public bool EsCargada { get; set; }
+
+    /// <summary>Para cuando una pantalla tiene más de una imagen.</summary>
+    public string Titulo { get; set; } = "Imagen";
+    public string CampoArchivo { get; set; } = "imagen";
+    public string CampoAlt { get; set; } = "ImagenAlt";
+    public string CampoBorrar { get; set; } = "borrarImagen";
 }
 
 /// <summary>Fila del listado del panel. Sirve para cualquier entidad con imagen.</summary>

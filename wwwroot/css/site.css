@@ -283,6 +283,8 @@ p+p{margin-top:1.05em}
   width:100%;border:2px solid var(--petroleo);
   border-radius:200px 200px var(--curva) var(--curva);
   padding:8px;background:var(--crema);
+  /* Misma proporción para las dos fotos de Sobre, suba Rosalía la que suba. */
+  aspect-ratio:3/3.8;object-fit:cover;
 }
 .retrato--vacio{
   border:2px solid var(--petroleo);background:var(--durazno);
@@ -301,6 +303,7 @@ p+p{margin-top:1.05em}
   padding:5px 12px;border-radius:99px;
 }
 .columna-retrato{max-width:380px}
+.columna-retrato--der{justify-self:end;width:100%}
 .firma{font-size:var(--t-xl);font-weight:800;letter-spacing:-.02em;color:var(--petroleo);margin-top:26px}
 
 /* ── Newsletter ─────────────────────────────────────────────── */
@@ -434,6 +437,7 @@ p+p{margin-top:1.05em}
   .definicion,.duo,.suscripcion{grid-template-columns:1fr}
   .definicion .casita-grande{max-width:210px;grid-row:1}
   .retrato{max-width:340px}
+  .columna-retrato--der{justify-self:start}
   .kiosco{display:none}
   .pie-grilla{grid-template-columns:1fr 1fr}
 }

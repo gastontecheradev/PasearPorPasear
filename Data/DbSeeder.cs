@@ -56,17 +56,31 @@ public static class DbSeeder
         if (existente is not null)
         {
             SepararSobre(existente);
+
+            // La foto del proyecto llegó después: las páginas ya creadas arrancan con
+            // la demo.
+            if (existente.ProyectoImagenUrl is null && existente.ProyectoImagenDatos is null)
+            {
+                existente.ProyectoImagenUrl = ProyectoImagenDemo;
+                existente.ProyectoImagenAlt = ProyectoImagenAltDemo;
+            }
+
+            // «Por» pasó a ir con mayúscula. Sólo si sigue el título del seed.
+            if (existente.Titulo == "Sobre Pasear por Pasear") existente.Titulo = SobreTitulo;
+            if (existente.TituloPt == "Sobre Pasear por Pasear") existente.TituloPt = SobreTitulo;
             return;
         }
 
         ctx.PaginasSobre.Add(new PaginaSobre
         {
-            Titulo = "Sobre Pasear por Pasear",
+            Titulo = SobreTitulo,
             TituloEn = "About Pasear por Pasear",
-            TituloPt = "Sobre Pasear por Pasear",
+            TituloPt = SobreTitulo,
             Contenido = SobreProyectoEs,
             ContenidoEn = SobreProyectoEn,
             ContenidoPt = SobreProyectoPt,
+            ProyectoImagenUrl = ProyectoImagenDemo,
+            ProyectoImagenAlt = ProyectoImagenAltDemo,
             Firma = "Rosalía Souza",
             ContenidoAutora = SobreAutoraEs,
             ContenidoAutoraEn = SobreAutoraEn,
@@ -75,6 +89,10 @@ public static class DbSeeder
             ImagenAlt = "Rosalía caminando por la rambla de Montevideo al atardecer"
         });
     }
+
+    private const string SobreTitulo = "Sobre Pasear Por Pasear";
+    private const string ProyectoImagenDemo = Demo + "fachada-2.webp";
+    private const string ProyectoImagenAltDemo = "Casa con buganvilla y techo rojo";
 
     // La página pasó de un solo texto a dos secciones: el proyecto y Rosalía.
     // Sólo se reparte el idioma que conserva el texto original del seed; si

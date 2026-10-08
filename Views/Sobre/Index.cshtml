@@ -6,18 +6,30 @@
 
 <section class="banda banda--crema" aria-labelledby="sobre-proyecto">
     <div class="contenedor">
-        <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
-        <div class="texto" style="margin-top:20px">
-            @Html.Raw(Model.Contenido)
+        <div class="duo">
+            <div>
+                <div class="regla regla--izq"><partial name="_Flor" /></div>
+                <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
+                <div class="texto" style="margin-top:20px">
+                    @Html.Raw(Model.Contenido)
+                </div>
+                <p class="atributos" style="color:var(--petroleo)">
+                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
+                    <partial name="_Flor" />
+                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
+                    <partial name="_Flor" />
+                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
+                </p>
+            </div>
+            @if (!string.IsNullOrEmpty(Model.ProyectoImagenSrc))
+            {
+                <div class="columna-retrato columna-retrato--der">
+                    <div class="retrato">
+                        <img src="@Model.ProyectoImagenSrc" alt="@Model.Pagina.ProyectoImagenAlt" />
+                    </div>
+                </div>
+            }
         </div>
-        <p class="atributos" style="color:var(--petroleo)">
-            @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
-            <partial name="_Flor" />
-            @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
-            <partial name="_Flor" />
-            @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
-        </p>
     </div>
 </section>
 
@@ -51,11 +63,10 @@
     <div class="contenedor">
         <div class="suscripcion">
             <div>
-                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Caminhamos?" : esIngles ? "Shall we walk?" : "¿Caminamos?")</h2>
-                <p class="bajada">@(esPortugues ? "Se quiser propor um bairro, me contar algo que viu ou simplesmente escrever, a porta está aberta." : esIngles ? "If you want to suggest a neighbourhood, tell me something you saw, or just write, the door is open." : "Si querés proponer un barrio, contarme algo que viste o simplemente escribir, la puerta está abierta.")</p>
+                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Gosta do projeto? Você pode colaborar com o “envelope virtual”." : esIngles ? "Do you like the project? You can chip in to the “virtual envelope”." : "¿Te gusta el proyecto? Podés colaborar “al sobre virtual”.")</h2>
+                <p class="bajada">@(esPortugues ? "Este projeto se sustenta com tempo, cafezinho e muito amor. Se quiser colaborar com o que puder e quiser, pode fazer isso aqui:" : esIngles ? "This project runs on time, coffee and a lot of love. If you'd like to chip in whatever you can, you can do it here:" : "Este proyecto se sostiene con tiempo, cafecito y mucho amor. Si querés colaborar con lo que puedas, quieras, podés hacerlo acá:")</p>
                 <div class="acciones">
-                    <a class="boton boton--claro" href="/Paseos">@(esPortugues ? "Ver os passeios" : esIngles ? "See the walks" : "Ver los paseos")</a>
-                    <a class="boton boton--borde-claro" href="/Contacto">@(esPortugues ? "Escreva-me" : esIngles ? "Write to me" : "Escribime")</a>
+                    <a class="boton boton--claro" href="https://link.mercadopago.com.uy/pasearporpasear" target="_blank" rel="noopener">@(esPortugues ? "Deixar uma gorjeta" : esIngles ? "Leave a tip" : "Dejar una propina")</a>
                 </div>
             </div>
             <img class="kiosco" src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" />

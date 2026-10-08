@@ -40,7 +40,8 @@ public class PaginasController : ControladorAdmin
     [HttpPost("Sobre")]
     [ValidateAntiForgeryToken]
     [RequestSizeLimit(8 * 1024 * 1024)]
-    public async Task<IActionResult> Sobre(PaginaSobre entrada, IFormFile? imagen, bool borrarImagen = false)
+    public async Task<IActionResult> Sobre(PaginaSobre entrada, IFormFile? imagen, bool borrarImagen = false,
+        IFormFile? imagenProyecto = null, bool borrarImagenProyecto = false)
     {
         var p = await Ctx.PaginasSobre.FirstOrDefaultAsync();
         if (p is null) return NotFound();
@@ -56,8 +57,11 @@ public class PaginasController : ControladorAdmin
         p.ContenidoAutoraEn = entrada.ContenidoAutoraEn ?? string.Empty;
         p.ContenidoAutoraPt = entrada.ContenidoAutoraPt ?? string.Empty;
         p.ImagenAlt = entrada.ImagenAlt?.Trim();
+        p.ProyectoImagenAlt = entrada.ProyectoImagenAlt?.Trim();
 
-        if (!await AplicarImagenAsync(p, imagen, borrarImagen))
+        var retratoOk = await AplicarImagenAsync(p, imagen, borrarImagen);
+        var proyectoOk = await AplicarImagenProyectoAsync(p, imagenProyecto, borrarImagenProyecto);
+        if (!retratoOk || !proyectoOk)
         {
             ViewData["Title"] = "Sobre PPP";
             return View(p);
@@ -68,6 +72,33 @@ public class PaginasController : ControladorAdmin
 
         TempData["Success"] = "Cambios guardados.";
         return RedirectToAction(nameof(Sobre));
+    }
+
+    /// <summary>
+    /// Igual que AplicarImagenAsync, pero para la foto de la sección del proyecto:
+    /// la página tiene dos imágenes y ITieneImagen cubre sólo el retrato.
+    /// </summary>
+    private async Task<bool> AplicarImagenProyectoAsync(PaginaSobre p, IFormFile? archivo, bool borrar)
+    {
+        if (borrar)
+        {
+            p.ProyectoImagenDatos = null;
+            p.ProyectoImagenTipo = null;
+            return true;
+        }
+
+        if (archivo is null || archivo.Length == 0) return true;
+
+        var subida = await Imagenes.LeerAsync(archivo);
+        if (subida is null)
+        {
+            ModelState.AddModelError("imagenProyecto", Imagenes.UltimoMotivo ?? "No se pudo leer la imagen.");
+            return false;
+        }
+
+        p.ProyectoImagenDatos = subida.Datos;
+        p.ProyectoImagenTipo = subida.Tipo;
+        return true;
     }
 
     // ── Encabezados de sección ────────────────────────────────

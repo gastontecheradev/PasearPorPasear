@@ -67,8 +67,6 @@ public class ClubcitoController : ControladorPublico
                          "Clubcito walks are announced through the Casita mailbox, once a month. There is no other list and no other group.",
                          "As saídas do Clubcito são avisadas pela caixa de correio da Casita, uma vez por mês. Não há outra lista nem outro grupo."),
             EtiquetaBoton = vm.T("Sumarme al buzón", "Join the mailbox", "Entrar na caixa"),
-            Origen = "clubcito",
-            VolverA = "/Clubcito",
             // El bloque va sobre banda petróleo: el botón principal se perdería.
             ClaseBoton = "boton--claro"
         };

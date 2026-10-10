@@ -308,12 +308,6 @@ p+p{margin-top:1.05em}
 
 /* ── Newsletter ─────────────────────────────────────────────── */
 .suscripcion{display:grid;grid-template-columns:1fr auto;gap:clamp(28px,4vw,64px);align-items:center}
-.form-linea{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px;max-width:460px}
-.form-linea input{
-  flex:1 1 220px;font:inherit;font-size:var(--t-sm);padding:13px 18px;
-  border:2px solid var(--petroleo);border-radius:99px;background:var(--crema);color:var(--petroleo);
-}
-.form-linea input::placeholder{color:var(--tinta-2)}
 .nota{font-size:var(--t-xs);color:var(--petroleo);margin-top:12px}
 .kiosco{width:190px;justify-self:center}
 
@@ -370,6 +364,16 @@ p+p{margin-top:1.05em}
   color:var(--tinta-2);font-size:var(--t-sm);font-weight:600;margin-block:40px;
 }
 .mapa iframe{width:100%;height:100%;display:block;border:0}
+/* Contacto: el formulario de suscripción va primero y los datos debajo, en una sola columna. */
+.contacto{max-width:580px}
+.contacto .datos{margin-top:40px}
+/* Formulario de MailerLite embebido: el iframe no toma el alto de su contenido,
+   así que se fija a mano con margen de sobra para que no aparezca barra de desplazamiento
+   (más angosto = más renglones = más alto). */
+.formulario-externo iframe{width:100%;height:640px;display:block;border:0}
+@media (max-width:640px){
+  .formulario-externo iframe{height:780px}
+}
 .galeria{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:16px;margin-block:40px}
 .galeria a{display:block}
 .galeria img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:var(--curva)}

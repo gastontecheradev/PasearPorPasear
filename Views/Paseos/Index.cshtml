@@ -54,7 +54,14 @@
                                 </div>
                             }
                             <div class="acciones" style="margin-top:22px">
-                                <a class="boton boton--principal" href="@p.Enlace">@p.TextoEnlace</a>
+                                @if (p.Enlace?.StartsWith("http") == true)
+                                {
+                                    <a class="boton boton--principal" href="@p.Enlace" target="_blank" rel="noopener">@p.TextoEnlace</a>
+                                }
+                                else
+                                {
+                                    <a class="boton boton--principal" href="@p.Enlace">@p.TextoEnlace</a>
+                                }
                             </div>
                         }
                     </div>
@@ -64,75 +71,3 @@
     </div>
 </section>
 
-<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--crema-2)")" /></div>
-
-<section class="banda banda--crema2" id="consulta" style="padding-top:calc(var(--aire) * .5)">
-    <div class="contenedor">
-        <div class="duo" style="align-items:start">
-            <div>
-                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Escreva e a gente monta" : esIngles ? "Write and we'll sort it out" : "Escribime y lo armamos")</h2>
-                <p class="bajada" style="font-size:var(--t-md)">@(esPortugues ? "Conte qual proposta lhe interessa e quantos são. Respondo com as datas disponíveis e como se combina." : esIngles ? "Tell me which offering interests you and how many of you there are. I'll reply with available dates and how to arrange it." : "Contame qué propuesta te interesa y cuántos son. Te contesto con las fechas disponibles y cómo se coordina.")</p>
-                <ul class="datos" style="margin-top:30px">
-                    <li>
-                        <strong>@(esPortugues ? "Quando se sai" : esIngles ? "When we go out" : "Cuándo se sale")</strong>
-                        @(esPortugues ? "Sábados e domingos de manhã, e alguma quarta à tarde." : esIngles ? "Saturday and Sunday mornings, and the odd Wednesday afternoon." : "Sábados y domingos de mañana, y algún miércoles de tarde.")
-                    </li>
-                    <li>
-                        <strong>@(esPortugues ? "Se chover" : esIngles ? "If it rains" : "Si llueve")</strong>
-                        @(esPortugues ? "Passa para o fim de semana seguinte, sem custo." : esIngles ? "It moves to the following weekend, at no cost." : "Se pasa para el fin de semana siguiente, sin costo.")
-                    </li>
-                    <li>
-                        <strong>@(esPortugues ? "Acessibilidade" : esIngles ? "Accessibility" : "Accesibilidad")</strong>
-                        @(esPortugues ? "Se alguém caminha devagar ou precisa de paradas, monta-se diferente. É só dizer." : esIngles ? "If someone walks slowly or needs stops, we plan it differently. Just say so." : "Si alguien camina despacio o necesita paradas, se arma distinto. Decímelo y listo.")
-                    </li>
-                </ul>
-            </div>
-
-            <form asp-controller="Paseos" asp-action="Consulta" method="post">
-                <div asp-validation-summary="ModelOnly" class="aviso aviso--error" role="alert"></div>
-
-                <div class="campo">
-                    <label asp-for="Consulta.PropuestaId">@(esPortugues ? "Qual proposta lhe interessa" : esIngles ? "Which offering interests you" : "Qué propuesta te interesa")</label>
-                    <select asp-for="Consulta.PropuestaId">
-                        @foreach (var p in Model.Propuestas)
-                        {
-                            <option value="@p.Id">@p.Titulo</option>
-                        }
-                    </select>
-                </div>
-
-                <div class="dos-columnas">
-                    <div class="campo">
-                        <label asp-for="Consulta.Nombre">@(esPortugues ? "Seu nome" : esIngles ? "Your name" : "Tu nombre")</label>
-                        <input asp-for="Consulta.Nombre" autocomplete="name" required maxlength="150" />
-                        <span asp-validation-for="Consulta.Nombre" class="pista"></span>
-                    </div>
-                    <div class="campo">
-                        <label asp-for="Consulta.Email">@(esPortugues ? "Seu e-mail" : esIngles ? "Your email" : "Tu correo")</label>
-                        <input asp-for="Consulta.Email" type="email" autocomplete="email" required maxlength="200" />
-                        <span asp-validation-for="Consulta.Email" class="pista"></span>
-                    </div>
-                </div>
-
-                <div class="dos-columnas">
-                    <div class="campo">
-                        <label asp-for="Consulta.FechaDeseada">@(esPortugues ? "Data que serve" : esIngles ? "A date that works" : "Fecha que te sirve")</label>
-                        <input asp-for="Consulta.FechaDeseada" type="date" />
-                    </div>
-                    <div class="campo">
-                        <label asp-for="Consulta.CantidadPersonas">@(esPortugues ? "Quantos são" : esIngles ? "How many of you" : "Cuántos son")</label>
-                        <input asp-for="Consulta.CantidadPersonas" type="number" min="1" max="40" />
-                        <span asp-validation-for="Consulta.CantidadPersonas" class="pista"></span>
-                    </div>
-                </div>
-
-                <div class="campo">
-                    <label asp-for="Consulta.Notas">@(esPortugues ? "Algo que eu deva saber" : esIngles ? "Anything I should know" : "Algo que deba saber")</label>
-                    <textarea asp-for="Consulta.Notas" style="min-height:92px" maxlength="1000"></textarea>
-                </div>
-
-                <button class="boton boton--principal" type="submit">@(esPortugues ? "Enviar a consulta" : esIngles ? "Send the enquiry" : "Enviar la consulta")</button>
-            </form>
-        </div>
-    </div>
-</section>

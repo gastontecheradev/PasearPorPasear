@@ -149,7 +149,6 @@ public class Propuesta : ITieneImagen
     public DateTime? ActualizadaEn { get; set; }
 
     public ICollection<PropuestaDato> Datos { get; set; } = new List<PropuestaDato>();
-    public ICollection<ConsultaPaseo> Consultas { get; set; } = new List<ConsultaPaseo>();
 }
 
 /// <summary>
@@ -403,86 +402,6 @@ public class EncabezadoSeccion
     [StringLength(2000)] public string? BajadaPt { get; set; }
 
     public DateTime ActualizadoEn { get; set; } = DateTime.Now;
-}
-
-// ──────────────────────────────────────────────────────────────
-//  El buzón de la Casita  (antes NewsletterSubscriber)
-// ──────────────────────────────────────────────────────────────
-public class SuscriptorBuzon
-{
-    public int Id { get; set; }
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(120)] public string? Nombre { get; set; }
-
-    /// <summary>Desde qué formulario llegó: portada, clubcito, productos, contacto.</summary>
-    [StringLength(40)] public string? Origen { get; set; }
-
-    public DateTime SuscritoEn { get; set; } = DateTime.Now;
-    public bool Activo { get; set; } = true;
-}
-
-// ──────────────────────────────────────────────────────────────
-//  Consultas y mensajes
-// ──────────────────────────────────────────────────────────────
-public enum EstadoConsulta { Pendiente, Contestada, Confirmada, Cancelada }
-
-public class ConsultaPaseo
-{
-    public int Id { get; set; }
-
-    /// <summary>Null si la propuesta se borró: la consulta se conserva igual.</summary>
-    public int? PropuestaId { get; set; }
-
-    [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(150)]
-    public string Nombre { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(50)] public string? Telefono { get; set; }
-
-    public DateTime? FechaDeseada { get; set; }
-
-    [Range(1, 40, ErrorMessage = "Entre 1 y 40 personas")]
-    public int CantidadPersonas { get; set; } = 2;
-
-    [StringLength(1000)] public string? Notas { get; set; }
-
-    public EstadoConsulta Estado { get; set; } = EstadoConsulta.Pendiente;
-    public DateTime CreadaEn { get; set; } = DateTime.Now;
-
-    public Propuesta? Propuesta { get; set; }
-}
-
-public class MensajeContacto
-{
-    public int Id { get; set; }
-
-    [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(150)]
-    public string Nombre { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(200)] public string? Asunto { get; set; }
-
-    [Required(ErrorMessage = "El mensaje es obligatorio")]
-    [StringLength(2000)]
-    public string Mensaje { get; set; } = string.Empty;
-
-    public DateTime EnviadoEn { get; set; } = DateTime.Now;
-    public bool Leido { get; set; }
 }
 
 // ──────────────────────────────────────────────────────────────

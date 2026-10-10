@@ -10,32 +10,9 @@ public class PaseosController : ControladorPublico
 {
     public PaseosController(ApplicationDbContext ctx) : base(ctx) { }
 
-    public async Task<IActionResult> Index() => View(await ArmarAsync(new ConsultaPaseo()));
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Consulta(ConsultaPaseo consulta)
+    public async Task<IActionResult> Index()
     {
-        if (!ModelState.IsValid)
-            return View(nameof(Index), await ArmarAsync(consulta));
-
-        consulta.CreadaEn = DateTime.Now;
-        consulta.Estado = EstadoConsulta.Pendiente;
-        Ctx.ConsultasPaseo.Add(consulta);
-        await Ctx.SaveChangesAsync();
-
-        TempData["Success"] = Idioma switch
-        {
-            "en" => "Consultation sent. I'll reply with the available dates.",
-            "pt" => "Consulta enviada. Respondo com as datas disponíveis.",
-            _    => "Consulta enviada. Te contesto con las fechas disponibles."
-        };
-        return RedirectToAction(nameof(Index));
-    }
-
-    private async Task<PaseosVm> ArmarAsync(ConsultaPaseo consulta)
-    {
-        var vm = await PrepararAsync(new PaseosVm { Consulta = consulta }, "paseos");
+        var vm = await PrepararAsync(new PaseosVm(), "paseos");
 
         var filas = await Ctx.Propuestas.AsNoTracking()
             .Where(p => p.Activa)
@@ -69,14 +46,16 @@ public class PaseosController : ControladorPublico
                 Valor = vm.T(d.Valor, d.ValorEn, d.ValorPt),
                 Etiqueta = vm.T(d.Etiqueta, d.EtiquetaEn, d.EtiquetaPt)
             }).ToList(),
-            // El Clubcito tiene página propia; el resto lleva al formulario de consulta.
-            Enlace = p.Clave == ClavePropuesta.Clubcito ? "/Clubcito" : "#consulta",
+            // El Clubcito lleva al formulario de novedades (MailerLite); el resto, a la página de contacto.
+            Enlace = p.Clave == ClavePropuesta.Clubcito
+                ? "https://preview.mailerlite.io/forms/2403548/194248063120835606/share"
+                : "/Contacto",
             TextoEnlace = p.Clave == ClavePropuesta.Clubcito
-                ? vm.T("Conocer El Clubcito", "Meet El Clubcito", "Conhecer El Clubcito")
+                ? vm.T("Recibir novedades", "Get updates", "Receber novidades")
                 : vm.T("Consultar", "Get in touch", "Consultar")
         }).ToList();
 
         ViewData["Title"] = vm.TituloSeccion;
-        return vm;
+        return View(vm);
     }
 }

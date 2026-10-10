@@ -74,8 +74,8 @@ public class HomeController : ControladorPublico
             Texto = await AjusteAsync("BuzonTexto") ?? string.Empty,
             EtiquetaBoton = vm.T("Suscribirme", "Subscribe", "Inscrever-me"),
             Nota = NotaCanalWhatsApp(vm, await CanalWhatsAppAsync()),
-            Origen = "portada",
-            VolverA = "/"
+            // El formulario está embebido en Contacto; desde la portada se va ahí.
+            Enlace = "/Contacto#buzon"
         };
 
         ViewData["Title"] = vm.T("Inicio", "Home", "Início");

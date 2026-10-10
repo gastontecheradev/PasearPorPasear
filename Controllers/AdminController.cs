@@ -27,10 +27,7 @@ public class AdminController : Controller
             ProximosEncuentros = await _ctx.ClubcitoEncuentros.CountAsync(c => c.Publicado && c.Fecha >= hoy),
             AfichesPublicados = await _ctx.CarteleraAfiches.CountAsync(a =>
                 a.Estado == EstadoAfiche.Publicado && (a.VigenteHasta == null || a.VigenteHasta >= hoy)),
-            AfichesPorRevisar = await _ctx.CarteleraAfiches.CountAsync(a => a.Estado == EstadoAfiche.PorRevisar),
-            MensajesSinLeer = await _ctx.MensajesContacto.CountAsync(m => !m.Leido),
-            ConsultasPendientes = await _ctx.ConsultasPaseo.CountAsync(c => c.Estado == EstadoConsulta.Pendiente),
-            SuscriptoresBuzon = await _ctx.SuscriptoresBuzon.CountAsync(s => s.Activo)
+            AfichesPorRevisar = await _ctx.CarteleraAfiches.CountAsync(a => a.Estado == EstadoAfiche.PorRevisar)
         };
 
         ViewData["Title"] = "Panel";
@@ -43,8 +40,5 @@ public class AdminController : Controller
         public int ProximosEncuentros { get; set; }
         public int AfichesPublicados { get; set; }
         public int AfichesPorRevisar { get; set; }
-        public int MensajesSinLeer { get; set; }
-        public int ConsultasPendientes { get; set; }
-        public int SuscriptoresBuzon { get; set; }
     }
 }

@@ -18,9 +18,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Producto> Productos => Set<Producto>();
     public DbSet<PaginaSobre> PaginasSobre => Set<PaginaSobre>();
     public DbSet<EncabezadoSeccion> EncabezadosSeccion => Set<EncabezadoSeccion>();
-    public DbSet<SuscriptorBuzon> SuscriptoresBuzon => Set<SuscriptorBuzon>();
-    public DbSet<ConsultaPaseo> ConsultasPaseo => Set<ConsultaPaseo>();
-    public DbSet<MensajeContacto> MensajesContacto => Set<MensajeContacto>();
     public DbSet<Ajuste> Ajustes => Set<Ajuste>();
 
     protected override void OnModelCreating(ModelBuilder builder)
@@ -88,31 +85,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         builder.Entity<EncabezadoSeccion>(e =>
         {
             e.HasIndex(s => s.Clave).IsUnique();
-        });
-
-        // ── Buzón de la Casita ──
-        builder.Entity<SuscriptorBuzon>(e =>
-        {
-            e.HasIndex(s => s.Email).IsUnique();
-        });
-
-        // ── Consultas de paseo ──
-        builder.Entity<ConsultaPaseo>(e =>
-        {
-            e.HasOne(c => c.Propuesta)
-             .WithMany(p => p.Consultas)
-             .HasForeignKey(c => c.PropuestaId)
-             // Si se borra una propuesta, la consulta queda huérfana pero se conserva:
-             // son datos de alguien que escribió y hay que poder contestarle.
-             .OnDelete(DeleteBehavior.SetNull);
-            e.Property(c => c.Estado).HasConversion<int>();
-            e.HasIndex(c => c.CreadaEn);
-        });
-
-        // ── Mensajes de contacto ──
-        builder.Entity<MensajeContacto>(e =>
-        {
-            e.HasIndex(m => new { m.Leido, m.EnviadoEn });
         });
 
         // ── Ajustes ──

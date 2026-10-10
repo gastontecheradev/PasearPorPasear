@@ -19,10 +19,9 @@
     <div><b>@Model.Fachadas</b><span>fachadas publicadas</span></div>
     <div><b>@Model.ProximosEncuentros</b><span>encuentros por venir</span></div>
     <div><b>@Model.AfichesPublicados</b><span>afiches en la cartelera</span></div>
-    <div><b>@Model.SuscriptoresBuzon</b><span>en el buzón</span></div>
 </div>
 
-@if (Model.AfichesPorRevisar > 0 || Model.MensajesSinLeer > 0 || Model.ConsultasPendientes > 0)
+@if (Model.AfichesPorRevisar > 0)
 {
     <div class="admin-panel" style="border-color:var(--coral)">
         <h2>Esperando tu respuesta</h2>
@@ -36,22 +35,6 @@
                     <a href="/Admin/Cartelera">ir a la cartelera</a>
                 </li>
             }
-            @if (Model.MensajesSinLeer > 0)
-            {
-                <li>
-                    <strong>Contacto</strong>
-                    @Model.MensajesSinLeer mensaje(s) sin leer ·
-                    <a href="/Admin/Bandejas">ir a los mensajes</a>
-                </li>
-            }
-            @if (Model.ConsultasPendientes > 0)
-            {
-                <li>
-                    <strong>Paseos</strong>
-                    @Model.ConsultasPendientes consulta(s) pendiente(s) ·
-                    <a href="/Admin/Bandejas/Consultas">ir a las consultas</a>
-                </li>
-            }
         </ul>
     </div>
 }
@@ -59,7 +42,7 @@ else
 {
     <div class="admin-panel">
         <h2>No hay nada pendiente</h2>
-        <p>Ningún afiche por revisar, ningún mensaje sin leer y ninguna consulta esperando.</p>
+        <p>Ningún afiche por revisar.</p>
     </div>
 }
 
@@ -73,6 +56,5 @@ else
         <li><strong>Productos</strong><a href="/Admin/Productos">Catálogo, precios y descargas</a></li>
         <li><strong>Cartelera de barrio</strong><a href="/Admin/Cartelera">Publicar, archivar y editar afiches</a></li>
         <li><strong>Sobre PPP y títulos</strong><a href="/Admin/Paginas/Sobre">La página Sobre, los títulos de sección y los ajustes</a></li>
-        <li><strong>Bandejas</strong><a href="/Admin/Bandejas">Mensajes, consultas de paseo y suscriptores del buzón</a></li>
     </ul>
 </div>

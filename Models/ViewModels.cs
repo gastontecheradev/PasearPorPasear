@@ -52,17 +52,18 @@ public class TarjetaVm
     public string? PieDerecha { get; set; }
 }
 
-// ── Bloque de suscripción al buzón, reutilizable ──
+// ── Bloque de suscripción al buzón (formulario de MailerLite), reutilizable ──
 public class BuzonVm
 {
     public string Titulo { get; set; } = string.Empty;
     public string Texto { get; set; } = string.Empty;
     public string EtiquetaBoton { get; set; } = string.Empty;
     public string? Nota { get; set; }
-    /// <summary>Desde qué formulario llegó: portada, clubcito, productos, contacto.</summary>
-    public string Origen { get; set; } = "portada";
-    /// <summary>A dónde vuelve después de suscribirse.</summary>
-    public string VolverA { get; set; } = "/";
+    /// <summary>
+    /// A dónde lleva el botón. Por defecto, al formulario de la newsletter en MailerLite;
+    /// una ruta interna (p. ej. «/Contacto#buzon») abre en la misma pestaña.
+    /// </summary>
+    public string Enlace { get; set; } = "https://preview.mailerlite.io/forms/2403548/193692652342872057/share";
     /// <summary>Clase extra del recuadro, para adaptarlo a la banda donde va.</summary>
     public string? Clase { get; set; }
 
@@ -121,8 +122,6 @@ public class CarteleraVm : VistaBase
 // ── Contacto ──
 public class ContactoVm : VistaBase
 {
-    public MensajeContacto Mensaje { get; set; } = new();
-    public BuzonVm Buzon { get; set; } = new();
     public string CorreoContacto { get; set; } = "pasearporpasear@gmail.com";
     public string? CanalWhatsApp { get; set; }
 }
@@ -148,7 +147,7 @@ public class PropuestaVm
     public bool PendienteDeDefinir { get; set; }
     public List<DatoVm> Datos { get; set; } = new();
 
-    /// <summary>El Clubcito tiene página propia; el resto lleva al formulario.</summary>
+    /// <summary>El Clubcito lleva al formulario de novedades; el resto, a contacto.</summary>
     public string? Enlace { get; set; }
     public string? TextoEnlace { get; set; }
 }
@@ -156,7 +155,6 @@ public class PropuestaVm
 public class PaseosVm : VistaBase
 {
     public List<PropuestaVm> Propuestas { get; set; } = new();
-    public ConsultaPaseo Consulta { get; set; } = new();
 }
 
 // ══════════════════════════════════════════════════════════════

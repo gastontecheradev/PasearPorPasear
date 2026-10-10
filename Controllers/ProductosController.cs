@@ -54,8 +54,6 @@ public class ProductosController : ControladorPublico
                          "We are still on the printing tests. When they are ready, the news goes out first through the Casita mailbox.",
                          "Ainda estamos nos testes de impressão. Quando estiverem prontos, o aviso sai primeiro pela caixa de correio da Casita."),
             EtiquetaBoton = vm.T("Avisame", "Notify me", "Avise-me"),
-            Origen = "productos",
-            VolverA = "/Productos",
             Clase = "recuadro"
         };
 

@@ -268,23 +268,8 @@ namespace PasearPorPasear.Migrations
                     b.Property<DateTime?>("ActualizadoEn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Barrio")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("Color")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Contacto")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailRemitente")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("Estado")
                         .HasColumnType("int");
@@ -306,11 +291,6 @@ namespace PasearPorPasear.Migrations
 
                     b.Property<int>("Orden")
                         .HasColumnType("int");
-
-                    b.Property<string>("Texto")
-                        .IsRequired()
-                        .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
 
                     b.Property<string>("Titulo")
                         .IsRequired()

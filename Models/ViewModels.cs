@@ -79,7 +79,7 @@ public class InicioVm : VistaBase
 {
     public EncabezadoSeccion? Definicion { get; set; }
     public List<TarjetaVm> TiraArchivo { get; set; } = new();
-    public List<CarteleraAfiche> Afiches { get; set; } = new();
+    public List<AficheVm> Afiches { get; set; } = new();
     public PaginaSobre? Sobre { get; set; }
     public string? SobreImagenSrc { get; set; }
     public BuzonVm Buzon { get; set; } = new();
@@ -115,8 +115,30 @@ public class SobreVm : VistaBase
 // ── Cartelera de barrio ──
 public class CarteleraVm : VistaBase
 {
-    public List<CarteleraAfiche> Afiches { get; set; } = new();
+    public List<AficheVm> Afiches { get; set; } = new();
     public string CorreoCartelera { get; set; } = "pasearporpasear@gmail.com";
+}
+
+/// <summary>
+/// Un afiche sin los bytes de la imagen: la imagen la sirve
+/// ImagenesController por su URL. Lo usan el muro y el listado del panel.
+/// </summary>
+public class AficheVm
+{
+    public int Id { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string? ImagenAlt { get; set; }
+    public bool TieneImagen { get; set; }
+    public DateTime Sello { get; set; }
+    public DateTime? VigenteHasta { get; set; }
+    public EstadoAfiche Estado { get; set; }
+
+    public string? ImagenSrc => Imagen.Src("Afiche", Id, TieneImagen, null, Sello);
+
+    /// <summary>El texto alternativo, o el nombre si no lo completaron.</summary>
+    public string Alt => string.IsNullOrWhiteSpace(ImagenAlt) ? Titulo : ImagenAlt;
+
+    public bool EstaVencido => VigenteHasta.HasValue && VigenteHasta.Value.Date < DateTime.Today;
 }
 
 // ── Contacto ──

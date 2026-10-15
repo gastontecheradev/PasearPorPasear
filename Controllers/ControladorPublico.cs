@@ -64,12 +64,26 @@ public abstract class ControladorPublico : Controller
                    "There is also a WhatsApp channel, if you would rather get it there.",
                    "Também há canal de WhatsApp, se preferir receber por lá.");
 
-    /// <summary>Los afiches que se muestran en el muro, ya filtrados por vigencia.</summary>
-    protected IQueryable<CarteleraAfiche> AfichesVigentes() =>
+    /// <summary>
+    /// Los afiches que se muestran en el muro, ya filtrados por vigencia.
+    /// Sin los bytes de la imagen: el navegador la pide aparte por su URL.
+    /// </summary>
+    protected IQueryable<AficheVm> AfichesVigentes() =>
         Ctx.CarteleraAfiches
            .AsNoTracking()
            .Where(a => a.Estado == EstadoAfiche.Publicado &&
+                       a.ImagenDatos != null &&
                        (a.VigenteHasta == null || a.VigenteHasta >= DateTime.Today))
            .OrderBy(a => a.Orden)
-           .ThenByDescending(a => a.CreadoEn);
+           .ThenByDescending(a => a.CreadoEn)
+           .Select(a => new AficheVm
+           {
+               Id = a.Id,
+               Titulo = a.Titulo,
+               ImagenAlt = a.ImagenAlt,
+               TieneImagen = true,
+               Sello = a.ActualizadoEn ?? a.CreadoEn,
+               VigenteHasta = a.VigenteHasta,
+               Estado = a.Estado
+           });
 }

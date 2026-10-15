@@ -235,49 +235,44 @@ public class ClubcitoEncuentro : ITieneImagen
 /// <summary>Los seis diseños de afiche del manual de marca.</summary>
 public enum ColorAfiche { Crema, Mostaza, Petroleo, Coral, Durazno, Rayas }
 
-public enum EstadoAfiche { PorRevisar, Publicado, Archivado }
+/// <summary>
+/// Los valores van explícitos porque se guardan como entero: antes existía
+/// «PorRevisar» (0) y los números de los demás no pueden moverse.
+/// </summary>
+public enum EstadoAfiche { Publicado = 1, Archivado = 2 }
 
 /// <summary>
-/// Los afiches los manda el barrio por correo y son avisos locales, así que
-/// van en un solo idioma a propósito: nadie traduce el aviso del gato perdido
-/// de la esquina. Si algún día hace falta, se agregan los sufijos.
+/// Rosalía arma cada afiche aparte, sobre la plantilla de la cartelera, y lo
+/// sube ya terminado como imagen: todo lo que dice el afiche va dentro de la
+/// imagen. Por eso acá sólo queda un nombre para reconocerlo en el panel y el
+/// texto alternativo para quien no puede ver la imagen.
 /// </summary>
 public class CarteleraAfiche : ITieneImagen
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "El título es obligatorio")]
+    /// <summary>Nombre para reconocerlo en el panel. Si no hay texto alternativo, se usa como tal.</summary>
+    [Required(ErrorMessage = "Poné un nombre para reconocer el afiche en el listado")]
     [StringLength(120)]
     public string Titulo { get; set; } = string.Empty;
-
-    [StringLength(120)] public string? Barrio { get; set; }
-
-    [Required(ErrorMessage = "El texto del afiche es obligatorio")]
-    [StringLength(400, ErrorMessage = "Cuatro o cinco líneas como máximo, para que entre en el afiche")]
-    public string Texto { get; set; } = string.Empty;
-
-    /// <summary>Teléfono, correo o lo que haya mandado quien publica.</summary>
-    [StringLength(200)] public string? Contacto { get; set; }
 
     /// <summary>Null = sin vencimiento, como un oficio.</summary>
     public DateTime? VigenteHasta { get; set; }
 
-    public ColorAfiche Color { get; set; } = ColorAfiche.Crema;
-    public EstadoAfiche Estado { get; set; } = EstadoAfiche.PorRevisar;
+    public EstadoAfiche Estado { get; set; } = EstadoAfiche.Publicado;
 
+    /// <summary>El afiche en sí. Obligatoria: un afiche sin imagen no se puede mostrar.</summary>
     public byte[]? ImagenDatos { get; set; }
     [StringLength(100)] public string? ImagenTipo { get; set; }
     [StringLength(500)] public string? ImagenUrl { get; set; }
+
+    /// <summary>Lo que dice el afiche, para los lectores de pantalla.</summary>
     [StringLength(300)] public string? ImagenAlt { get; set; }
 
-    /// <summary>Imagen cargada si la hay; si no, la ruta estática del seed.</summary>
     [NotMapped]
     public string? ImagenSrc => ImagenDatos is { Length: > 0 }
         ? $"/Imagenes/Afiche/{Id}?v={(ActualizadoEn ?? CreadoEn).Ticks}"
         : ImagenUrl;
-
-    /// <summary>De qué correo llegó, para poder contestarle a quien lo mandó.</summary>
-    [EmailAddress][StringLength(200)] public string? EmailRemitente { get; set; }
 
     public int Orden { get; set; }
     public DateTime CreadoEn { get; set; } = DateTime.Now;

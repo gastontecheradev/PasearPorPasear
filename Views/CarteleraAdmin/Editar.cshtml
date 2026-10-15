@@ -2,29 +2,15 @@
 @{
     Layout = "_AdminLayout";
     var esNuevo = Model.Id == 0;
-    var sello = Model.ActualizadoEn ?? Model.CreadoEn;
-    var colores = new (ColorAfiche Valor, string Nombre)[]
-    {
-        (ColorAfiche.Crema, "Crema con marco mostaza"),
-        (ColorAfiche.Mostaza, "Mostaza"),
-        (ColorAfiche.Petroleo, "Petróleo"),
-        (ColorAfiche.Coral, "Coral"),
-        (ColorAfiche.Durazno, "Durazno"),
-        (ColorAfiche.Rayas, "Rayado celeste")
-    };
-    var cargada = Model.ImagenDatos is { Length: > 0 };
-    var campoImagen = new CampoImagenVm
-    {
-        Src = cargada ? $"/Imagenes/Afiche/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
-        Alt = Model.ImagenAlt,
-        EsCargada = cargada
-    };
+    // Un afiche nuevo todavía no tiene URL: si el formulario volvió con un
+    // error, la imagen elegida no se guardó y hay que elegirla de nuevo.
+    var guardada = !esNuevo && Model.ImagenDatos is { Length: > 0 };
 }
 
 <div class="admin-titulo">
     <div>
         <h1>@(esNuevo ? "Afiche nuevo" : Model.Titulo)</h1>
-        <p>Los afiches van en un solo idioma: los manda el barrio.</p>
+        <p>El afiche se sube ya armado sobre la plantilla de la cartelera.</p>
     </div>
     <div class="admin-acciones">
         <a class="boton boton--borde" href="/Admin/Cartelera">Volver al listado</a>
@@ -41,56 +27,45 @@
         <div>
             <div class="admin-panel">
                 <h2>El afiche</h2>
-                <p>Lo que se lee en la cartelera.</p>
+                <p>En la cartelera se ve la imagen tal cual la subas.</p>
 
-                <div class="admin-fila">
-                    <div class="campo">
-                        <label for="Titulo">Título</label>
-                        <input id="Titulo" name="Titulo" type="text" value="@Model.Titulo" required maxlength="120" />
+                <div class="admin-afiche">
+                    <div class="admin-afiche-vista">
+                        @if (guardada)
+                        {
+                            <img src="@Model.ImagenSrc" alt="" width="1080" height="1350" />
+                        }
+                        else
+                        {
+                            <div class="sin-imagen">Todavía sin imagen</div>
+                        }
                     </div>
-                    <div class="campo">
-                        <label for="Barrio">Barrio</label>
-                        <input id="Barrio" name="Barrio" type="text" value="@Model.Barrio" maxlength="120" />
-                    </div>
-                </div>
 
-                <div class="campo">
-                    <label for="Texto">Texto</label>
-                    <textarea id="Texto" name="Texto" required maxlength="400" style="min-height:120px">@Model.Texto</textarea>
-                    <p class="pista">Cuatro o cinco líneas como máximo, para que entre en el afiche.</p>
-                </div>
+                    <div>
+                        <div class="campo">
+                            <label for="imagen">@(guardada ? "Reemplazar la imagen" : "Imagen del afiche")</label>
+                            <input id="imagen" name="imagen" type="file"
+                                   accept="image/jpeg,image/png,image/webp,image/gif" required="@(!guardada)" />
+                            <p class="pista">
+                                La plantilla ya terminada, en vertical como la original (1080 × 1350).
+                                JPG, PNG, WEBP o GIF, hasta 6 MB.
+                            </p>
+                        </div>
 
-                <div class="campo">
-                    <label for="Contacto">Cómo lo contactan</label>
-                    <input id="Contacto" name="Contacto" type="text" value="@Model.Contacto" maxlength="200" />
-                    <p class="pista">Teléfono, nombre, día y hora: lo que haya mandado.</p>
-                </div>
+                        <div class="campo">
+                            <label for="Titulo">Nombre</label>
+                            <input id="Titulo" name="Titulo" type="text" value="@Model.Titulo" required maxlength="120" />
+                            <p class="pista">Para reconocerlo en el listado. No se ve en el sitio.</p>
+                        </div>
 
-                <div class="campo">
-                    <label for="EmailRemitente">Correo de quien lo mandó</label>
-                    <input id="EmailRemitente" name="EmailRemitente" type="email" value="@Model.EmailRemitente" maxlength="200" />
-                    <p class="pista">No se publica. Sirve para poder contestarle.</p>
-                </div>
-            </div>
-
-            <div class="admin-panel">
-                <h2>Diseño</h2>
-                <p>Los seis diseños del manual de marca.</p>
-
-                <div class="admin-fila">
-                    <div class="campo">
-                        <label for="Color">Color del afiche</label>
-                        <select id="Color" name="Color">
-                            @foreach (var c in colores)
-                            {
-                                <option value="@((int)c.Valor)" selected="@(Model.Color == c.Valor)">@c.Nombre</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="campo">
-                        <label for="Orden">Orden</label>
-                        <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
-                        <p class="pista">Más chico, más arriba en el muro.</p>
+                        <div class="campo">
+                            <label for="ImagenAlt">Qué dice el afiche</label>
+                            <textarea id="ImagenAlt" name="ImagenAlt" maxlength="300" style="min-height:110px">@Model.ImagenAlt</textarea>
+                            <p class="pista">
+                                Lo leen quienes usan lector de pantalla: qué es, cuándo y dónde, en pocas palabras.
+                                Si lo dejás vacío, se usa el nombre.
+                            </p>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -99,13 +74,12 @@
         <div>
             <div class="admin-panel admin-panel--lateral">
                 <h2>Publicación</h2>
-                <p>Sólo se ve en el sitio si está publicado y no venció.</p>
+                <p>Se ve en el sitio si está pegado y no venció.</p>
 
                 <div class="campo">
                     <label for="Estado">Estado</label>
                     <select id="Estado" name="Estado">
-                        <option value="@((int)EstadoAfiche.PorRevisar)" selected="@(Model.Estado == EstadoAfiche.PorRevisar)">Por revisar</option>
-                        <option value="@((int)EstadoAfiche.Publicado)" selected="@(Model.Estado == EstadoAfiche.Publicado)">Publicado</option>
+                        <option value="@((int)EstadoAfiche.Publicado)" selected="@(Model.Estado == EstadoAfiche.Publicado)">Pegado en la cartelera</option>
                         <option value="@((int)EstadoAfiche.Archivado)" selected="@(Model.Estado == EstadoAfiche.Archivado)">Archivado</option>
                     </select>
                 </div>
@@ -114,15 +88,19 @@
                     <label for="VigenteHasta">Vigente hasta</label>
                     <input id="VigenteHasta" name="VigenteHasta" type="date"
                            value="@(Model.VigenteHasta?.ToString("yyyy-MM-dd"))" />
-                    <p class="pista">Dejalo vacío si no vence, como un oficio.</p>
+                    <p class="pista">Al día siguiente se despega solo. Dejalo vacío si no vence, como un oficio.</p>
+                </div>
+
+                <div class="campo">
+                    <label for="Orden">Orden</label>
+                    <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                    <p class="pista">Más chico, más arriba en el muro. Con el mismo número, el más nuevo primero.</p>
                 </div>
 
                 <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
                     @(esNuevo ? "Pegar el afiche" : "Guardar cambios")
                 </button>
             </div>
-
-            <partial name="_CampoImagen" model="campoImagen" />
         </div>
     </div>
 </form>

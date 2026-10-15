@@ -67,7 +67,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
         builder.Entity<CarteleraAfiche>(e =>
         {
             e.HasIndex(a => new { a.Estado, a.VigenteHasta });
-            e.Property(a => a.Color).HasConversion<int>();
             e.Property(a => a.Estado).HasConversion<int>();
             e.Property(a => a.VigenteHasta).HasColumnType("datetime2");
         });

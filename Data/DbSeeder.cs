@@ -41,7 +41,6 @@ public static class DbSeeder
         SeedClubcito(ctx);
         SeedFachadas(ctx);
         SeedProductos(ctx);
-        SeedCartelera(ctx);
         SeedAjustes(ctx);
 
         await ctx.SaveChangesAsync();
@@ -666,72 +665,6 @@ public static class DbSeeder
                 DescripcionPt = "Os seis desenhos de cartaz em A5, prontos para imprimir e colar no seu bairro.",
                 ImagenUrl = "/img/marca/ventana-1.webp", ImagenAlt = "Afiche imprimible de la cartelera de barrio",
                 ColorPanel = ColorAfiche.Petroleo, Estado = EstadoProducto.DescargaGratis, Orden = 6
-            });
-    }
-
-    // ══════════════════════════════════════════════════════════
-    //  Cartelera de barrio
-    // ══════════════════════════════════════════════════════════
-    private static void SeedCartelera(ApplicationDbContext ctx)
-    {
-        if (ctx.CarteleraAfiches.Any()) return;
-
-        var hoy = DateTime.Today;
-
-        ctx.CarteleraAfiches.AddRange(
-            new CarteleraAfiche
-            {
-                Titulo = "Feria de las artesanas", Barrio = "Parque Batlle",
-                Texto = "Cerámica, tejido y encuadernación. Con feria de plantas y algo para comer.",
-                Contacto = "Sáb 14 · Plaza de los Olímpicos · 10 a 18 h",
-                VigenteHasta = hoy.AddDays(20),
-                Color = ColorAfiche.Crema, Estado = EstadoAfiche.Publicado, Orden = 1
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Se busca gato atigrado", Barrio = "Punta Carretas",
-                Texto = "Se llama Nabo, es gris con rayas y bastante miedoso. Se perdió el domingo cerca de la rambla.",
-                Contacto = "099 000 000",
-                VigenteHasta = hoy.AddDays(30),
-                Color = ColorAfiche.Petroleo, Estado = EstadoAfiche.Publicado, Orden = 2
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Taller de cerámica", Barrio = "Parque Rodó",
-                Texto = "Ocho encuentros, materiales incluidos y horno propio. Quedan tres lugares.",
-                Contacto = "Miércoles 18 h",
-                VigenteHasta = hoy.AddDays(45),
-                Color = ColorAfiche.Coral, Estado = EstadoAfiche.Publicado, Orden = 3
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Arreglos de costura", Barrio = "Malvín",
-                Texto = "Ruedos, cierres, ajustes y ropa a medida. Trabajo en casa y entrego rápido.",
-                Contacto = "Marta",
-                Color = ColorAfiche.Rayas, Estado = EstadoAfiche.Publicado, Orden = 4
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Clases de guitarra", Barrio = "La Blanqueada",
-                Texto = "A domicilio o en mi casa. Para empezar de cero, sin saber leer música. La primera es gratis.",
-                Contacto = "Diego",
-                Color = ColorAfiche.Durazno, Estado = EstadoAfiche.Publicado, Orden = 5
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Merienda compartida", Barrio = "Buceo",
-                Texto = "Se junta el club de la esquina todos los últimos viernes. Cada uno lleva algo. Vengan.",
-                Contacto = "Club Atlético Buceo · 17 h",
-                VigenteHasta = hoy.AddDays(12),
-                Color = ColorAfiche.Mostaza, Estado = EstadoAfiche.Publicado, Orden = 6
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Coro de barrio abierto", Barrio = "Villa Dolores",
-                Texto = "Ensayamos los jueves en el salón de la parroquia. No hace falta saber cantar.",
-                Contacto = "coro.villadolores@ejemplo.com",
-                VigenteHasta = hoy.AddDays(50),
-                Color = ColorAfiche.Crema, Estado = EstadoAfiche.PorRevisar, Orden = 7
             });
     }
 

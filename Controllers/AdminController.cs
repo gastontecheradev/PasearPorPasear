@@ -26,8 +26,8 @@ public class AdminController : Controller
             Fachadas = await _ctx.Fachadas.CountAsync(f => f.Publicada),
             ProximosEncuentros = await _ctx.ClubcitoEncuentros.CountAsync(c => c.Publicado && c.Fecha >= hoy),
             AfichesPublicados = await _ctx.CarteleraAfiches.CountAsync(a =>
-                a.Estado == EstadoAfiche.Publicado && (a.VigenteHasta == null || a.VigenteHasta >= hoy)),
-            AfichesPorRevisar = await _ctx.CarteleraAfiches.CountAsync(a => a.Estado == EstadoAfiche.PorRevisar)
+                a.Estado == EstadoAfiche.Publicado && a.ImagenDatos != null &&
+                (a.VigenteHasta == null || a.VigenteHasta >= hoy))
         };
 
         ViewData["Title"] = "Panel";
@@ -39,6 +39,5 @@ public class AdminController : Controller
         public int Fachadas { get; set; }
         public int ProximosEncuentros { get; set; }
         public int AfichesPublicados { get; set; }
-        public int AfichesPorRevisar { get; set; }
     }
 }

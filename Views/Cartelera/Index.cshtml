@@ -50,7 +50,13 @@
         <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "O que está colado agora" : esIngles ? "What is up right now" : "Lo que está pegado ahora")</h2>
         @if (Model.Afiches.Count == 0)
         {
-            <p class="bajada">@(esPortugues ? "Por enquanto o mural está vazio. O primeiro cartaz pode ser o seu." : esIngles ? "The board is empty for now. The first poster could be yours." : "Por ahora la cartelera está vacía. El primer afiche puede ser el tuyo.")</p>
+            @* Sin afiches queda pegada la plantilla vacía, que ya dice cómo mandar uno. *@
+            <div class="muro muro--vacio" style="margin-top:38px">
+                <div class="afiche">
+                    <img src="~/img/cartelera/cartelera-vacia.png" width="1080" height="1350"
+                         alt="@(esPortugues ? $"Mural vazio do Pasear por Pasear. Para colar seu cartaz, escreva para {Model.CorreoCartelera} com o assunto «cartelera de barrio» e as informações do seu evento, pedido de ajuda ou empreendimento." : esIngles ? $"Empty Pasear por Pasear board. To put your poster up, write to {Model.CorreoCartelera} with the subject «cartelera de barrio» and the details of your event, request for help or small business." : $"Cartelera vacía de Pasear por Pasear. Si querés pegar tu afiche, escribí a {Model.CorreoCartelera} con el asunto «cartelera de barrio» y la información sobre tu evento, pedido de ayuda o emprendimiento.")" />
+                </div>
+            </div>
         }
         else
         {
@@ -60,6 +66,12 @@
                     <partial name="_Afiche" model="a" />
                 }
             </div>
+
+            @* Afiche en grande sin salir de la página. Lo abre site.js; sin JS, el enlace abre la imagen. *@
+            <dialog class="afiche-grande" id="afiche-grande" aria-label="@(esPortugues ? "Cartaz ampliado" : esIngles ? "Enlarged poster" : "Afiche en grande")">
+                <button type="button" class="afiche-grande-cerrar" data-cerrar>@(esPortugues ? "Fechar" : esIngles ? "Close" : "Cerrar")</button>
+                <img src="" alt="" width="1080" height="1350" />
+            </dialog>
         }
     </div>
 </section>

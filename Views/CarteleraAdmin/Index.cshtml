@@ -1,32 +1,32 @@
-@model List<CarteleraAfiche>
+@model List<AficheVm>
 @{
     Layout = "_AdminLayout";
-    var porRevisar = Model.Count(a => a.Estado == EstadoAfiche.PorRevisar);
+    var pegados = Model.Count(a => a.Estado == EstadoAfiche.Publicado && a.TieneImagen && !a.EstaVencido);
 }
 
 <div class="admin-titulo">
     <div>
         <h1>Cartelera de barrio</h1>
         <p>
-            @Model.Count afiche(s).
-            @if (porRevisar > 0)
+            @(pegados == 1 ? "1 afiche pegado" : $"{pegados} afiches pegados") en el sitio.
+            @if (pegados == 0)
             {
-                <text><strong>@porRevisar esperando revisión.</strong></text>
+                <text>Mientras no haya ninguno, se ve la cartelera vacía con el correo para mandar afiches.</text>
             }
         </p>
     </div>
     <div class="admin-acciones">
-        <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Afiche nuevo</a>
+        <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Subir un afiche</a>
     </div>
 </div>
 
 <div class="admin-barra">
-    <input class="buscador" type="search" placeholder="Buscar por título, barrio o texto…" aria-label="Buscar" />
+    <input class="buscador" type="search" placeholder="Buscar por nombre o por lo que dice…" aria-label="Buscar" />
 </div>
 
 @if (Model.Count == 0)
 {
-    <p class="admin-vacio">La cartelera está vacía.</p>
+    <p class="admin-vacio">Todavía no subiste ningún afiche.</p>
 }
 else
 {
@@ -34,23 +34,35 @@ else
         <table class="admin-tabla">
             <thead>
                 <tr>
+                    <th style="width:64px"></th>
                     <th>Afiche</th>
-                    <th style="width:130px">Barrio</th>
                     <th style="width:130px">Vigencia</th>
                     <th style="width:120px">Estado</th>
-                    <th style="width:250px"></th>
+                    <th style="width:270px"></th>
                 </tr>
             </thead>
             <tbody>
                 @foreach (var a in Model)
                 {
                     var vencido = a.EstaVencido;
-                    <tr class="@(a.Estado == EstadoAfiche.PorRevisar ? "bandeja-sin-leer" : "")">
+                    <tr>
+                        <td>
+                            @if (a.TieneImagen)
+                            {
+                                <img class="admin-miniatura admin-miniatura--afiche" src="@a.ImagenSrc" alt="" loading="lazy" />
+                            }
+                        </td>
                         <td>
                             <span class="principal">@a.Titulo</span>
-                            <span class="secundario">@(a.Texto.Length > 70 ? a.Texto.Substring(0, 70) + "…" : a.Texto)</span>
+                            @if (!a.TieneImagen)
+                            {
+                                <span class="secundario">Sin imagen: no se muestra hasta que le subas una.</span>
+                            }
+                            else if (!string.IsNullOrWhiteSpace(a.ImagenAlt))
+                            {
+                                <span class="secundario">@(a.ImagenAlt.Length > 70 ? a.ImagenAlt.Substring(0, 70) + "…" : a.ImagenAlt)</span>
+                            }
                         </td>
-                        <td>@a.Barrio</td>
                         <td>
                             @if (a.VigenteHasta is null)
                             {
@@ -66,11 +78,7 @@ else
                             }
                         </td>
                         <td>
-                            @if (a.Estado == EstadoAfiche.PorRevisar)
-                            {
-                                <span class="pastilla pastilla--espera">Por revisar</span>
-                            }
-                            else if (a.Estado == EstadoAfiche.Archivado)
+                            @if (a.Estado == EstadoAfiche.Archivado)
                             {
                                 <span class="pastilla pastilla--vencido">Archivado</span>
                             }
@@ -80,16 +88,16 @@ else
                             }
                             else
                             {
-                                <span class="pastilla pastilla--activo">Publicado</span>
+                                <span class="pastilla pastilla--activo">Pegado</span>
                             }
                         </td>
                         <td>
-                            @if (a.Estado != EstadoAfiche.Publicado)
+                            @if (a.Estado == EstadoAfiche.Archivado)
                             {
                                 <form method="post" action="/Admin/Cartelera/Estado/@a.Id" style="display:inline">
                                     @Html.AntiForgeryToken()
                                     <input type="hidden" name="estado" value="@((int)EstadoAfiche.Publicado)" />
-                                    <button type="submit" class="boton boton--principal boton--chico">Publicar</button>
+                                    <button type="submit" class="boton boton--principal boton--chico">Volver a pegar</button>
                                 </form>
                             }
                             else

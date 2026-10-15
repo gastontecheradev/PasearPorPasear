@@ -223,11 +223,36 @@ p+p{margin-top:1.05em}
   display:grid;grid-template-columns:repeat(auto-fill,minmax(252px,1fr));
   gap:clamp(26px,3vw,40px);margin-top:8px;
 }
+/* Un solo afiche (la cartelera vacía): más grande, para que se lea el correo. */
+.muro--vacio{grid-template-columns:minmax(0,420px)}
+/* El afiche es la imagen que sube Rosalía: el diseño viene en ella. */
 .afiche{
-  position:relative;padding:26px 22px 24px;border-radius:4px;
+  position:relative;display:block;border-radius:4px;
   box-shadow:0 10px 22px rgba(43,62,73,.14);
   transition:transform .22s ease;
 }
+.afiche img{display:block;width:100%;height:auto;border-radius:inherit}
+
+/* Afiche en grande: el dialog ocupa toda la pantalla y tocar fuera de la imagen lo cierra. */
+.afiche-grande{
+  width:100%;height:100%;max-width:none;max-height:none;margin:0;padding:56px 16px 24px;
+  border:0;background:transparent;
+  display:none;place-items:center;
+}
+.afiche-grande[open]{display:grid;animation:afiche-entra .2s ease-out}
+.afiche-grande::backdrop{background:rgba(43,62,73,.88)}
+.afiche-grande img{
+  display:block;width:auto;height:auto;max-width:min(100%,640px);max-height:calc(100dvh - 80px);
+  border-radius:4px;box-shadow:0 18px 40px rgba(0,0,0,.35);
+}
+.afiche-grande-cerrar{
+  position:fixed;top:12px;right:16px;
+  font:inherit;font-size:var(--t-sm);font-weight:700;
+  padding:9px 18px;border:2px solid var(--crema);border-radius:99px;
+  background:var(--petroleo);color:var(--crema);cursor:pointer;
+}
+.afiche-grande-cerrar:hover{background:var(--crema);color:var(--petroleo)}
+@keyframes afiche-entra{from{opacity:0;transform:scale(.97)}to{opacity:1;transform:none}}
 .afiche:nth-child(3n+1){transform:rotate(-1.5deg)}
 .afiche:nth-child(3n+2){transform:rotate(1.1deg)}
 .afiche:nth-child(3n+3){transform:rotate(-.5deg)}
@@ -238,33 +263,7 @@ p+p{margin-top:1.05em}
   background:rgba(255,245,230,.62);border-left:1px dashed rgba(43,62,73,.18);
   border-right:1px dashed rgba(43,62,73,.18);
 }
-.afiche-marco{border:2px solid currentColor;border-radius:3px;padding:22px 18px 18px;position:relative}
-.afiche-marco::before{ /* filete interior */
-  content:"";position:absolute;inset:4px;border:1px solid currentColor;opacity:.42;border-radius:2px;pointer-events:none;
-}
-.afiche h3{font-size:var(--t-lg);font-weight:800;letter-spacing:-.02em;margin-top:12px}
-.afiche p{font-size:var(--t-sm);line-height:1.5;margin-top:9px}
-.afiche .dato{
-  display:block;margin-top:14px;font-size:var(--t-xs);font-weight:700;
-  letter-spacing:.07em;text-transform:uppercase;text-wrap:pretty;
-}
 .filete{width:74px;height:auto;margin-inline:auto;opacity:.9}
-.afiche--crema{background:var(--crema);color:var(--mostaza)}
-.afiche--crema h3,.afiche--crema p,.afiche--crema .dato{color:var(--petroleo)}
-.afiche--mostaza{background:var(--mostaza);color:var(--petroleo)}
-.afiche--petroleo{background:var(--petroleo);color:var(--durazno)}
-.afiche--petroleo h3,.afiche--petroleo p,.afiche--petroleo .dato{color:var(--crema)}
-.afiche--coral{background:var(--coral);color:var(--durazno)}
-.afiche--coral .afiche-marco{background:var(--durazno)}
-.afiche--coral h3,.afiche--coral p,.afiche--coral .dato{color:var(--petroleo)}
-.afiche--durazno{background:var(--durazno);color:var(--coral)}
-.afiche--durazno h3,.afiche--durazno p,.afiche--durazno .dato{color:var(--petroleo)}
-.afiche--rayas{
-  background:repeating-linear-gradient(90deg,var(--crema) 0 13px,#DCEAEE 13px 26px);
-  color:var(--piedra);
-}
-.afiche--rayas h3,.afiche--rayas p,.afiche--rayas .dato{color:var(--petroleo)}
-.afiche--rayas .afiche-marco{background:var(--crema)}
 
 /* ── Pasos (secuencia real: 1 → 2 → 3) ──────────────────────── */
 .pasos{list-style:none;display:grid;grid-template-columns:repeat(auto-fit,minmax(232px,1fr));gap:28px;margin-top:36px;counter-reset:paso}
@@ -722,6 +721,8 @@ p+p{margin-top:1.05em}
   width:56px;height:56px;object-fit:cover;border-radius:6px;
   border:2px solid var(--crema-3);background:var(--crema-2);
 }
+/* Los afiches son verticales (1080 × 1350): la miniatura conserva la proporción. */
+.admin-miniatura--afiche{width:48px;height:60px;border-radius:3px}
 .admin-vacio{padding:48px 0;text-align:center;color:var(--tinta-2);font-size:var(--t-sm)}
 
 /* ── Botones pequeños de fila ───────────────────────────────── */
@@ -764,6 +765,22 @@ p+p{margin-top:1.05em}
 .admin-imagen .origen{
   display:inline-block;margin-top:10px;font-size:var(--t-xs);font-weight:600;
   color:var(--tinta-2);background:var(--crema);padding:3px 10px;border-radius:99px;
+}
+
+/* Afiche de la cartelera: la imagen es el contenido, va al lado de sus campos */
+.admin-afiche{display:grid;grid-template-columns:200px minmax(0,1fr);gap:24px;align-items:start}
+.admin-afiche-vista{
+  border:2px dashed var(--crema-3);border-radius:var(--curva);
+  padding:12px;background:var(--crema-2);
+}
+.admin-afiche-vista img{display:block;width:100%;height:auto;border-radius:3px}
+.admin-afiche-vista .sin-imagen{
+  display:grid;place-items:center;aspect-ratio:4/5;color:var(--tinta-2);
+  font-size:var(--t-xs);font-weight:600;
+}
+@media (max-width:640px){
+  .admin-afiche{grid-template-columns:1fr}
+  .admin-afiche-vista{max-width:220px}
 }
 
 .admin-fila{display:grid;grid-template-columns:1fr 1fr;gap:0 18px}

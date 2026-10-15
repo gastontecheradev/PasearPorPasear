@@ -11,7 +11,7 @@
     </div>
     <div class="admin-acciones">
         <a class="boton boton--principal" href="/Admin/Fachadas/Nueva">Fachada nueva</a>
-        <a class="boton boton--borde" href="/Admin/Cartelera/Nuevo">Afiche nuevo</a>
+        <a class="boton boton--borde" href="/Admin/Cartelera/Nuevo">Subir un afiche</a>
     </div>
 </div>
 
@@ -21,31 +21,6 @@
     <div><b>@Model.AfichesPublicados</b><span>afiches en la cartelera</span></div>
 </div>
 
-@if (Model.AfichesPorRevisar > 0)
-{
-    <div class="admin-panel" style="border-color:var(--coral)">
-        <h2>Esperando tu respuesta</h2>
-        <p>Lo que llegó y todavía no miraste.</p>
-        <ul class="datos" style="max-width:620px">
-            @if (Model.AfichesPorRevisar > 0)
-            {
-                <li>
-                    <strong>Cartelera</strong>
-                    @Model.AfichesPorRevisar afiche(s) por revisar ·
-                    <a href="/Admin/Cartelera">ir a la cartelera</a>
-                </li>
-            }
-        </ul>
-    </div>
-}
-else
-{
-    <div class="admin-panel">
-        <h2>No hay nada pendiente</h2>
-        <p>Ningún afiche por revisar.</p>
-    </div>
-}
-
 <div class="admin-panel">
     <h2>Todo lo que se puede editar</h2>
     <p>Cada sección del sitio tiene su pantalla.</p>
@@ -54,7 +29,7 @@ else
         <li><strong>El Clubcito</strong><a href="/Admin/Encuentros">Encuentros, crónicas y asistentes</a></li>
         <li><strong>¿Paseamos?</strong><a href="/Admin/Propuestas">Las cuatro propuestas y sus casilleros de datos</a></li>
         <li><strong>Productos</strong><a href="/Admin/Productos">Catálogo, precios y descargas</a></li>
-        <li><strong>Cartelera de barrio</strong><a href="/Admin/Cartelera">Publicar, archivar y editar afiches</a></li>
+        <li><strong>Cartelera de barrio</strong><a href="/Admin/Cartelera">Subir, archivar y sacar afiches</a></li>
         <li><strong>Sobre PPP y títulos</strong><a href="/Admin/Paginas/Sobre">La página Sobre, los títulos de sección y los ajustes</a></li>
     </ul>
 </div>

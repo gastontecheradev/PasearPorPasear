@@ -50,10 +50,7 @@ public class ArchivoController : ControladorPublico
 
         var publicadas = Ctx.Fachadas.AsNoTracking().Where(f => f.Publicada);
 
-        vm.TotalFachadas = await publicadas.CountAsync();
         vm.Barrios = await publicadas.Select(f => f.Barrio).Distinct().OrderBy(b => b).ToListAsync();
-        vm.TotalBarrios = vm.Barrios.Count;
-        vm.DesdeAnio = vm.TotalFachadas == 0 ? null : await publicadas.MinAsync(f => f.FechaEncontrada.Year);
 
         var filtradas = string.IsNullOrWhiteSpace(barrio)
             ? publicadas

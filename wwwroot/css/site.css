@@ -363,6 +363,8 @@ p+p{margin-top:1.05em}
   color:var(--tinta-2);font-size:var(--t-sm);font-weight:600;margin-block:40px;
 }
 .mapa iframe{width:100%;height:100%;display:block;border:0}
+/* El mapa de todo el archivo (Google My Maps): más alto que el de una ficha, porque trae su propia barra. */
+.mapa--archivo{aspect-ratio:16/9;padding:0;overflow:hidden;margin-block:28px 0}
 /* Contacto: el formulario de suscripción va primero y los datos debajo, en una sola columna. */
 .contacto{max-width:580px}
 .contacto .datos{margin-top:40px}
@@ -506,15 +508,6 @@ p+p{margin-top:1.05em}
   text-decoration:underline;text-decoration-color:var(--coral);text-decoration-thickness:2px;text-underline-offset:3px}
 
 /* ── #ArchivoDeFachadas: cuadrícula de catálogo ─────────────── */
-.contador{
-  display:flex;gap:0;flex-wrap:wrap;border:2px solid var(--petroleo);
-  border-radius:var(--curva);overflow:hidden;margin-block:34px 40px;max-width:640px;
-}
-.contador div{flex:1 1 140px;padding:16px 20px;border-right:2px solid var(--petroleo)}
-.contador div:last-child{border-right:0}
-.contador b{display:block;font-size:1.9rem;font-weight:900;letter-spacing:-.04em;line-height:1}
-.contador span{display:block;font-size:var(--t-xs);font-weight:600;color:var(--tinta-2);margin-top:4px}
-
 .archivo{display:grid;grid-template-columns:repeat(auto-fill,minmax(196px,1fr));gap:clamp(16px,2vw,26px)}
 .ficha{display:block;text-decoration:none}
 .ficha-foto{overflow:hidden;border-radius:8px;background:var(--crema-3);border:2px solid var(--petroleo)}
@@ -626,8 +619,7 @@ p+p{margin-top:1.05em}
 }
 @media (max-width:640px){
   .archivo{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:12px}
-  .contador div{flex:1 1 100%;border-right:0;border-bottom:2px solid var(--petroleo)}
-  .contador div:last-child{border-bottom:0}
+  .mapa--archivo{aspect-ratio:4/5}
 }
 
 /* ── Avisos (TempData) ──────────────────────────────────────── */

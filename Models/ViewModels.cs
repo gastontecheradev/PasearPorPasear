@@ -179,9 +179,6 @@ public class ArchivoVm : VistaBase
     public string? BarrioActivo { get; set; }
     public int Pagina { get; set; } = 1;
     public int TotalPaginas { get; set; } = 1;
-    public int TotalFachadas { get; set; }
-    public int TotalBarrios { get; set; }
-    public int? DesdeAnio { get; set; }
 
     /// <summary>Números de página a mostrar: primera, vecinas y última.</summary>
     public IEnumerable<int> PaginasVisibles

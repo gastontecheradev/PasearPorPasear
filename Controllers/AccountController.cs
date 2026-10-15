@@ -22,12 +22,17 @@ public class AccountController : Controller
     [HttpPost, ValidateAntiForgeryToken]
     public async Task<IActionResult> Login(string email, string password, string? returnUrl)
     {
-        var resultado = await _signIn.PasswordSignInAsync(email, password, isPersistent: true, lockoutOnFailure: false);
-        if (resultado.Succeeded)
-            return LocalRedirect(returnUrl ?? "/Admin");
+        // Sin correo o contraseña no se consulta Identity (con null tira excepción).
+        if (!string.IsNullOrWhiteSpace(email) && !string.IsNullOrEmpty(password))
+        {
+            var resultado = await _signIn.PasswordSignInAsync(email.Trim(), password, isPersistent: true, lockoutOnFailure: true);
+            if (resultado.Succeeded)
+                return LocalRedirect(Url.IsLocalUrl(returnUrl) ? returnUrl : "/Admin");
+        }
 
-        // Mensaje genérico a propósito: no conviene decir si el correo existe.
-        ViewBag.Error = "Credenciales incorrectas.";
+        // Mensaje genérico a propósito, también con la cuenta bloqueada: decir
+        // «bloqueada» confirmaría que el correo existe.
+        ViewBag.Error = "Credenciales incorrectas. Después de 5 intentos fallidos el ingreso se bloquea 15 minutos.";
         ViewBag.ReturnUrl = returnUrl;
         return View();
     }

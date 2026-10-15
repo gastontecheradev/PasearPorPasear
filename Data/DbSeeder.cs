@@ -415,6 +415,9 @@ public static class DbSeeder
             // Sólo se verifica que siga teniendo el rol.
             if (!await userMgr.IsInRoleAsync(existing, AdminRole))
                 await userMgr.AddToRoleAsync(existing, AdminRole);
+            // Cuentas creadas antes de activar el bloqueo por intentos fallidos.
+            if (!await userMgr.GetLockoutEnabledAsync(existing))
+                await userMgr.SetLockoutEnabledAsync(existing, true);
             return;
         }
 

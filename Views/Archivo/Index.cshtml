@@ -13,24 +13,6 @@
         {
             <p class="bajada">@bajada</p>
         }
-
-        <div class="contador">
-            <div>
-                <b>@Model.TotalFachadas</b>
-                <span>@Textos["archivo.contador-fachadas"]</span>
-            </div>
-            <div>
-                <b>@Model.TotalBarrios</b>
-                <span>@Textos["archivo.contador-barrios"]</span>
-            </div>
-            @if (Model.DesdeAnio.HasValue)
-            {
-                <div>
-                    <b>@Model.DesdeAnio</b>
-                    <span>@Textos["archivo.contador-desde"]</span>
-                </div>
-            }
-        </div>
     </div>
 </section>
 
@@ -80,3 +62,20 @@
         }
     </div>
 </section>
+
+@if (Textos.Enlace("archivo.mapa") is { } mapa)
+{
+    <section class="banda banda--crema2" aria-labelledby="titulo-mapa">
+        <div class="contenedor">
+            <h2 class="titulo-seccion" id="titulo-mapa">@Textos["archivo.mapa-titulo"]</h2>
+            @if (Textos["archivo.mapa-bajada"] is { Length: > 0 } mapaBajada)
+            {
+                <p class="bajada">@mapaBajada</p>
+            }
+            <div class="mapa mapa--archivo">
+                <iframe src="@mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade"
+                        title="@Textos["archivo.mapa-titulo"]"></iframe>
+            </div>
+        </div>
+    </section>
+}

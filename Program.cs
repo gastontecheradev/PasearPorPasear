@@ -47,7 +47,10 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 // ── Localización ──────────────────────────────────────────────
 builder.Services.AddLocalization(options => options.ResourcesPath = "Resources");
-builder.Services.AddControllersWithViews()
+// Sin el «required» implícito de los string no anulables: las traducciones
+// vacías son válidas (el sitio cae al español) y lo obligatorio lo marcan los
+// [Required] explícitos o los controladores, con mensajes en español.
+builder.Services.AddControllersWithViews(o => o.SuppressImplicitRequiredAttributeForNonNullableReferenceTypes = true)
     .AddViewLocalization()
     .AddDataAnnotationsLocalization();
 
@@ -55,6 +58,7 @@ builder.Services.AddControllersWithViews()
 // Las imágenes que sube Rosalía se guardan en la base, no en el disco:
 // en App Service el contenido de wwwroot se pisa en cada despliegue.
 builder.Services.AddScoped<IServicioImagenes, ServicioImagenes>();
+builder.Services.AddScoped<ITextos, Textos>();
 
 // El límite del formulario acompaña al del servicio, con algo de margen
 // para el resto de los campos.

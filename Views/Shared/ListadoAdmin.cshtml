@@ -1,90 +1,119 @@
 @model ListadoAdminVm
 @{
     Layout = "_AdminLayout";
+    var cabecera = new CabeceraPaginaVm
+    {
+        Pagina = PasearPorPasear.Services.CatalogoTextos.Pagina(Model.Pagina)!,
+        Activa = "listado",
+        Cuenta = Model.Filas.Count
+    };
 }
 @*
-    Listado del panel, compartido por fachadas, encuentros y productos.
-    Los controladores lo invocan con View("ListadoAdmin", vm).
+    Listado del panel, compartido por fachadas, productos y
+    propuestas. Los controladores lo invocan con View("ListadoAdmin", vm).
+    Filtros y buscador se resuelven en el navegador (admin.js): las filas
+    ya están todas en la página.
 *@
 
-<div class="admin-titulo">
-    <div>
-        <h1>@Model.Titulo</h1>
-        @if (!string.IsNullOrEmpty(Model.Subtitulo))
-        {
-            <p>@Model.Subtitulo</p>
-        }
-    </div>
-    <div class="admin-acciones">
-        <a class="boton boton--principal" href="@Model.UrlNueva">@Model.TextoNueva</a>
-    </div>
-</div>
+<partial name="_CabeceraPagina" model="cabecera" />
 
-<div class="admin-barra">
-    <input class="buscador" type="search" placeholder="@Model.Buscador" aria-label="Buscar" />
+<div class="admin-subtitulo">
+    @if (!string.IsNullOrEmpty(Model.Subtitulo))
+    {
+        <p>@Model.Subtitulo</p>
+    }
+    @if (!string.IsNullOrEmpty(Model.UrlNueva))
+    {
+        <a class="boton boton--principal" href="@Model.UrlNueva">@Model.TextoNueva</a>
+    }
 </div>
 
 @if (Model.Filas.Count == 0)
 {
-    <p class="admin-vacio">@Model.Vacio</p>
+    <div class="admin-vacio">
+        <p>@Model.Vacio</p>
+        @if (!string.IsNullOrEmpty(Model.UrlNueva))
+        {
+            <a class="boton boton--principal" href="@Model.UrlNueva">@Model.TextoNueva</a>
+        }
+    </div>
 }
 else
 {
-    <div class="admin-tabla-envoltura">
-        <table class="admin-tabla">
-            <thead>
-                <tr>
-                    <th style="width:72px"></th>
-                    <th>@Model.EncabezadoPrincipal</th>
+    <div class="admin-barra">
+        @if (Model.Filtros.Count > 0)
+        {
+            <div class="admin-filtros" role="group" aria-label="Mostrar">
+                <button type="button" data-filtro-boton="" aria-pressed="true">Todo <span class="cuenta">@Model.Filas.Count</span></button>
+                @foreach (var f in Model.Filtros)
+                {
+                    var cuenta = Model.Filas.Count(x => x.Filtro == f.Clave);
+                    <button type="button" data-filtro-boton="@f.Clave" aria-pressed="false">@f.Texto <span class="cuenta">@cuenta</span></button>
+                }
+            </div>
+        }
+        <input class="buscador" type="search" placeholder="@Model.Buscador" aria-label="@Model.Buscador" data-buscador />
+    </div>
+
+    <table class="admin-tabla">
+        <caption class="oculto-visual">@Model.Titulo</caption>
+        <thead>
+            <tr>
+                <th class="foto"><span class="oculto-visual">Imagen</span></th>
+                <th>@Model.EncabezadoPrincipal</th>
+                @if (!string.IsNullOrEmpty(Model.Encabezado2))
+                {
+                    <th>@Model.Encabezado2</th>
+                }
+                @if (!string.IsNullOrEmpty(Model.Encabezado3))
+                {
+                    <th>@Model.Encabezado3</th>
+                }
+                <th>Estado</th>
+                <th class="col-acciones"><span class="oculto-visual">Acciones</span></th>
+            </tr>
+        </thead>
+        <tbody data-listado>
+            @foreach (var f in Model.Filas)
+            {
+                var urlEditar = $"{Model.UrlBase}/Editar/{f.Id}";
+                <tr data-fila data-filtro="@f.Filtro">
+                    <td class="foto">
+                        @if (!string.IsNullOrEmpty(f.ImagenSrc))
+                        {
+                            <img class="admin-miniatura" src="@f.ImagenSrc" alt="" loading="lazy" />
+                        }
+                        else
+                        {
+                            <span class="admin-miniatura admin-miniatura--vacia"></span>
+                        }
+                    </td>
+                    <td class="titulo">
+                        <a class="principal" href="@urlEditar">@f.Titulo</a>
+                        @if (!string.IsNullOrEmpty(f.Detalle) && f.Detalle != f.Titulo)
+                        {
+                            <span class="secundario">@f.Detalle</span>
+                        }
+                    </td>
                     @if (!string.IsNullOrEmpty(Model.Encabezado2))
                     {
-                        <th style="width:120px">@Model.Encabezado2</th>
+                        <td class="dato" data-etiqueta="@Model.Encabezado2">@f.Columna2</td>
                     }
                     @if (!string.IsNullOrEmpty(Model.Encabezado3))
                     {
-                        <th>@Model.Encabezado3</th>
+                        <td class="dato" data-etiqueta="@Model.Encabezado3">@f.Columna3</td>
                     }
-                    <th style="width:110px">Estado</th>
-                    <th style="width:170px"></th>
+                    <td class="estado"><span class="pastilla @f.ClaseEstado">@f.Estado</span></td>
+                    <td class="col-acciones">
+                        <a class="boton boton--borde boton--chico" href="@urlEditar">Editar<span class="oculto-visual"> «@f.Titulo»</span></a>
+                    </td>
                 </tr>
-            </thead>
-            <tbody>
-                @foreach (var f in Model.Filas)
-                {
-                    <tr>
-                        <td>
-                            @if (!string.IsNullOrEmpty(f.ImagenSrc))
-                            {
-                                <img class="admin-miniatura" src="@f.ImagenSrc" alt="" loading="lazy" />
-                            }
-                        </td>
-                        <td>
-                            <span class="principal">@f.Titulo</span>
-                            @if (!string.IsNullOrEmpty(f.Detalle))
-                            {
-                                <span class="secundario">@f.Detalle</span>
-                            }
-                        </td>
-                        @if (!string.IsNullOrEmpty(Model.Encabezado2))
-                        {
-                            <td>@f.Columna2</td>
-                        }
-                        @if (!string.IsNullOrEmpty(Model.Encabezado3))
-                        {
-                            <td>@f.Columna3</td>
-                        }
-                        <td><span class="pastilla @f.ClaseEstado">@f.Estado</span></td>
-                        <td>
-                            <a class="boton boton--borde boton--chico" href="@Model.UrlBase/Editar/@f.Id">Editar</a>
-                            <form method="post" action="@Model.UrlBase/Borrar/@f.Id" style="display:inline"
-                                  data-confirmar="¿Borrar «@f.Titulo»? No se puede deshacer.">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="boton boton--peligro boton--chico">Borrar</button>
-                            </form>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+            }
+        </tbody>
+    </table>
+
+    <div class="admin-sin-resultados" data-sin-resultados hidden>
+        <p>Nada coincide con lo que buscás.</p>
+        <button type="button" class="boton-texto" data-limpiar>Mostrar todo</button>
     </div>
 }

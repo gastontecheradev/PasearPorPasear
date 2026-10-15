@@ -9,14 +9,19 @@ using System.Globalization;
 namespace PasearPorPasear.Controllers;
 
 /// <summary>
-/// Base de los controladores públicos: resuelve el idioma y carga el
-/// encabezado editable de cada sección.
+/// Base de los controladores públicos: resuelve el idioma y da acceso a los
+/// textos editables del sitio (las vistas los leen directo con @Textos).
 /// </summary>
 public abstract class ControladorPublico : Controller
 {
     protected readonly ApplicationDbContext Ctx;
+    protected readonly ITextos Textos;
 
-    protected ControladorPublico(ApplicationDbContext ctx) { Ctx = ctx; }
+    protected ControladorPublico(ApplicationDbContext ctx, ITextos textos)
+    {
+        Ctx = ctx;
+        Textos = textos;
+    }
 
     /// <summary>
     /// El middleware de localización ya dejó puesta la cultura actual;
@@ -29,40 +34,12 @@ public abstract class ControladorPublico : Controller
         _    => "es"
     };
 
-    /// <summary>Completa idioma y encabezado de sección en cualquier vista.</summary>
-    protected async Task<T> PrepararAsync<T>(T vm, string? claveEncabezado = null) where T : VistaBase
+    /// <summary>Completa el idioma en cualquier vista.</summary>
+    protected T Preparar<T>(T vm) where T : VistaBase
     {
         vm.Idioma = Idioma;
-        if (claveEncabezado is not null)
-            vm.Encabezado = await Ctx.EncabezadosSeccion
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Clave == claveEncabezado);
         return vm;
     }
-
-    /// <summary>Valor de un ajuste, en el idioma actual.</summary>
-    protected async Task<string?> AjusteAsync(string clave)
-    {
-        var a = await Ctx.Ajustes.AsNoTracking().FirstOrDefaultAsync(x => x.Clave == clave);
-        if (a is null) return null;
-        var v = Traducir.Texto(Idioma, a.Valor, a.ValorEn, a.ValorPt);
-        return string.IsNullOrWhiteSpace(v) ? null : v;
-    }
-
-    /// <summary>
-    /// Canal de WhatsApp desde Ajustes, sólo si es una URL https válida.
-    /// Null si no hay canal: las vistas no lo enlazan ni lo mencionan.
-    /// </summary>
-    protected async Task<string?> CanalWhatsAppAsync() =>
-        EnlaceHelper.SoloHttps(await AjusteAsync("CanalWhatsApp"));
-
-    /// <summary>Nota del buzón que invita al canal; null si no hay canal.</summary>
-    protected static string? NotaCanalWhatsApp(VistaBase vm, string? canal) =>
-        canal is null
-            ? null
-            : vm.T("También hay canal de WhatsApp, si preferís que te llegue por ahí.",
-                   "There is also a WhatsApp channel, if you would rather get it there.",
-                   "Também há canal de WhatsApp, se preferir receber por lá.");
 
     /// <summary>
     /// Los afiches que se muestran en el muro, ya filtrados por vigencia.

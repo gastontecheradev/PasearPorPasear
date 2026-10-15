@@ -1,7 +1,5 @@
 @model ArchivoVm
 @{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
     string Enlace(string? barrio, int pagina) =>
         Url.Action("Index", "Archivo", new { barrio, pagina = pagina > 1 ? pagina : (int?)null })!;
 }
@@ -10,26 +8,26 @@
     <div class="contenedor">
         <img class="adorno" src="~/img/marca/ventana-3.webp" alt="" width="300" height="417" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
-        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        <h1 class="titulo-seccion">@Textos["archivo.titulo"]</h1>
+        @if (Textos["archivo.bajada"] is { Length: > 0 } bajada)
         {
-            <p class="bajada">@Model.BajadaSeccion</p>
+            <p class="bajada">@bajada</p>
         }
 
         <div class="contador">
             <div>
                 <b>@Model.TotalFachadas</b>
-                <span>@(esPortugues ? "fachadas arquivadas" : esIngles ? "facades archived" : "fachadas archivadas")</span>
+                <span>@Textos["archivo.contador-fachadas"]</span>
             </div>
             <div>
                 <b>@Model.TotalBarrios</b>
-                <span>@(esPortugues ? "bairros percorridos" : esIngles ? "neighbourhoods walked" : "barrios recorridos")</span>
+                <span>@Textos["archivo.contador-barrios"]</span>
             </div>
             @if (Model.DesdeAnio.HasValue)
             {
                 <div>
                     <b>@Model.DesdeAnio</b>
-                    <span>@(esPortugues ? "desde" : esIngles ? "since" : "desde")</span>
+                    <span>@Textos["archivo.contador-desde"]</span>
                 </div>
             }
         </div>
@@ -38,8 +36,8 @@
 
 <section class="banda banda--crema" style="padding-top:0">
     <div class="contenedor">
-        <nav class="filtros" aria-label="@(esPortugues ? "Filtrar por bairro" : esIngles ? "Filter by neighbourhood" : "Filtrar por barrio")">
-            <a class="filtro" href="@Enlace(null, 1)" aria-current="@(Model.BarrioActivo is null ? "page" : null)">@(esPortugues ? "Todos" : esIngles ? "All" : "Todos")</a>
+        <nav class="filtros" aria-label="@Model.T("Filtrar por barrio", "Filter by neighbourhood", "Filtrar por bairro")">
+            <a class="filtro" href="@Enlace(null, 1)" aria-current="@(Model.BarrioActivo is null ? "page" : null)">@Textos["archivo.filtro-todos"]</a>
             @foreach (var b in Model.Barrios)
             {
                 <a class="filtro" href="@Enlace(b, 1)" aria-current="@(Model.BarrioActivo == b ? "page" : null)">@b</a>
@@ -48,7 +46,7 @@
 
         @if (Model.Fichas.Count == 0)
         {
-            <p class="bajada">@(esPortugues ? "Ainda não há fachadas neste bairro." : esIngles ? "No facades in this neighbourhood yet." : "Todavía no hay fachadas en este barrio.")</p>
+            <p class="bajada">@Textos["archivo.vacio"]</p>
         }
         else
         {
@@ -69,14 +67,14 @@
 
         @if (Model.TotalPaginas > 1)
         {
-            <nav class="paginacion" aria-label="@(esPortugues ? "Paginação" : esIngles ? "Pagination" : "Paginación")">
+            <nav class="paginacion" aria-label="@Model.T("Paginación", "Pagination", "Paginação")">
                 @foreach (var n in Model.PaginasVisibles)
                 {
                     <a href="@Enlace(Model.BarrioActivo, n)" aria-current="@(n == Model.Pagina ? "page" : null)">@n</a>
                 }
                 @if (Model.Pagina < Model.TotalPaginas)
                 {
-                    <a href="@Enlace(Model.BarrioActivo, Model.Pagina + 1)">@(esPortugues ? "Seguinte" : esIngles ? "Next" : "Siguiente")</a>
+                    <a href="@Enlace(Model.BarrioActivo, Model.Pagina + 1)">@Textos["archivo.siguiente"]</a>
                 }
             </nav>
         }

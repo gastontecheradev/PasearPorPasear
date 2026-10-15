@@ -1,55 +1,65 @@
 @model PasearPorPasear.ViewModels.CamposIdiomaVm
 @*
-    Tres pestañas —español, inglés, portugués— para un mismo campo.
+    Un mismo campo en español, inglés y portugués. Qué idioma se ve lo
+    decide el selector de la página (_SelectorIdioma), no cada campo.
     El español es obligatorio; si falta una traducción, la vista pública
     cae al español, así que no pasa nada por dejarlas vacías.
+    En inglés y portugués se muestra el texto en español como referencia;
+    admin.js lo mantiene al día con lo que se esté escribiendo.
 *@
-<div>
-    <div class="idioma-pestanas" role="tablist" aria-label="Idioma de @Model.Etiqueta">
-        <button type="button" data-idioma="es" aria-selected="true">ES</button>
-        <button type="button" data-idioma="en" aria-selected="false">EN</button>
-        <button type="button" data-idioma="pt" aria-selected="false">PT</button>
-    </div>
+@{
+    var tieneEs = !string.IsNullOrWhiteSpace(Model.Es);
 
-    <div class="idioma-panel campo" data-idioma="es">
-        <label for="@(Model.Nombre)">@Model.Etiqueta</label>
-        @if (Model.Largo)
-        {
-            <textarea id="@(Model.Nombre)" name="@(Model.Nombre)" style="min-height:160px">@Model.Es</textarea>
-        }
-        else
-        {
-            <input id="@(Model.Nombre)" name="@(Model.Nombre)" type="text" value="@Model.Es" />
-        }
-        @if (!string.IsNullOrEmpty(Model.Pista))
-        {
-            <p class="pista">@Model.Pista</p>
-        }
-    </div>
+    void Panel(string idioma, string sufijo, string? valor, string? enIdioma)
+    {
+        var id = Model.Id + sufijo;
+        var nombre = Model.NombreDe(sufijo);
+        <div class="idioma-panel campo" data-idioma="@idioma" hidden="@(idioma != "es")">
+            <label for="@id">
+                @Model.Etiqueta
+                @if (enIdioma is not null)
+                {
+                    <span class="idioma-marca">en @enIdioma</span>
+                }
+            </label>
+            @if (Model.Largo)
+            {
+                <textarea id="@id" name="@nombre" maxlength="@Model.Maximo" class="@Model.ClaseLargo">@valor</textarea>
+            }
+            else
+            {
+                <input id="@id" name="@nombre" type="text" value="@valor" maxlength="@Model.Maximo" />
+            }
 
-    <div class="idioma-panel campo" data-idioma="en" hidden>
-        <label for="@(Model.Nombre)En">@Model.Etiqueta — inglés</label>
-        @if (Model.Largo)
-        {
-            <textarea id="@(Model.Nombre)En" name="@(Model.Nombre)En" style="min-height:160px">@Model.En</textarea>
-        }
-        else
-        {
-            <input id="@(Model.Nombre)En" name="@(Model.Nombre)En" type="text" value="@Model.En" />
-        }
-        <p class="pista">Si queda vacío se muestra el español.</p>
-    </div>
-
-    <div class="idioma-panel campo" data-idioma="pt" hidden>
-        <label for="@(Model.Nombre)Pt">@Model.Etiqueta — portugués</label>
-        @if (Model.Largo)
-        {
-            <textarea id="@(Model.Nombre)Pt" name="@(Model.Nombre)Pt" style="min-height:160px">@Model.Pt</textarea>
-        }
-        else
-        {
-            <input id="@(Model.Nombre)Pt" name="@(Model.Nombre)Pt" type="text" value="@Model.Pt" />
-        }
-        <p class="pista">Si queda vacío se muestra el español.</p>
-    </div>
+            @if (enIdioma is null)
+            {
+                if (!string.IsNullOrEmpty(Model.Pista))
+                {
+                    <p class="pista">@Model.Pista</p>
+                }
+            }
+            else
+            {
+                if (Model.Largo)
+                {
+                    <details class="original" data-original hidden="@(!tieneEs)">
+                        <summary>Ver el texto en español</summary>
+                        <div class="original-texto" data-original-texto>@Model.Es</div>
+                    </details>
+                }
+                else
+                {
+                    <p class="original" data-original hidden="@(!tieneEs)">
+                        <b>En español:</b> <span data-original-texto>@Model.Es</span>
+                    </p>
+                }
+                <p class="pista">Si queda vacío, en @enIdioma se muestra el español.</p>
+            }
+        </div>
+    }
+}
+<div class="idioma-campo" data-campo>
+    @{ Panel("es", "", Model.Es, null); }
+    @{ Panel("en", "En", Model.En, "inglés"); }
+    @{ Panel("pt", "Pt", Model.Pt, "portugués"); }
 </div>

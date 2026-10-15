@@ -1,7 +1,5 @@
 @model SobreVm
 @{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
 }
 
 <section class="banda banda--crema" aria-labelledby="sobre-proyecto">
@@ -14,11 +12,11 @@
                     @Html.Raw(Model.Contenido)
                 </div>
                 <p class="atributos" style="color:var(--petroleo)">
-                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
+                    @Textos["general.atributo-1"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
+                    @Textos["general.atributo-2"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
+                    @Textos["general.atributo-3"]
                 </p>
             </div>
             @if (!string.IsNullOrEmpty(Model.ProyectoImagenSrc))
@@ -63,11 +61,17 @@
     <div class="contenedor">
         <div class="suscripcion">
             <div>
-                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Gosta do projeto? Você pode colaborar com o “envelope virtual”." : esIngles ? "Do you like the project? You can chip in to the “virtual envelope”." : "¿Te gusta el proyecto? Podés colaborar “al sobre virtual”.")</h2>
-                <p class="bajada">@(esPortugues ? "Este projeto se sustenta com tempo, cafezinho e muito amor. Se quiser colaborar com o que puder e quiser, pode fazer isso aqui:" : esIngles ? "This project runs on time, coffee and a lot of love. If you'd like to chip in whatever you can, you can do it here:" : "Este proyecto se sostiene con tiempo, cafecito y mucho amor. Si querés colaborar con lo que puedas, quieras, podés hacerlo acá:")</p>
-                <div class="acciones">
-                    <a class="boton boton--claro" href="https://link.mercadopago.com.uy/pasearporpasear" target="_blank" rel="noopener">@(esPortugues ? "Deixar uma gorjeta" : esIngles ? "Leave a tip" : "Dejar una propina")</a>
-                </div>
+                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Textos["sobre.colaborar-titulo"]</h2>
+                @if (Textos["sobre.colaborar-texto"] is { Length: > 0 } colaborar)
+                {
+                    <p class="bajada">@colaborar</p>
+                }
+                @if (Textos.Enlace("sobre.colaborar-enlace") is string pago)
+                {
+                    <div class="acciones">
+                        <a class="boton boton--claro" href="@pago" target="_blank" rel="noopener">@Textos["sobre.colaborar-boton"]</a>
+                    </div>
+                }
             </div>
             <img class="kiosco" src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" />
         </div>

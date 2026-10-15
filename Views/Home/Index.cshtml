@@ -1,7 +1,7 @@
 @model InicioVm
 @{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
+    var definicionTitulo = Textos["portada.definicion-titulo"];
+    var entrada = Textos["portada.entrada"];
 }
 
 <section class="portada">
@@ -9,14 +9,14 @@
         <h1 class="oculto-visual">Pasear por Pasear</h1>
         <img class="lettering-grande" src="~/img/marca/wordmark-petroleo.webp"
              alt="Pasear por Pasear" width="720" height="307" />
-        <p class="frase">@Model.TituloSeccion</p>
-        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        <p class="frase">@Textos["portada.frase"]</p>
+        @if (!string.IsNullOrEmpty(entrada))
         {
-            <p class="entrada">@Model.BajadaSeccion</p>
+            <p class="entrada">@entrada</p>
         }
         <div class="acciones">
-            <a class="boton boton--principal" href="/Paseos">@(esPortugues ? "Vamos passear?" : esIngles ? "Shall we walk?" : "¿Paseamos?")</a>
-            <a class="boton boton--borde" href="/Archivo">@(esPortugues ? "Ver o arquivo" : esIngles ? "See the archive" : "Ver el archivo")</a>
+            <a class="boton boton--principal" href="/Paseos">@Textos["portada.boton-paseos"]</a>
+            <a class="boton boton--borde" href="/Archivo">@Textos["portada.boton-archivo"]</a>
         </div>
     </div>
 </section>
@@ -27,25 +27,25 @@
 </div>
 
 @* ── Qué es Pasear por Pasear ── *@
-@if (Model.Definicion is not null)
+@if (!string.IsNullOrEmpty(definicionTitulo))
 {
 <section class="banda banda--petroleo" style="padding-top:calc(var(--aire) * .5)">
     <div class="contenedor">
         <div class="definicion">
             <div>
-                <h2 class="titulo-seccion">@Model.T(Model.Definicion.Titulo, Model.Definicion.TituloEn, Model.Definicion.TituloPt)</h2>
+                <h2 class="titulo-seccion">@definicionTitulo</h2>
                 <div class="texto" style="margin-top:22px;color:var(--tinta-clara)">
-                    @Html.Raw(Model.TO(Model.Definicion.Bajada, Model.Definicion.BajadaEn, Model.Definicion.BajadaPt))
+                    @Textos.Html("portada.definicion-texto")
                 </div>
                 <p class="atributos">
-                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
+                    @Textos["general.atributo-1"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
+                    @Textos["general.atributo-2"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
+                    @Textos["general.atributo-3"]
                 </p>
                 <div class="acciones">
-                    <a class="boton boton--claro" href="/Sobre">@(esPortugues ? "Sobre PPP" : esIngles ? "About PPP" : "Sobre PPP")</a>
+                    <a class="boton boton--claro" href="/Sobre">@Textos["portada.boton-sobre"]</a>
                 </div>
             </div>
             <img class="casita-grande" src="~/img/marca/casita.webp" alt="" width="380" height="447" />

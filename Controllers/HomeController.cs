@@ -2,25 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class HomeController : ControladorPublico
 {
-    public HomeController(ApplicationDbContext ctx) : base(ctx) { }
+    public HomeController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
     public async Task<IActionResult> Index()
     {
-        var vm = await PrepararAsync(new InicioVm(), "portada");
-
-        vm.Definicion = await Ctx.EncabezadosSeccion.AsNoTracking()
-            .FirstOrDefaultAsync(e => e.Clave == "definicion");
-
-        var clavesPilares = new[] { "pilares", "pilar-clubcito", "pilar-alsobre", "pilar-recorridos", "pilar-personalizados" };
-        vm.Pilares = await Ctx.EncabezadosSeccion.AsNoTracking()
-            .Where(e => clavesPilares.Contains(e.Clave))
-            .ToDictionaryAsync(e => e.Clave);
+        var vm = Preparar(new InicioVm());
 
         // Tira de fachadas. Se proyecta el flag, nunca los bytes.
         var fachadas = await Ctx.Fachadas.AsNoTracking()
@@ -70,15 +63,16 @@ public class HomeController : ControladorPublico
 
         vm.Buzon = new BuzonVm
         {
-            Titulo = vm.T("El buzón de la Casita", "The Casita mailbox", "A caixa de correio da Casita"),
-            Texto = await AjusteAsync("BuzonTexto") ?? string.Empty,
-            EtiquetaBoton = vm.T("Suscribirme", "Subscribe", "Inscrever-me"),
-            Nota = NotaCanalWhatsApp(vm, await CanalWhatsAppAsync()),
+            Titulo = Textos["portada.buzon-titulo"],
+            Texto = Textos["portada.buzon-texto"],
+            EtiquetaBoton = Textos["portada.buzon-boton"],
+            // La nota invita al canal: sin canal cargado, no se menciona.
+            Nota = Textos.Enlace("general.whatsapp") is null ? null : Textos["portada.buzon-nota"],
             // El formulario está embebido en Contacto; desde la portada se va ahí.
             Enlace = "/Contacto#buzon"
         };
 
-        ViewData["Title"] = vm.T("Inicio", "Home", "Início");
+        ViewData["Title"] = Textos["general.menu-inicio"];
         return View(vm);
     }
 

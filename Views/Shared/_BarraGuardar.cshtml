@@ -1,0 +1,14 @@
+@model PasearPorPasear.ViewModels.BarraGuardarVm
+@*
+    Barra fija al pie de los formularios del panel: el botón de guardar
+    queda siempre a mano y el fondo cambia cuando hay cambios sin guardar.
+    Va DENTRO del <form data-editor>.
+*@
+<div class="admin-guardar" data-barra-guardar>
+    <p class="admin-guardar-estado" data-estado-guardado aria-live="polite">@Model.EstadoInicial</p>
+    @if (!string.IsNullOrEmpty(Model.UrlVolver))
+    {
+        <a class="boton boton--borde" href="@Model.UrlVolver">@Model.TextoVolver</a>
+    }
+    <button class="boton boton--principal" type="submit" data-guardando="Guardando…">@Model.TextoGuardar</button>
+</div>

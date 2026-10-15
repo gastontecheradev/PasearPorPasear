@@ -1,20 +1,19 @@
 @model ProductosVm
 @{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
     // Mientras la sección está en construcción no se muestra la grilla de productos.
-    // Para volver a publicarla, cambiar a false.
-    var enConstruccion = true;
+    // Se cambia desde el panel: Productos, Textos de la página.
+    var enConstruccion = Textos.Activo("productos.en-construccion");
+    var bajada = Textos["productos.bajada"];
 }
 
 <section class="encabezado banda--crema">
     <div class="contenedor">
         <img class="adorno" src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
-        @if (!enConstruccion && !string.IsNullOrEmpty(Model.BajadaSeccion))
+        <h1 class="titulo-seccion">@Textos["productos.titulo"]</h1>
+        @if (!enConstruccion && !string.IsNullOrEmpty(bajada))
         {
-            <p class="bajada">@Model.BajadaSeccion</p>
+            <p class="bajada">@bajada</p>
         }
     </div>
 </section>
@@ -24,10 +23,8 @@
         @if (enConstruccion)
         {
             <div class="en-construccion">
-                <h2>@(esPortugues ? "Esta seção está em construção" : esIngles ? "This section is under construction" : "Esta sección está en construcción")</h2>
-                <p>@(esPortugues ? "Estamos preparando os produtos da Casita. Em breve estarão aqui."
-                     : esIngles ? "We are getting the Casita products ready. They will be here soon."
-                     : "Estamos preparando los productos de la Casita. Muy pronto van a estar acá.")</p>
+                <h2>@Textos["productos.construccion-titulo"]</h2>
+                <p>@Textos["productos.construccion-texto"]</p>
             </div>
         }
         else
@@ -48,18 +45,18 @@
                         <div class="precio">
                             @if (p.Estado == EstadoProducto.DescargaGratis)
                             {
-                                <b>@(esPortugues ? "Grátis" : esIngles ? "Free" : "Gratis")</b>
-                                <a class="boton boton--borde" href="@(p.ArchivoUrl ?? "/Contacto")">@(esPortugues ? "Baixar" : esIngles ? "Download" : "Descargar")</a>
+                                <b>@Textos["productos.gratis"]</b>
+                                <a class="boton boton--borde" href="@(p.ArchivoUrl ?? "/Contacto")">@Textos["productos.descargar"]</a>
                             }
                             else if (p.Estado == EstadoProducto.ALaVenta)
                             {
                                 <b>$ @p.Precio?.ToString("N0")</b>
-                                <a class="boton boton--principal" href="/Contacto">@(esPortugues ? "Pedir" : esIngles ? "Order" : "Pedir")</a>
+                                <a class="boton boton--principal" href="/Contacto">@Textos["productos.pedir"]</a>
                             }
                             else
                             {
-                                <b>@(esPortugues ? "Em breve" : esIngles ? "Soon" : "Pronto")</b>
-                                <span class="pendiente" style="margin:0">@(esPortugues ? "Em preparação" : esIngles ? "In the works" : "En preparación")</span>
+                                <b>@Textos["productos.pronto"]</b>
+                                <span class="pendiente" style="margin:0">@Textos["productos.en-preparacion"]</span>
                             }
                         </div>
                     </div>

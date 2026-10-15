@@ -2,16 +2,18 @@
 @*
     Imagen actual y reemplazo. Las imágenes se guardan en la base:
     el aviso de peso no es decorativo, el límite son 6 MB por archivo.
+    admin.js muestra la imagen elegida antes de guardar y frena las
+    que pasan el límite sin esperar al servidor.
 *@
-<div class="admin-panel admin-panel--lateral">
+<section class="admin-panel" data-imagen>
     <h2>@Model.Titulo</h2>
-    <p>JPG, PNG, WEBP o GIF. Hasta 6 MB.</p>
+    <p>Lo que se ve en el sitio.</p>
 
-    <div class="admin-imagen">
+    <div class="admin-imagen" data-imagen-vista>
         @if (!string.IsNullOrEmpty(Model.Src))
         {
             <img src="@Model.Src" alt="" />
-            <span class="origen">@(Model.EsCargada ? "cargada desde el panel" : "imagen de arranque")</span>
+            <span class="origen">@(Model.EsCargada ? "Cargada desde el panel" : "Imagen de arranque del sitio")</span>
         }
         else
         {
@@ -19,23 +21,25 @@
         }
     </div>
 
-    <div class="campo" style="margin-top:18px">
-        <label for="@Model.CampoArchivo">Reemplazar</label>
-        <input id="@Model.CampoArchivo" name="@Model.CampoArchivo" type="file" accept="image/jpeg,image/png,image/webp,image/gif" />
-        <p class="pista">Conviene achicarla antes de subirla: las imágenes ocupan lugar en la base.</p>
+    <div class="campo campo-archivo">
+        <label for="@Model.CampoArchivo">@(string.IsNullOrEmpty(Model.Src) ? "Elegir una imagen" : "Cambiar por otra")</label>
+        <input id="@Model.CampoArchivo" name="@Model.CampoArchivo" type="file"
+               accept="image/jpeg,image/png,image/webp,image/gif" data-imagen-archivo />
+        <p class="campo-error" data-imagen-error role="alert" hidden></p>
+        <p class="pista">JPG, PNG, WEBP o GIF, hasta 6 MB. Conviene achicarla antes: ocupa lugar en la base.</p>
     </div>
 
     <div class="campo">
-        <label for="@Model.CampoAlt">Texto alternativo</label>
+        <label for="@Model.CampoAlt">Qué se ve en la foto</label>
         <input id="@Model.CampoAlt" name="@Model.CampoAlt" type="text" value="@Model.Alt" maxlength="300" />
-        <p class="pista">Qué se ve en la foto. Lo leen los lectores de pantalla.</p>
+        <p class="pista">Lo leen quienes usan lector de pantalla.</p>
     </div>
 
     @if (Model.EsCargada)
     {
-        <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-top:4px">
-            <input type="checkbox" name="@Model.CampoBorrar" value="true" style="width:auto" />
-            Quitar la imagen cargada
+        <label class="casilla">
+            <input type="checkbox" name="@Model.CampoBorrar" value="true" />
+            <span>Quitar la imagen cargada<small>Vuelve la imagen de arranque, si había una.</small></span>
         </label>
     }
-</div>
+</section>

@@ -2,17 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class PaseosController : ControladorPublico
 {
-    public PaseosController(ApplicationDbContext ctx) : base(ctx) { }
+    public PaseosController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
     public async Task<IActionResult> Index()
     {
-        var vm = await PrepararAsync(new PaseosVm(), "paseos");
+        var vm = Preparar(new PaseosVm());
 
         var filas = await Ctx.Propuestas.AsNoTracking()
             .Where(p => p.Activa)
@@ -48,14 +49,21 @@ public class PaseosController : ControladorPublico
             }).ToList(),
             // El Clubcito lleva al formulario de novedades (MailerLite); el resto, a la página de contacto.
             Enlace = p.Clave == ClavePropuesta.Clubcito
-                ? "https://preview.mailerlite.io/forms/2403548/194248063120835606/share"
+                ? Textos.Enlace("paseos.enlace-clubcito") ?? "/Contacto"
                 : "/Contacto",
             TextoEnlace = p.Clave == ClavePropuesta.Clubcito
-                ? vm.T("Recibir novedades", "Get updates", "Receber novidades")
-                : vm.T("Consultar", "Get in touch", "Consultar")
+                ? Textos["paseos.boton-clubcito"]
+                : Textos["paseos.boton-consultar"]
         }).ToList();
 
-        ViewData["Title"] = vm.TituloSeccion;
+        ViewData["Title"] = Textos["paseos.titulo"];
         return View(vm);
     }
+
+    /// <summary>
+    /// El Clubcito ya no tiene página propia: sigue como propuesta de
+    /// ¿Paseamos?. Las direcciones viejas (y sus encuentros) llevan ahí.
+    /// </summary>
+    [HttpGet("Clubcito/{**resto}")]
+    public IActionResult ClubcitoViejo() => RedirectPermanent("/Paseos");
 }

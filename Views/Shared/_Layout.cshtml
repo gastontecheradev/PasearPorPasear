@@ -6,9 +6,7 @@
     var isPt = culture == "pt";
 
     var controlador = ViewContext.RouteData.Values["controller"]?.ToString() ?? "";
-    // El Clubcito cuelga de ¿Paseamos?: el menú marca la sección madre
-    var seccion = controlador == "Clubcito" ? "Paseos" : controlador;
-    Func<string, string> activo = c => seccion == c ? "page" : null;
+    Func<string, string?> activo = c => controlador == c ? "page" : null;
 
     var esAdmin = SignInManager.IsSignedIn(User) && User.IsInRole("Admin");
 }
@@ -39,7 +37,7 @@
 
     <meta name="theme-color" content="#FFF5E6" />
     <meta property="og:title" content="@(ViewData["Title"] ?? "Pasear por Pasear")" />
-    <meta property="og:description" content="@(isPt ? "Caminhar Montevidéu sem pressa e contar. Bairro por bairro." : isEn ? "Walking Montevideo slowly, and writing it down. Block by block." : "Caminar Montevideo sin apuro y contarlo. Barrio por barrio, vereda por vereda.")" />
+    <meta property="og:description" content="@Textos["general.descripcion"]" />
     <meta property="og:image" content="https://pasearporpasear.com/img/marca/og-image.jpg" />
     <meta property="og:type" content="website" />
     <meta property="og:locale" content="@culture" />
@@ -57,14 +55,13 @@
         </a>
 
         <ul class="nav" id="nav">
-            <li><a href="/" aria-current="@activo("Home")">@(isPt ? "Início" : isEn ? "Home" : "Inicio")</a></li>
-            <li><a href="/Sobre" aria-current="@activo("Sobre")">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
-            <li><a href="/Paseos" aria-current="@activo("Paseos")">@(isPt ? "Vamos passear?" : isEn ? "Shall we walk?" : "¿Paseamos?")</a></li>
-                @* El hashtag es parte de la marca: no se traduce en ningún idioma *@
-            <li><a href="/Archivo" aria-current="@activo("Archivo")">#ArchivoDeFachadas</a></li>
-            <li><a href="/Productos" aria-current="@activo("Productos")">@(isPt ? "Produtos" : isEn ? "Shop" : "Productos")</a></li>
-            <li><a href="/Cartelera" aria-current="@activo("Cartelera")">@(isPt ? "Mural do bairro" : isEn ? "Neighbourhood board" : "Cartelera")</a></li>
-            <li><a href="/Contacto" aria-current="@activo("Contacto")">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
+            <li><a href="/" aria-current="@activo("Home")">@Textos["general.menu-inicio"]</a></li>
+            <li><a href="/Sobre" aria-current="@activo("Sobre")">@Textos["general.menu-sobre"]</a></li>
+            <li><a href="/Paseos" aria-current="@activo("Paseos")">@Textos["general.menu-paseos"]</a></li>
+            <li><a href="/Archivo" aria-current="@activo("Archivo")">@Textos["general.menu-archivo"]</a></li>
+            <li><a href="/Productos" aria-current="@activo("Productos")">@Textos["general.menu-productos"]</a></li>
+            <li><a href="/Cartelera" aria-current="@activo("Cartelera")">@Textos["general.menu-cartelera"]</a></li>
+            <li><a href="/Contacto" aria-current="@activo("Contacto")">@Textos["general.menu-contacto"]</a></li>
         </ul>
 
         <div class="idiomas" role="group" aria-label="@(isPt ? "Idioma" : isEn ? "Language" : "Idioma")">
@@ -102,42 +99,44 @@
         <div class="pie-grilla">
             <div>
                 <img class="lettering" src="~/img/marca/wordmark-crema.webp" alt="Pasear por Pasear" width="720" height="307" />
-                <p>@(isPt ? "Caminhar Montevidéu sem pressa e contar. Bairro por bairro, calçada por calçada." : isEn ? "Walking Montevideo slowly, and writing it down. Block by block, pavement by pavement." : "Caminar Montevideo sin apuro y contarlo. Barrio por barrio, vereda por vereda.")</p>
+                <p>@Textos["general.pie-lema"]</p>
             </div>
             <div>
-                <h4>@(isPt ? "Percorrer" : isEn ? "Explore" : "Recorrer")</h4>
+                <h4>@Textos["general.pie-recorrer"]</h4>
                 <ul>
-                <li><a href="/Sobre">@(isPt ? "Sobre PPP" : isEn ? "About PPP" : "Sobre PPP")</a></li>
-                <li><a href="/Paseos">@(isPt ? "Vamos passear?" : isEn ? "Shall we walk?" : "¿Paseamos?")</a></li>
-                <li><a href="/Clubcito">El Clubcito</a></li>
-                <li><a href="/Archivo">#ArchivoDeFachadas</a></li>
-                <li><a href="/Cartelera">@(isPt ? "Mural do bairro" : isEn ? "Neighbourhood board" : "Cartelera de barrio")</a></li>
+                <li><a href="/Sobre">@Textos["general.menu-sobre"]</a></li>
+                <li><a href="/Paseos">@Textos["general.menu-paseos"]</a></li>
+                <li><a href="/Archivo">@Textos["general.menu-archivo"]</a></li>
+                <li><a href="/Cartelera">@Textos["general.pie-cartelera"]</a></li>
                 </ul>
             </div>
             <div>
-                <h4>@(isPt ? "Escrever" : isEn ? "Write" : "Escribir")</h4>
+                <h4>@Textos["general.pie-escribir"]</h4>
                 <ul>
-                <li><a href="/Contacto">@(isPt ? "Contato" : isEn ? "Contact" : "Contacto")</a></li>
-                <li><a href="/Productos">@(isPt ? "Produtos" : isEn ? "Shop" : "Productos")</a></li>
-                    <li><a href="mailto:pasearporpasear@gmail.com?subject=cartelera%20de%20barrio">@(isPt ? "Enviar um cartaz" : isEn ? "Send a poster" : "Mandar un afiche")</a></li>
-                <li><a href="/Contacto#buzon">@(isPt ? "A caixa de correio da Casita" : isEn ? "The Casita mailbox" : "El buzón de la Casita")</a></li>
+                <li><a href="/Contacto">@Textos["general.menu-contacto"]</a></li>
+                <li><a href="/Productos">@Textos["general.menu-productos"]</a></li>
+                <li><a href="mailto:@Textos["general.correo"]?subject=cartelera%20de%20barrio">@Textos["general.pie-afiche"]</a></li>
+                <li><a href="/Contacto#buzon">@Textos["general.pie-buzon"]</a></li>
                 </ul>
             </div>
             <div>
-                <h4>@(isPt ? "Seguir" : isEn ? "Follow" : "Seguir")</h4>
+                <h4>@Textos["general.pie-seguir"]</h4>
                 <ul>
-                    <li><a href="https://www.instagram.com/pasearporpasear/" target="_blank" rel="noopener">Instagram</a></li>
+                    @if (Textos.Enlace("general.instagram") is string instagram)
+                    {
+                        <li><a href="@instagram" target="_blank" rel="noopener">Instagram</a></li>
+                    }
                     @await Component.InvokeAsync("CanalWhatsApp")
                 </ul>
             </div>
         </div>
 
         <div class="pie-abajo">
-            <span>© @DateTime.Now.Year Pasear por Pasear · Rosalía Souza · Montevideo, Uruguay</span>
+            <span>© @DateTime.Now.Year @Textos["general.pie-firma"]</span>
             <span>
                 @if (esAdmin)
                 {
-                    <a href="/Admin/Dashboard">Admin</a>
+                    <a href="/Admin">Admin</a>
                     <span style="margin:0 8px;opacity:.5">·</span>
                     <form asp-controller="Account" asp-action="Logout" method="post" style="display:inline">
                         <button type="submit" class="pie-salir">@(isPt ? "Sair" : isEn ? "Log out" : "Salir")</button>
@@ -149,7 +148,7 @@
                     <a href="/Account/Login">Admin</a>
                     <span style="margin:0 8px;opacity:.5">·</span>
                 }
-                @(isPt ? "Identidade visual" : isEn ? "Visual identity" : "Identidad visual"): Mechi Barrón
+                @Textos["general.pie-identidad"]
             </span>
         </div>
     </div>

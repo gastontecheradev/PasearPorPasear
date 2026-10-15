@@ -1,123 +1,128 @@
 @model List<AficheVm>
 @{
     Layout = "_AdminLayout";
-    var pegados = Model.Count(a => a.Estado == EstadoAfiche.Publicado && a.TieneImagen && !a.EstaVencido);
+
+    // Un afiche está en uno solo de tres estados: el muro filtra por estos.
+    string Filtro(AficheVm a) =>
+        a.Estado == EstadoAfiche.Archivado ? "archivado" : a.EstaVencido ? "vencido" : "pegado";
+
+    var pegados = Model.Count(a => Filtro(a) == "pegado" && a.TieneImagen);
+    var filtros = new (string Clave, string Texto)[] { ("pegado", "Pegados"), ("vencido", "Vencidos"), ("archivado", "Archivados") };
+    var cabecera = new CabeceraPaginaVm
+    {
+        Pagina = PasearPorPasear.Services.CatalogoTextos.Pagina("cartelera")!,
+        Activa = "listado",
+        Cuenta = Model.Count
+    };
 }
 
-<div class="admin-titulo">
-    <div>
-        <h1>Cartelera de barrio</h1>
-        <p>
-            @(pegados == 1 ? "1 afiche pegado" : $"{pegados} afiches pegados") en el sitio.
-            @if (pegados == 0)
-            {
-                <text>Mientras no haya ninguno, se ve la cartelera vacía con el correo para mandar afiches.</text>
-            }
-        </p>
-    </div>
-    <div class="admin-acciones">
-        <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Subir un afiche</a>
-    </div>
-</div>
+<partial name="_CabeceraPagina" model="cabecera" />
 
-<div class="admin-barra">
-    <input class="buscador" type="search" placeholder="Buscar por nombre o por lo que dice…" aria-label="Buscar" />
+<div class="admin-subtitulo">
+    <p>
+        @(pegados == 1 ? "1 afiche pegado" : $"{pegados} afiches pegados") en el sitio.
+        @if (pegados == 0)
+        {
+            <text>Mientras no haya ninguno, se ve la cartelera vacía con el correo para mandar afiches.</text>
+        }
+    </p>
+    <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Subir un afiche</a>
 </div>
 
 @if (Model.Count == 0)
 {
-    <p class="admin-vacio">Todavía no subiste ningún afiche.</p>
+    <div class="admin-vacio">
+        <p>Todavía no subiste ningún afiche. Se suben ya armados sobre la plantilla de la cartelera.</p>
+        <a class="boton boton--principal" href="/Admin/Cartelera/Nuevo">Subir un afiche</a>
+    </div>
 }
 else
 {
-    <div class="admin-tabla-envoltura">
-        <table class="admin-tabla">
-            <thead>
-                <tr>
-                    <th style="width:64px"></th>
-                    <th>Afiche</th>
-                    <th style="width:130px">Vigencia</th>
-                    <th style="width:120px">Estado</th>
-                    <th style="width:270px"></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var a in Model)
+    <div class="admin-barra">
+        <div class="admin-filtros" role="group" aria-label="Mostrar">
+            <button type="button" data-filtro-boton="" aria-pressed="true">Todo <span class="cuenta">@Model.Count</span></button>
+            @foreach (var f in filtros)
+            {
+                <button type="button" data-filtro-boton="@f.Clave" aria-pressed="false">@f.Texto <span class="cuenta">@Model.Count(a => Filtro(a) == f.Clave)</span></button>
+            }
+        </div>
+        <input class="buscador" type="search" placeholder="Buscar por nombre o por lo que dice…" aria-label="Buscar por nombre o por lo que dice" data-buscador />
+    </div>
+
+    <ul class="admin-muro" data-listado>
+        @foreach (var a in Model)
+        {
+            var filtro = Filtro(a);
+            var urlEditar = $"/Admin/Cartelera/Editar/{a.Id}";
+            <li class="admin-muro-item @(filtro != "pegado" ? "esta-apagado" : null)" data-fila data-filtro="@filtro">
+                <a class="admin-muro-foto" href="@urlEditar" tabindex="-1" aria-hidden="true">
+                    @if (a.TieneImagen)
+                    {
+                        <img src="@a.ImagenSrc" alt="" loading="lazy" width="1080" height="1350" />
+                    }
+                    else
+                    {
+                        <span class="sin-imagen">Sin imagen: no se muestra hasta que le subas una</span>
+                    }
+                </a>
+
+                <div class="admin-muro-meta">
+                    @if (filtro == "archivado")
+                    {
+                        <span class="pastilla pastilla--vencido">Archivado</span>
+                    }
+                    else if (filtro == "vencido")
+                    {
+                        <span class="pastilla pastilla--vencido">Vencido</span>
+                    }
+                    else
+                    {
+                        <span class="pastilla pastilla--activo">Pegado</span>
+                    }
+                    <span>
+                        @if (a.VigenteHasta is null)
+                        {
+                            <text>sin vencimiento</text>
+                        }
+                        else if (a.EstaVencido)
+                        {
+                            <text>venció el @a.VigenteHasta.Value.ToString("dd/MM")</text>
+                        }
+                        else
+                        {
+                            <text>hasta el @a.VigenteHasta.Value.ToString("dd/MM")</text>
+                        }
+                    </span>
+                </div>
+
+                <h2><a href="@urlEditar">@a.Titulo</a></h2>
+                @if (!string.IsNullOrWhiteSpace(a.ImagenAlt))
                 {
-                    var vencido = a.EstaVencido;
-                    <tr>
-                        <td>
-                            @if (a.TieneImagen)
-                            {
-                                <img class="admin-miniatura admin-miniatura--afiche" src="@a.ImagenSrc" alt="" loading="lazy" />
-                            }
-                        </td>
-                        <td>
-                            <span class="principal">@a.Titulo</span>
-                            @if (!a.TieneImagen)
-                            {
-                                <span class="secundario">Sin imagen: no se muestra hasta que le subas una.</span>
-                            }
-                            else if (!string.IsNullOrWhiteSpace(a.ImagenAlt))
-                            {
-                                <span class="secundario">@(a.ImagenAlt.Length > 70 ? a.ImagenAlt.Substring(0, 70) + "…" : a.ImagenAlt)</span>
-                            }
-                        </td>
-                        <td>
-                            @if (a.VigenteHasta is null)
-                            {
-                                <text>sin fecha</text>
-                            }
-                            else if (vencido)
-                            {
-                                <text>venció @a.VigenteHasta.Value.ToString("dd/MM")</text>
-                            }
-                            else
-                            {
-                                <text>hasta @a.VigenteHasta.Value.ToString("dd/MM")</text>
-                            }
-                        </td>
-                        <td>
-                            @if (a.Estado == EstadoAfiche.Archivado)
-                            {
-                                <span class="pastilla pastilla--vencido">Archivado</span>
-                            }
-                            else if (vencido)
-                            {
-                                <span class="pastilla pastilla--vencido">Vencido</span>
-                            }
-                            else
-                            {
-                                <span class="pastilla pastilla--activo">Pegado</span>
-                            }
-                        </td>
-                        <td>
-                            @if (a.Estado == EstadoAfiche.Archivado)
-                            {
-                                <form method="post" action="/Admin/Cartelera/Estado/@a.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="estado" value="@((int)EstadoAfiche.Publicado)" />
-                                    <button type="submit" class="boton boton--principal boton--chico">Volver a pegar</button>
-                                </form>
-                            }
-                            else
-                            {
-                                <form method="post" action="/Admin/Cartelera/Estado/@a.Id" style="display:inline">
-                                    @Html.AntiForgeryToken()
-                                    <input type="hidden" name="estado" value="@((int)EstadoAfiche.Archivado)" />
-                                    <button type="submit" class="boton boton--borde boton--chico">Archivar</button>
-                                </form>
-                            }
-                            <a class="boton boton--borde boton--chico" href="/Admin/Cartelera/Editar/@a.Id">Editar</a>
-                            <form method="post" action="/Admin/Cartelera/Borrar/@a.Id" style="display:inline"
-                                  data-confirmar="¿Borrar «@a.Titulo»? No se puede deshacer.">
-                                @Html.AntiForgeryToken()
-                                <button type="submit" class="boton boton--peligro boton--chico">Borrar</button>
-                            </form>
-                        </td>
-                    </tr>
+                    <p class="admin-muro-texto">@a.ImagenAlt</p>
                 }
-            </tbody>
-        </table>
+
+                <div class="admin-muro-acciones">
+                    <a class="boton boton--borde boton--chico" href="@urlEditar">Editar<span class="oculto-visual"> «@a.Titulo»</span></a>
+                    <form method="post" action="/Admin/Cartelera/Estado/@a.Id">
+                        @Html.AntiForgeryToken()
+                        @if (a.Estado == EstadoAfiche.Archivado)
+                        {
+                            <input type="hidden" name="estado" value="@((int)EstadoAfiche.Publicado)" />
+                            <button type="submit" class="boton boton--principal boton--chico">Volver a pegar<span class="oculto-visual"> «@a.Titulo»</span></button>
+                        }
+                        else
+                        {
+                            <input type="hidden" name="estado" value="@((int)EstadoAfiche.Archivado)" />
+                            <button type="submit" class="boton boton--borde boton--chico">Archivar<span class="oculto-visual"> «@a.Titulo»</span></button>
+                        }
+                    </form>
+                </div>
+            </li>
+        }
+    </ul>
+
+    <div class="admin-sin-resultados" data-sin-resultados hidden>
+        <p>Ningún afiche coincide con lo que buscás.</p>
+        <button type="button" class="boton-texto" data-limpiar>Mostrar todo</button>
     </div>
 }

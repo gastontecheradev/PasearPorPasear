@@ -2,13 +2,14 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class SobreController : ControladorPublico
 {
-    public SobreController(ApplicationDbContext ctx) : base(ctx) { }
+    public SobreController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
     public async Task<IActionResult> Index()
     {
@@ -27,7 +28,7 @@ public class SobreController : ControladorPublico
 
         if (fila is null) return NotFound();
 
-        var vm = await PrepararAsync(new SobreVm
+        var vm = Preparar(new SobreVm
         {
             Pagina = new PaginaSobre
             {

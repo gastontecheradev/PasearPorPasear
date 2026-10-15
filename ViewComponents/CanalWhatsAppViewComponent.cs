@@ -1,49 +1,24 @@
-using System.Globalization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using PasearPorPasear.Data;
-using PasearPorPasear.Models;
 using PasearPorPasear.Services;
 
 namespace PasearPorPasear.ViewComponents;
 
 /// <summary>
-/// Enlace al canal de WhatsApp del pie de página. Lee el mismo ajuste
-/// «CanalWhatsApp» que la página de Contacto, así la dirección se cambia
-/// en un solo lugar (/Admin/Paginas/Ajustes). Si el ajuste está vacío
-/// o no es una URL https, no se muestra nada.
+/// Enlace al canal de WhatsApp del pie de página. Lee el mismo texto
+/// «general.whatsapp» que la página de Contacto, así la dirección se cambia
+/// en un solo lugar (Menú, pie y enlaces). Si está vacío o no es una URL
+/// https, no se muestra nada.
 /// </summary>
 public class CanalWhatsAppViewComponent : ViewComponent
 {
-    private readonly ApplicationDbContext _ctx;
-    private readonly ILogger<CanalWhatsAppViewComponent> _logger;
+    private readonly ITextos _textos;
 
-    public CanalWhatsAppViewComponent(ApplicationDbContext ctx, ILogger<CanalWhatsAppViewComponent> logger)
+    public CanalWhatsAppViewComponent(ITextos textos) { _textos = textos; }
+
+    public IViewComponentResult Invoke()
     {
-        _ctx = ctx;
-        _logger = logger;
-    }
+        var url = _textos.Enlace("general.whatsapp");
 
-    public async Task<IViewComponentResult> InvokeAsync()
-    {
-        Ajuste? a;
-        try
-        {
-            a = await _ctx.Ajustes.AsNoTracking().FirstOrDefaultAsync(x => x.Clave == "CanalWhatsApp");
-        }
-        catch (Exception ex)
-        {
-            // El pie también se dibuja en la página de error: si la base no
-            // responde, se omite el enlace en vez de romper esa página.
-            _logger.LogWarning(ex, "No se pudo leer el ajuste CanalWhatsApp.");
-            return Content(string.Empty);
-        }
-        if (a is null) return Content(string.Empty);
-
-        var idioma = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-        var url = EnlaceHelper.SoloHttps(Traducir.Texto(idioma, a.Valor, a.ValorEn, a.ValorPt));
-
-        // View("Default", url): con View(url) un string se toma como nombre de vista, no como modelo.
-        return url is null ? Content(string.Empty) : View("Default", url);
+        return url is null ? Content(string.Empty) : View("Default", (url, _textos["general.pie-whatsapp"]));
     }
 }

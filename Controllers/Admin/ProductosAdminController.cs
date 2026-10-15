@@ -43,14 +43,17 @@ public class ProductosAdminController : ControladorAdmin
                 _ => "en preparación"
             },
             Estado = p.Visible ? "Visible" : "Oculto",
-            ClaseEstado = p.Visible ? "pastilla--activo" : "pastilla--espera"
+            ClaseEstado = p.Visible ? "pastilla--activo" : "pastilla--espera",
+            Filtro = p.Visible ? "visible" : "oculto"
         }).ToList();
 
         ViewData["Title"] = "Productos";
         return View("ListadoAdmin", new ListadoAdminVm
         {
+            Pagina = "productos",
             Titulo = "Productos",
-            Subtitulo = $"{vm.Count} producto(s).",
+            Subtitulo = vm.Count == 1 ? "1 producto en el catálogo." : $"{vm.Count} productos en el catálogo.",
+            Filtros = { new("visible", "Visibles"), new("oculto", "Ocultos") },
             UrlBase = "/Admin/Productos",
             UrlNueva = "/Admin/Productos/Nuevo",
             TextoNueva = "Producto nuevo",

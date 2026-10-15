@@ -2,19 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class ContactoController : ControladorPublico
 {
-    public ContactoController(ApplicationDbContext ctx) : base(ctx) { }
+    public ContactoController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
-    public async Task<IActionResult> Index()
+    public IActionResult Index()
     {
-        var vm = await PrepararAsync(new ContactoVm(), "contacto");
-        vm.CorreoContacto = await AjusteAsync("EmailContacto") ?? vm.CorreoContacto;
-        vm.CanalWhatsApp = await CanalWhatsAppAsync();
-        return View(vm);
+        ViewData["Title"] = Textos["contacto.titulo"];
+        return View(Preparar(new ContactoVm()));
     }
 }

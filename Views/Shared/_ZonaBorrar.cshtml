@@ -1,0 +1,12 @@
+@model PasearPorPasear.ViewModels.ZonaBorrarVm
+@*
+    Borrado desde la pantalla de edición. Va dentro del formulario de
+    edición y usa formaction: así reaprovecha su token antiforgery sin
+    anidar formularios. admin.js pide confirmación antes de enviar.
+*@
+<section class="admin-borrar">
+    <button type="submit" class="boton boton--peligro boton--chico"
+            formaction="@Model.Url" formnovalidate
+            data-confirmar="¿Borrar «@Model.Nombre»? No se puede deshacer.">@Model.Texto</button>
+    <p>@Model.Explicacion</p>
+</section>

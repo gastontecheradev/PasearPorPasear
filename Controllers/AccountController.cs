@@ -24,7 +24,7 @@ public class AccountController : Controller
     {
         var resultado = await _signIn.PasswordSignInAsync(email, password, isPersistent: true, lockoutOnFailure: false);
         if (resultado.Succeeded)
-            return LocalRedirect(returnUrl ?? "/Admin/Dashboard");
+            return LocalRedirect(returnUrl ?? "/Admin");
 
         // Mensaje genérico a propósito: no conviene decir si el correo existe.
         ViewBag.Error = "Credenciales incorrectas.";

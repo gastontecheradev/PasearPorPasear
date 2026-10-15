@@ -2,17 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class ProductosController : ControladorPublico
 {
-    public ProductosController(ApplicationDbContext ctx) : base(ctx) { }
+    public ProductosController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
     public async Task<IActionResult> Index()
     {
-        var vm = await PrepararAsync(new ProductosVm(), "productos");
+        var vm = Preparar(new ProductosVm());
 
         var filas = await Ctx.Productos.AsNoTracking()
             .Where(p => p.Visible)
@@ -49,15 +50,14 @@ public class ProductosController : ControladorPublico
 
         vm.Buzon = new BuzonVm
         {
-            Titulo = vm.T("Te avisamos cuando salgan", "We'll let you know when they're out", "Avisamos quando saírem"),
-            Texto = vm.T("Todavía estamos con las pruebas de impresión. Cuando estén listos, el aviso sale primero por el buzón de la Casita.",
-                         "We are still on the printing tests. When they are ready, the news goes out first through the Casita mailbox.",
-                         "Ainda estamos nos testes de impressão. Quando estiverem prontos, o aviso sai primeiro pela caixa de correio da Casita."),
-            EtiquetaBoton = vm.T("Avisame", "Notify me", "Avise-me"),
+            Titulo = Textos["productos.buzon-titulo"],
+            Texto = Textos["productos.buzon-texto"],
+            EtiquetaBoton = Textos["productos.buzon-boton"],
+            Enlace = Textos.Enlace("general.buzon-formulario") ?? "/Contacto#buzon",
             Clase = "recuadro"
         };
 
-        ViewData["Title"] = vm.TituloSeccion;
+        ViewData["Title"] = Textos["productos.titulo"];
         return View(vm);
     }
 }

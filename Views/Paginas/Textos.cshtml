@@ -1,0 +1,22 @@
+@model TextosPaginaVm
+@{
+    Layout = "_AdminLayout";
+    var cabecera = new CabeceraPaginaVm { Pagina = Model.Pagina, Activa = "textos" };
+    var barra = new BarraGuardarVm { TextoGuardar = "Guardar los textos" };
+}
+
+<partial name="_CabeceraPagina" model="cabecera" />
+
+<form method="post" action="@Model.Pagina.UrlTextos" data-editor>
+    @Html.AntiForgeryToken()
+
+    <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
+
+    <partial name="_SelectorIdioma" />
+
+    <div class="admin-textos">
+        <partial name="_CamposTextos" model="Model" />
+    </div>
+
+    <partial name="_BarraGuardar" model="barra" />
+</form>

@@ -13,12 +13,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
     public DbSet<Fachada> Fachadas => Set<Fachada>();
     public DbSet<Propuesta> Propuestas => Set<Propuesta>();
     public DbSet<PropuestaDato> PropuestaDatos => Set<PropuestaDato>();
-    public DbSet<ClubcitoEncuentro> ClubcitoEncuentros => Set<ClubcitoEncuentro>();
     public DbSet<CarteleraAfiche> CarteleraAfiches => Set<CarteleraAfiche>();
     public DbSet<Producto> Productos => Set<Producto>();
     public DbSet<PaginaSobre> PaginasSobre => Set<PaginaSobre>();
-    public DbSet<EncabezadoSeccion> EncabezadosSeccion => Set<EncabezadoSeccion>();
-    public DbSet<Ajuste> Ajustes => Set<Ajuste>();
+    public DbSet<TextoSitio> TextosSitio => Set<TextoSitio>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -54,15 +52,6 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             e.HasIndex(d => new { d.PropuestaId, d.Orden });
         });
 
-        // ── El Clubcito ──
-        builder.Entity<ClubcitoEncuentro>(e =>
-        {
-            e.HasIndex(c => c.Slug).IsUnique();
-            e.HasIndex(c => c.Fecha);
-            e.Property(c => c.Fecha).HasColumnType("datetime2");
-            e.Property(c => c.Estado).HasConversion<int>();
-        });
-
         // ── Cartelera ──
         builder.Entity<CarteleraAfiche>(e =>
         {
@@ -80,16 +69,10 @@ public class ApplicationDbContext : IdentityDbContext<IdentityUser>
             e.Property(p => p.ColorPanel).HasConversion<int>();
         });
 
-        // ── Encabezados de sección ──
-        builder.Entity<EncabezadoSeccion>(e =>
+        // ── Textos del sitio ──
+        builder.Entity<TextoSitio>(e =>
         {
-            e.HasIndex(s => s.Clave).IsUnique();
-        });
-
-        // ── Ajustes ──
-        builder.Entity<Ajuste>(e =>
-        {
-            e.HasIndex(a => a.Clave).IsUnique();
+            e.HasIndex(t => t.Clave).IsUnique();
         });
     }
 }

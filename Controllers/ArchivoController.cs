@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
@@ -10,7 +11,7 @@ public class ArchivoController : ControladorPublico
 {
     private const int PorPagina = 12;
 
-    public ArchivoController(ApplicationDbContext ctx) : base(ctx) { }
+    public ArchivoController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
     /// <summary>Proyección del listado. Nunca incluye ImagenDatos.</summary>
     private sealed record FilaFachada(
@@ -45,7 +46,7 @@ public class ArchivoController : ControladorPublico
     {
         if (pagina < 1) pagina = 1;
 
-        var vm = await PrepararAsync(new ArchivoVm { BarrioActivo = barrio, Pagina = pagina }, "archivo");
+        var vm = Preparar(new ArchivoVm { BarrioActivo = barrio, Pagina = pagina });
 
         var publicadas = Ctx.Fachadas.AsNoTracking().Where(f => f.Publicada);
 
@@ -69,7 +70,7 @@ public class ArchivoController : ControladorPublico
 
         vm.Fichas = filas.Select(f => AFicha(f, vm)).ToList();
 
-        ViewData["Title"] = vm.TituloSeccion;
+        ViewData["Title"] = Textos["archivo.titulo"];
         return View(vm);
     }
 
@@ -93,7 +94,7 @@ public class ArchivoController : ControladorPublico
 
         if (f is null) return NotFound();
 
-        var vm = await PrepararAsync(new FichaDetalleVm
+        var vm = Preparar(new FichaDetalleVm
         {
             ContenidoHtml = Traducir.Texto(Idioma, f.Contenido, f.ContenidoEn, f.ContenidoPt),
             AnioConstruccion = f.AnioConstruccion,

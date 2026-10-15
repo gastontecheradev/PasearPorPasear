@@ -5,32 +5,48 @@
     // Un afiche nuevo todavía no tiene URL: si el formulario volvió con un
     // error, la imagen elegida no se guardó y hay que elegirla de nuevo.
     var guardada = !esNuevo && Model.ImagenDatos is { Length: > 0 };
+
+    var barra = new BarraGuardarVm
+    {
+        TextoGuardar = esNuevo ? "Pegar el afiche" : "Guardar cambios",
+        UrlVolver = "/Admin/Cartelera",
+        TextoVolver = "Volver a la cartelera"
+    };
+    var borrar = new ZonaBorrarVm
+    {
+        Url = $"/Admin/Cartelera/Borrar/{Model.Id}",
+        Nombre = Model.Titulo,
+        Texto = "Borrar el afiche",
+        Explicacion = "Se borra con su imagen. No se puede deshacer; para sacarlo del muro alcanza con archivarlo."
+    };
 }
 
-<div class="admin-titulo">
+<header class="admin-titulo">
     <div>
+        <nav class="admin-miga" aria-label="Estás en">
+            <a href="/Admin/Cartelera">Cartelera de barrio</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@(esNuevo ? "Afiche nuevo" : Model.Titulo)</span>
+        </nav>
         <h1>@(esNuevo ? "Afiche nuevo" : Model.Titulo)</h1>
-        <p>El afiche se sube ya armado sobre la plantilla de la cartelera.</p>
+        <p>El afiche se sube ya armado sobre la plantilla de la cartelera. En el sitio se ve tal cual.</p>
     </div>
-    <div class="admin-acciones">
-        <a class="boton boton--borde" href="/Admin/Cartelera">Volver al listado</a>
-    </div>
-</div>
+</header>
 
-<form method="post" action="/Admin/Cartelera/Guardar" enctype="multipart/form-data">
+<form method="post" action="/Admin/Cartelera/Guardar" enctype="multipart/form-data" data-editor>
     @Html.AntiForgeryToken()
     <input type="hidden" name="Id" value="@Model.Id" />
 
     <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
 
     <div class="admin-form">
-        <div>
-            <div class="admin-panel">
+        <div class="admin-principal">
+            <section class="admin-seccion">
                 <h2>El afiche</h2>
-                <p>En la cartelera se ve la imagen tal cual la subas.</p>
+                <p>La imagen es el contenido: lo que se lee en la cartelera es lo que está dibujado en ella.</p>
 
-                <div class="admin-afiche">
-                    <div class="admin-afiche-vista">
+                <div class="admin-afiche" data-imagen>
+                    <div class="admin-afiche-vista" data-imagen-vista>
                         @if (guardada)
                         {
                             <img src="@Model.ImagenSrc" alt="" width="1080" height="1350" />
@@ -42,10 +58,11 @@
                     </div>
 
                     <div>
-                        <div class="campo">
-                            <label for="imagen">@(guardada ? "Reemplazar la imagen" : "Imagen del afiche")</label>
+                        <div class="campo campo-archivo">
+                            <label for="imagen">@(guardada ? "Cambiar por otra imagen" : "Imagen del afiche")</label>
                             <input id="imagen" name="imagen" type="file"
-                                   accept="image/jpeg,image/png,image/webp,image/gif" required="@(!guardada)" />
+                                   accept="image/jpeg,image/png,image/webp,image/gif" required="@(!guardada)" data-imagen-archivo />
+                            <p class="campo-error" data-imagen-error role="alert" hidden></p>
                             <p class="pista">
                                 La plantilla ya terminada, en vertical como la original (1080 × 1350).
                                 JPG, PNG, WEBP o GIF, hasta 6 MB.
@@ -55,12 +72,12 @@
                         <div class="campo">
                             <label for="Titulo">Nombre</label>
                             <input id="Titulo" name="Titulo" type="text" value="@Model.Titulo" required maxlength="120" />
-                            <p class="pista">Para reconocerlo en el listado. No se ve en el sitio.</p>
+                            <p class="pista">Para reconocerlo en el panel. No se ve en el sitio.</p>
                         </div>
 
                         <div class="campo">
                             <label for="ImagenAlt">Qué dice el afiche</label>
-                            <textarea id="ImagenAlt" name="ImagenAlt" maxlength="300" style="min-height:110px">@Model.ImagenAlt</textarea>
+                            <textarea id="ImagenAlt" name="ImagenAlt" maxlength="300" class="campo-medio">@Model.ImagenAlt</textarea>
                             <p class="pista">
                                 Lo leen quienes usan lector de pantalla: qué es, cuándo y dónde, en pocas palabras.
                                 Si lo dejás vacío, se usa el nombre.
@@ -68,21 +85,21 @@
                         </div>
                     </div>
                 </div>
-            </div>
+            </section>
         </div>
 
-        <div>
-            <div class="admin-panel admin-panel--lateral">
-                <h2>Publicación</h2>
+        <div class="admin-lado">
+            <section class="admin-panel">
+                <h2>En el muro</h2>
                 <p>Se ve en el sitio si está pegado y no venció.</p>
 
-                <div class="campo">
-                    <label for="Estado">Estado</label>
-                    <select id="Estado" name="Estado">
-                        <option value="@((int)EstadoAfiche.Publicado)" selected="@(Model.Estado == EstadoAfiche.Publicado)">Pegado en la cartelera</option>
-                        <option value="@((int)EstadoAfiche.Archivado)" selected="@(Model.Estado == EstadoAfiche.Archivado)">Archivado</option>
-                    </select>
-                </div>
+                <fieldset class="conmutador">
+                    <legend>¿Dónde está?</legend>
+                    <div class="conmutador-opciones">
+                        <label><input type="radio" name="Estado" value="@((int)EstadoAfiche.Archivado)" checked="@(Model.Estado == EstadoAfiche.Archivado)" /> Archivado</label>
+                        <label><input type="radio" name="Estado" value="@((int)EstadoAfiche.Publicado)" checked="@(Model.Estado == EstadoAfiche.Publicado)" /> Pegado</label>
+                    </div>
+                </fieldset>
 
                 <div class="campo">
                     <label for="VigenteHasta">Vigente hasta</label>
@@ -96,11 +113,14 @@
                     <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
                     <p class="pista">Más chico, más arriba en el muro. Con el mismo número, el más nuevo primero.</p>
                 </div>
+            </section>
 
-                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
-                    @(esNuevo ? "Pegar el afiche" : "Guardar cambios")
-                </button>
-            </div>
+            @if (!esNuevo)
+            {
+                <partial name="_ZonaBorrar" model="borrar" />
+            }
         </div>
     </div>
+
+    <partial name="_BarraGuardar" model="barra" />
 </form>

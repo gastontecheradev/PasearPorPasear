@@ -1,17 +1,13 @@
 @model PaseosVm
-@{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
-}
 
 <section class="encabezado banda--crema">
     <div class="contenedor">
         <img class="adorno" src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
-        <h1 class="titulo-seccion">@Model.TituloSeccion</h1>
-        @if (!string.IsNullOrEmpty(Model.BajadaSeccion))
+        <h1 class="titulo-seccion">@Textos["paseos.titulo"]</h1>
+        @if (Textos["paseos.bajada"] is { Length: > 0 } bajada)
         {
-            <p class="bajada">@Model.BajadaSeccion</p>
+            <p class="bajada">@bajada</p>
         }
     </div>
 </section>
@@ -40,7 +36,7 @@
 
                         @if (p.PendienteDeDefinir)
                         {
-                            <span class="pendiente">@(esPortugues ? "Falta definir o conteúdo" : esIngles ? "Content still to be defined" : "Falta definir el contenido")</span>
+                            <span class="pendiente">@Textos["paseos.falta-definir"]</span>
                         }
                         else
                         {

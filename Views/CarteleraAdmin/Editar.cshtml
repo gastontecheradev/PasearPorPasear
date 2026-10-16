@@ -102,21 +102,6 @@
                 </fieldset>
 
                 <div class="campo">
-                    <label for="Categoria">Categoría</label>
-                    <select id="Categoria" name="Categoria" required>
-                        @if (!Enum.IsDefined(Model.Categoria))
-                        {
-                            <option value="" selected>Elegí una</option>
-                        }
-                        @foreach (var c in CategoriasAfiche.Todas)
-                        {
-                            <option value="@((int)c.Categoria)" selected="@(Model.Categoria == c.Categoria)">@c.NombrePanel</option>
-                        }
-                    </select>
-                    <p class="pista">En el muro se puede filtrar por categoría.</p>
-                </div>
-
-                <div class="campo">
                     <label for="VigenteHasta">Vigente hasta</label>
                     <input id="VigenteHasta" name="VigenteHasta" type="date"
                            value="@(Model.VigenteHasta?.ToString("yyyy-MM-dd"))" />

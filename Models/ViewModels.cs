@@ -96,35 +96,6 @@ public class SobreVm : VistaBase
 public class CarteleraVm : VistaBase
 {
     public List<AficheVm> Afiches { get; set; } = new();
-
-    /// <summary>Null = «Todos».</summary>
-    public CategoriaAfiche? CategoriaActiva { get; set; }
-
-    /// <summary>Hay algo pegado, en cualquier categoría. Sin nada, se ve la plantilla vacía.</summary>
-    public bool HayAfiches { get; set; }
-}
-
-/// <summary>
-/// Las categorías de la cartelera en el orden en que se muestran, con la
-/// palabra que va en la dirección (/Cartelera?categoria=comercios), la clave
-/// de su texto en el sitio y el nombre que se ve en el panel.
-/// </summary>
-public static class CategoriasAfiche
-{
-    public sealed record Def(CategoriaAfiche Categoria, string Slug, string ClaveTexto, string NombrePanel);
-
-    public static readonly IReadOnlyList<Def> Todas = new[]
-    {
-        new Def(CategoriaAfiche.PedidosDeAyuda, "pedidos-de-ayuda", "cartelera.categoria-ayuda", "Pedidos de ayuda"),
-        new Def(CategoriaAfiche.Actividades, "actividades", "cartelera.categoria-actividades", "Actividades"),
-        new Def(CategoriaAfiche.Comercios, "comercios", "cartelera.categoria-comercios", "Comercios"),
-        new Def(CategoriaAfiche.Emprendimientos, "emprendimientos", "cartelera.categoria-emprendimientos", "Emprendimientos")
-    };
-
-    public static Def? PorSlug(string? slug) =>
-        Todas.FirstOrDefault(d => string.Equals(d.Slug, slug, StringComparison.OrdinalIgnoreCase));
-
-    public static Def? De(CategoriaAfiche categoria) => Todas.FirstOrDefault(d => d.Categoria == categoria);
 }
 
 /// <summary>
@@ -140,7 +111,6 @@ public class AficheVm
     public DateTime Sello { get; set; }
     public DateTime? VigenteHasta { get; set; }
     public EstadoAfiche Estado { get; set; }
-    public CategoriaAfiche Categoria { get; set; }
 
     public string? ImagenSrc => Imagen.Src("Afiche", Id, TieneImagen, null, Sello);
 
@@ -174,7 +144,7 @@ public class PropuestaVm
     public bool PendienteDeDefinir { get; set; }
     public List<DatoVm> Datos { get; set; } = new();
 
-    /// <summary>El Clubcito y Al sobre llevan a sus formularios de MailerLite; el resto, a contacto.</summary>
+    /// <summary>El Clubcito lleva al formulario de novedades; el resto, a contacto.</summary>
     public string? Enlace { get; set; }
     public string? TextoEnlace { get; set; }
 }

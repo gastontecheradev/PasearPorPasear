@@ -61,6 +61,7 @@ public abstract class ControladorPublico : Controller
                TieneImagen = true,
                Sello = a.ActualizadoEn ?? a.CreadoEn,
                VigenteHasta = a.VigenteHasta,
-               Estado = a.Estado
+               Estado = a.Estado,
+               Categoria = a.Categoria
            });
 }

@@ -35,7 +35,8 @@ public class CarteleraAdminController : ControladorAdmin
                 TieneImagen = a.ImagenDatos != null,
                 Sello = a.ActualizadoEn ?? a.CreadoEn,
                 VigenteHasta = a.VigenteHasta,
-                Estado = a.Estado
+                Estado = a.Estado,
+                Categoria = a.Categoria
             })
             .ToListAsync();
 
@@ -64,7 +65,8 @@ public class CarteleraAdminController : ControladorAdmin
     [RequestSizeLimit(8 * 1024 * 1024)]
     public async Task<IActionResult> Guardar(
         [Bind(nameof(CarteleraAfiche.Id), nameof(CarteleraAfiche.Titulo), nameof(CarteleraAfiche.ImagenAlt),
-              nameof(CarteleraAfiche.VigenteHasta), nameof(CarteleraAfiche.Estado), nameof(CarteleraAfiche.Orden))]
+              nameof(CarteleraAfiche.VigenteHasta), nameof(CarteleraAfiche.Estado), nameof(CarteleraAfiche.Categoria),
+              nameof(CarteleraAfiche.Orden))]
         CarteleraAfiche entrada,
         IFormFile? imagen)
     {
@@ -76,6 +78,7 @@ public class CarteleraAdminController : ControladorAdmin
         a.ImagenAlt = entrada.ImagenAlt?.Trim();
         a.VigenteHasta = entrada.VigenteHasta;
         a.Estado = Enum.IsDefined(entrada.Estado) ? entrada.Estado : EstadoAfiche.Publicado;
+        a.Categoria = entrada.Categoria;
         a.Orden = entrada.Orden;
 
         ViewData["Title"] = esNuevo ? "Afiche nuevo" : a.Titulo;
@@ -83,6 +86,11 @@ public class CarteleraAdminController : ControladorAdmin
         // La imagen no se puede quitar, sólo reemplazar: es el afiche.
         if (!await AplicarImagenAsync(a, imagen, borrarImagen: false))
             return View("Editar", a);
+
+        // «Elegí una» llega vacía: en lugar del error genérico del enlazado, uno que diga qué hacer.
+        ModelState.Remove(nameof(CarteleraAfiche.Categoria));
+        if (!Enum.IsDefined(a.Categoria))
+            ModelState.AddModelError(nameof(CarteleraAfiche.Categoria), "Elegí una categoría: es la que usa el muro para filtrar.");
 
         if (a.ImagenDatos is not { Length: > 0 })
             ModelState.AddModelError("imagen", "Falta la imagen del afiche. Subí la plantilla ya terminada.");

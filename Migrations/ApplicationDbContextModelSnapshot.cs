@@ -235,6 +235,9 @@ namespace PasearPorPasear.Migrations
                     b.Property<DateTime?>("ActualizadoEn")
                         .HasColumnType("datetime2");
 
+                    b.Property<int>("Categoria")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("datetime2");
 

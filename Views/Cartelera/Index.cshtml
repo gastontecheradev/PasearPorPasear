@@ -1,13 +1,12 @@
 @model CarteleraVm
 @{
     var correo = Textos["general.correo"];
-    var asunto = Uri.EscapeDataString("cartelera de barrio");
-    var mailto = $"mailto:{correo}?subject={asunto}";
+    string Enlace(string? categoria) => Url.Action("Index", "Cartelera", new { categoria })!;
 }
 
 <section class="encabezado banda--crema">
     <div class="contenedor">
-        <img class="adorno" src="~/img/marca/ventana-2.webp" alt="" width="300" height="379" />
+        <img class="adorno" src="~/img/marca/gorrion.webp" alt="" width="380" height="307" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Textos["cartelera.titulo"]</h1>
         @if (Textos["cartelera.bajada"] is { Length: > 0 } bajada)
@@ -34,28 +33,39 @@
                 <p>@Textos["cartelera.paso3-texto"]</p>
             </li>
         </ol>
-        <div class="acciones">
-            <a class="boton boton--principal" href="@mailto">@Textos["cartelera.boton-mandar"]</a>
-        </div>
     </div>
 </section>
 
 <section class="banda banda--crema2">
     <div class="contenedor">
-        <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Textos["cartelera.muro-titulo"]</h2>
-        @if (Model.Afiches.Count == 0)
+        @if (Model.HayAfiches)
+        {
+            <nav class="filtros" aria-label="@Model.T("Filtrar por categoría", "Filter by category", "Filtrar por categoria")">
+                <a class="filtro" href="@Enlace(null)" aria-current="@(Model.CategoriaActiva is null ? "page" : null)">@Textos["cartelera.filtro-todos"]</a>
+                @foreach (var c in CategoriasAfiche.Todas)
+                {
+                    <a class="filtro" href="@Enlace(c.Slug)" aria-current="@(Model.CategoriaActiva == c.Categoria ? "page" : null)">@Textos[c.ClaveTexto]</a>
+                }
+            </nav>
+        }
+
+        @if (!Model.HayAfiches)
         {
             @* Sin afiches queda pegada la plantilla vacía, que ya dice cómo mandar uno. *@
-            <div class="muro muro--vacio" style="margin-top:38px">
+            <div class="muro muro--vacio">
                 <div class="afiche">
                     <img src="~/img/cartelera/cartelera-vacia.png" width="1080" height="1350"
                          alt="@Textos["cartelera.vacia"].Replace("{correo}", correo)" />
                 </div>
             </div>
         }
+        else if (Model.Afiches.Count == 0)
+        {
+            <p class="bajada">@Textos["cartelera.vacia-categoria"]</p>
+        }
         else
         {
-            <div class="muro" style="margin-top:38px">
+            <div class="muro">
                 @foreach (var a in Model.Afiches)
                 {
                     <partial name="_Afiche" model="a" />

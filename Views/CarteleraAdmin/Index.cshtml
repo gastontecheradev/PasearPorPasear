@@ -79,6 +79,7 @@ else
                     {
                         <span class="pastilla pastilla--activo">Pegado</span>
                     }
+                    <span>@(CategoriasAfiche.De(a.Categoria)?.NombrePanel ?? "Sin categoría")</span>
                     <span>
                         @if (a.VigenteHasta is null)
                         {

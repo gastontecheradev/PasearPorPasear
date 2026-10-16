@@ -185,6 +185,12 @@ public enum ColorAfiche { Crema, Mostaza, Petroleo, Coral, Durazno, Rayas }
 public enum EstadoAfiche { Publicado = 1, Archivado = 2 }
 
 /// <summary>
+/// De qué se trata el afiche: con esto se filtra el muro. Se guarda como
+/// entero y el 0 queda libre para «sin categoría» (los afiches anteriores).
+/// </summary>
+public enum CategoriaAfiche { PedidosDeAyuda = 1, Actividades = 2, Comercios = 3, Emprendimientos = 4 }
+
+/// <summary>
 /// Rosalía arma cada afiche aparte, sobre la plantilla de la cartelera, y lo
 /// sube ya terminado como imagen: todo lo que dice el afiche va dentro de la
 /// imagen. Por eso acá sólo queda un nombre para reconocerlo en el panel y el
@@ -203,6 +209,9 @@ public class CarteleraAfiche : ITieneImagen
     public DateTime? VigenteHasta { get; set; }
 
     public EstadoAfiche Estado { get; set; } = EstadoAfiche.Publicado;
+
+    /// <summary>0 = sin categoría: sólo aparece en «Todos» hasta que se le elija una.</summary>
+    public CategoriaAfiche Categoria { get; set; }
 
     /// <summary>El afiche en sí. Obligatoria: un afiche sin imagen no se puede mostrar.</summary>
     public byte[]? ImagenDatos { get; set; }

@@ -47,17 +47,19 @@ public class PaseosController : ControladorPublico
                 Valor = vm.T(d.Valor, d.ValorEn, d.ValorPt),
                 Etiqueta = vm.T(d.Etiqueta, d.EtiquetaEn, d.EtiquetaPt)
             }).ToList(),
-            // El Clubcito y Al sobre llevan a sus formularios de MailerLite; el resto, a la página de contacto.
+            // El Clubcito, Al sobre y Recorridos creativos llevan a formularios de MailerLite; el resto, a la página de contacto.
             Enlace = p.Clave switch
             {
                 ClavePropuesta.Clubcito => Textos.Enlace("paseos.enlace-clubcito") ?? "/Contacto",
                 ClavePropuesta.AlSobre => Textos.Enlace("paseos.enlace-alsobre") ?? "/Contacto",
+                ClavePropuesta.RecorridosCreativos => Textos.Enlace("paseos.enlace-creativos") ?? "/Contacto",
                 _ => "/Contacto"
             },
             TextoEnlace = p.Clave switch
             {
                 ClavePropuesta.Clubcito => Textos["paseos.boton-clubcito"],
                 ClavePropuesta.AlSobre => Textos["paseos.boton-alsobre"],
+                ClavePropuesta.RecorridosCreativos => Textos["paseos.boton-creativos"],
                 _ => Textos["paseos.boton-consultar"]
             }
         }).ToList();

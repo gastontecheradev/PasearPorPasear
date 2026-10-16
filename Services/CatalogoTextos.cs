@@ -147,10 +147,15 @@ public static class CatalogoTextos
             "https://preview.mailerlite.io/forms/2403548/194248063120835606/share",
             Pista: "El formulario de novedades del Clubcito en MailerLite."),
         new DefTexto("paseos.boton-alsobre", "Tarjetas", "Botón de Al sobre", TipoTexto.Linea,
-            "Recibir el sobre", "Get the envelope", "Receber o envelope"),
+            "Recibir información", "Get information", "Receber informações"),
         new DefTexto("paseos.enlace-alsobre", "Tarjetas", "A dónde lleva el botón de Al sobre", TipoTexto.Enlace,
             "https://preview.mailerlite.io/forms/2403548/194239708958557318/share",
             Pista: "El formulario de Al sobre en MailerLite."),
+        new DefTexto("paseos.boton-creativos", "Tarjetas", "Botón de Recorridos creativos", TipoTexto.Linea,
+            "Recibir información", "Get information", "Receber informações"),
+        new DefTexto("paseos.enlace-creativos", "Tarjetas", "A dónde lleva el botón de Recorridos creativos", TipoTexto.Enlace,
+            "https://preview.mailerlite.io/forms/2403548/194239708958557318/share",
+            Pista: "El formulario de Recorridos creativos en MailerLite."),
 
         // ── #ArchivoDeFachadas ────────────────────────────────
         new DefTexto("archivo.titulo", "Encabezado", "Título", TipoTexto.Dato, "#ArchivoDeFachadas",

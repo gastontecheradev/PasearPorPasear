@@ -174,7 +174,7 @@ public class PropuestaVm
     public bool PendienteDeDefinir { get; set; }
     public List<DatoVm> Datos { get; set; } = new();
 
-    /// <summary>El Clubcito y Al sobre llevan a sus formularios de MailerLite; el resto, a contacto.</summary>
+    /// <summary>El Clubcito, Al sobre y Recorridos creativos llevan a formularios de MailerLite; el resto, a contacto.</summary>
     public string? Enlace { get; set; }
     public string? TextoEnlace { get; set; }
 }

@@ -23,23 +23,19 @@ public static class Imagen
         tieneImagen ? $"/Imagenes/{tipo}/{id}?v={sello.Ticks}" : url;
 }
 
-/// <summary>Base de todas las vistas: resuelve el idioma y el encabezado de sección.</summary>
+/// <summary>
+/// Base de todas las vistas públicas: resuelve el idioma de las entradas.
+/// Los textos fijos de cada página salen de @Textos (Services/Textos.cs).
+/// </summary>
 public abstract class VistaBase
 {
     public string Idioma { get; set; } = "es";
-    public EncabezadoSeccion? Encabezado { get; set; }
 
     public string T(string es, string? en, string? pt) => Traducir.Texto(Idioma, es, en, pt);
     public string? TO(string? es, string? en, string? pt) => Traducir.Opcional(Idioma, es, en, pt);
-
-    public string TituloSeccion =>
-        Encabezado is null ? string.Empty : T(Encabezado.Titulo, Encabezado.TituloEn, Encabezado.TituloPt);
-
-    public string? BajadaSeccion =>
-        Encabezado is null ? null : TO(Encabezado.Bajada, Encabezado.BajadaEn, Encabezado.BajadaPt);
 }
 
-// ── Tarjeta genérica: sirve para fachadas y para encuentros ──
+// ── Tarjeta genérica de fachada ──
 public class TarjetaVm
 {
     public string Titulo { get; set; } = string.Empty;
@@ -52,17 +48,18 @@ public class TarjetaVm
     public string? PieDerecha { get; set; }
 }
 
-// ── Bloque de suscripción al buzón, reutilizable ──
+// ── Bloque de suscripción al buzón (formulario de MailerLite), reutilizable ──
 public class BuzonVm
 {
     public string Titulo { get; set; } = string.Empty;
     public string Texto { get; set; } = string.Empty;
     public string EtiquetaBoton { get; set; } = string.Empty;
     public string? Nota { get; set; }
-    /// <summary>Desde qué formulario llegó: portada, clubcito, productos, contacto.</summary>
-    public string Origen { get; set; } = "portada";
-    /// <summary>A dónde vuelve después de suscribirse.</summary>
-    public string VolverA { get; set; } = "/";
+    /// <summary>
+    /// A dónde lleva el botón. Por defecto, al formulario de la newsletter en MailerLite;
+    /// una ruta interna (p. ej. «/Contacto#buzon») abre en la misma pestaña.
+    /// </summary>
+    public string Enlace { get; set; } = "https://preview.mailerlite.io/forms/2403548/193692652342872057/share";
     /// <summary>Clase extra del recuadro, para adaptarlo a la banda donde va.</summary>
     public string? Clase { get; set; }
 
@@ -76,27 +73,11 @@ public class BuzonVm
 // ── Portada ──
 public class InicioVm : VistaBase
 {
-    public EncabezadoSeccion? Definicion { get; set; }
     public List<TarjetaVm> TiraArchivo { get; set; } = new();
-    public List<CarteleraAfiche> Afiches { get; set; } = new();
+    public List<AficheVm> Afiches { get; set; } = new();
     public PaginaSobre? Sobre { get; set; }
     public string? SobreImagenSrc { get; set; }
     public BuzonVm Buzon { get; set; } = new();
-
-    /// <summary>
-    /// La intro de «¿Por dónde querés empezar?» y las cuatro tarjetas,
-    /// buscadas por Clave (pilares, pilar-clubcito, pilar-archivo,
-    /// pilar-productos, pilar-cartelera). Se editan desde
-    /// /Admin/Paginas/Encabezados igual que el resto de la portada.
-    /// </summary>
-    public Dictionary<string, EncabezadoSeccion> Pilares { get; set; } = new();
-
-    /// <summary>El fallback sólo entra en juego si el seed todavía no corrió.</summary>
-    public string TituloPilar(string clave, string fallback) =>
-        Pilares.TryGetValue(clave, out var e) ? T(e.Titulo, e.TituloEn, e.TituloPt) : fallback;
-
-    public string BajadaPilar(string clave, string fallback) =>
-        Pilares.TryGetValue(clave, out var e) ? (TO(e.Bajada, e.BajadaEn, e.BajadaPt) ?? fallback) : fallback;
 }
 
 // ── Sobre PPP ──
@@ -104,29 +85,46 @@ public class SobreVm : VistaBase
 {
     public PaginaSobre Pagina { get; set; } = new();
     public string? ImagenSrc { get; set; }
+    public string? ProyectoImagenSrc { get; set; }
 
     public string Titulo => T(Pagina.Titulo, Pagina.TituloEn, Pagina.TituloPt);
     public string Contenido => T(Pagina.Contenido, Pagina.ContenidoEn, Pagina.ContenidoPt);
+    public string ContenidoAutora => T(Pagina.ContenidoAutora, Pagina.ContenidoAutoraEn, Pagina.ContenidoAutoraPt);
 }
 
 // ── Cartelera de barrio ──
 public class CarteleraVm : VistaBase
 {
-    public List<CarteleraAfiche> Afiches { get; set; } = new();
-    public string CorreoCartelera { get; set; } = "pasearporpasear@gmail.com";
+    public List<AficheVm> Afiches { get; set; } = new();
+}
+
+/// <summary>
+/// Un afiche sin los bytes de la imagen: la imagen la sirve
+/// ImagenesController por su URL. Lo usan el muro y el listado del panel.
+/// </summary>
+public class AficheVm
+{
+    public int Id { get; set; }
+    public string Titulo { get; set; } = string.Empty;
+    public string? ImagenAlt { get; set; }
+    public bool TieneImagen { get; set; }
+    public DateTime Sello { get; set; }
+    public DateTime? VigenteHasta { get; set; }
+    public EstadoAfiche Estado { get; set; }
+
+    public string? ImagenSrc => Imagen.Src("Afiche", Id, TieneImagen, null, Sello);
+
+    /// <summary>El texto alternativo, o el nombre si no lo completaron.</summary>
+    public string Alt => string.IsNullOrWhiteSpace(ImagenAlt) ? Titulo : ImagenAlt;
+
+    public bool EstaVencido => VigenteHasta.HasValue && VigenteHasta.Value.Date < DateTime.Today;
 }
 
 // ── Contacto ──
-public class ContactoVm : VistaBase
-{
-    public MensajeContacto Mensaje { get; set; } = new();
-    public BuzonVm Buzon { get; set; } = new();
-    public string CorreoContacto { get; set; } = "pasearporpasear@gmail.com";
-    public string? CanalWhatsApp { get; set; }
-}
+public class ContactoVm : VistaBase { }
 
 // ══════════════════════════════════════════════════════════════
-//  ¿Paseás conmigo?
+//  ¿Paseamos?
 // ══════════════════════════════════════════════════════════════
 public class DatoVm
 {
@@ -146,7 +144,7 @@ public class PropuestaVm
     public bool PendienteDeDefinir { get; set; }
     public List<DatoVm> Datos { get; set; } = new();
 
-    /// <summary>El Clubcito tiene página propia; el resto lleva al formulario.</summary>
+    /// <summary>El Clubcito lleva al formulario de novedades; el resto, a contacto.</summary>
     public string? Enlace { get; set; }
     public string? TextoEnlace { get; set; }
 }
@@ -154,41 +152,6 @@ public class PropuestaVm
 public class PaseosVm : VistaBase
 {
     public List<PropuestaVm> Propuestas { get; set; } = new();
-    public ConsultaPaseo Consulta { get; set; } = new();
-}
-
-// ══════════════════════════════════════════════════════════════
-//  El Clubcito
-// ══════════════════════════════════════════════════════════════
-public class EncuentroVm
-{
-    public string Titulo { get; set; } = string.Empty;
-    public string Url { get; set; } = "#";
-    public DateTime Fecha { get; set; }
-    public string? Barrio { get; set; }
-    public string? PuntoEncuentro { get; set; }
-    public string? Extracto { get; set; }
-    public string? ImagenSrc { get; set; }
-    public string? ImagenAlt { get; set; }
-    public int? Asistentes { get; set; }
-    public EstadoEncuentro Estado { get; set; }
-
-    public string Dia => Fecha.Day.ToString("00");
-    public string MesCorto => Fecha.ToString("MMM").TrimEnd('.').ToLowerInvariant();
-}
-
-public class ClubcitoVm : VistaBase
-{
-    public List<EncuentroVm> Proximos { get; set; } = new();
-    public List<EncuentroVm> Anteriores { get; set; } = new();
-    public BuzonVm Buzon { get; set; } = new();
-}
-
-public class EncuentroDetalleVm : VistaBase
-{
-    public EncuentroVm Encuentro { get; set; } = new();
-    public string ContenidoHtml { get; set; } = string.Empty;
-    public string? MapaEmbedUrl { get; set; }
 }
 
 // ══════════════════════════════════════════════════════════════
@@ -216,9 +179,6 @@ public class ArchivoVm : VistaBase
     public string? BarrioActivo { get; set; }
     public int Pagina { get; set; } = 1;
     public int TotalPaginas { get; set; } = 1;
-    public int TotalFachadas { get; set; }
-    public int TotalBarrios { get; set; }
-    public int? DesdeAnio { get; set; }
 
     /// <summary>Números de página a mostrar: primera, vecinas y última.</summary>
     public IEnumerable<int> PaginasVisibles
@@ -282,7 +242,28 @@ public class CamposIdiomaVm
     public string? Pt { get; set; }
     /// <summary>true para textarea, false para input de una línea.</summary>
     public bool Largo { get; set; }
+    /// <summary>Alto del textarea: «campo-largo» para textos largos, «campo-medio» para un párrafo.</summary>
+    public string ClaseLargo { get; set; } = "campo-largo";
     public string? Pista { get; set; }
+    public int? Maximo { get; set; }
+
+    /// <summary>
+    /// Prefijo del id HTML. Hace falta cuando una misma página repite el
+    /// campo (los títulos de sección): si no, los label apuntan al primero.
+    /// </summary>
+    public string? IdBase { get; set; }
+    public string Id => IdBase ?? Nombre;
+
+    /// <summary>Nombres de las traducciones cuando no siguen la convención Nombre+En/Pt.</summary>
+    public string? NombreEn { get; set; }
+    public string? NombrePt { get; set; }
+
+    public string NombreDe(string sufijo) => sufijo switch
+    {
+        "En" => NombreEn ?? Nombre + "En",
+        "Pt" => NombrePt ?? Nombre + "Pt",
+        _ => Nombre
+    };
 }
 
 /// <summary>Estado de la imagen de una entidad, para el parcial _CampoImagen.</summary>
@@ -292,6 +273,32 @@ public class CampoImagenVm
     public string? Alt { get; set; }
     /// <summary>true si la subió Rosalía; false si es la imagen estática del seed.</summary>
     public bool EsCargada { get; set; }
+
+    /// <summary>Para cuando una pantalla tiene más de una imagen.</summary>
+    public string Titulo { get; set; } = "Imagen";
+    public string CampoArchivo { get; set; } = "imagen";
+    public string CampoAlt { get; set; } = "ImagenAlt";
+    public string CampoBorrar { get; set; } = "borrarImagen";
+}
+
+/// <summary>Barra fija de guardar, al pie de los formularios del panel.</summary>
+public class BarraGuardarVm
+{
+    /// <summary>Lo que hace el botón, con el mismo nombre que el aviso posterior: «Crear la ficha».</summary>
+    public string TextoGuardar { get; set; } = "Guardar cambios";
+    public string? UrlVolver { get; set; }
+    public string TextoVolver { get; set; } = "Volver al listado";
+    public string EstadoInicial { get; set; } = "Sin cambios.";
+}
+
+/// <summary>Botón de borrar de la pantalla de edición, para el parcial _ZonaBorrar.</summary>
+public class ZonaBorrarVm
+{
+    public string Url { get; set; } = string.Empty;
+    /// <summary>Lo que se nombra en la confirmación.</summary>
+    public string Nombre { get; set; } = string.Empty;
+    public string Texto { get; set; } = "Borrar";
+    public string Explicacion { get; set; } = "No se puede deshacer.";
 }
 
 /// <summary>Fila del listado del panel. Sirve para cualquier entidad con imagen.</summary>
@@ -305,24 +312,69 @@ public class FilaAdminVm
     public string? Columna3 { get; set; }
     public string? Estado { get; set; }
     public string? ClaseEstado { get; set; }
+    /// <summary>Clave del filtro al que pertenece la fila («borrador», «proximo»…).</summary>
+    public string? Filtro { get; set; }
 }
 
+/// <summary>Un botón de filtro del listado: la clave coincide con FilaAdminVm.Filtro.</summary>
+public record FiltroAdminVm(string Clave, string Texto);
+
 /// <summary>
-/// Listado genérico del panel. Fachadas, encuentros y productos comparten
-/// la misma pantalla: cambia el texto y las rutas, no la estructura.
+/// Listado genérico del panel. Fachadas, productos y propuestas
+/// comparten la misma pantalla: cambia el texto y las rutas, no la estructura.
 /// </summary>
 public class ListadoAdminVm
 {
     public string Titulo { get; set; } = string.Empty;
     public string? Subtitulo { get; set; }
-    /// <summary>Base de las rutas: «/Admin/Fachadas». De ahí salen Editar y Borrar.</summary>
+    /// <summary>Base de las rutas: «/Admin/Fachadas». De ahí sale Editar.</summary>
     public string UrlBase { get; set; } = string.Empty;
-    public string UrlNueva { get; set; } = string.Empty;
+    /// <summary>Null cuando no se pueden crear (las propuestas son fijas).</summary>
+    public string? UrlNueva { get; set; }
     public string TextoNueva { get; set; } = string.Empty;
+    /// <summary>Página del sitio a la que pertenece el listado (CatalogoTextos.Paginas).</summary>
+    public string Pagina { get; set; } = string.Empty;
+    public List<FiltroAdminVm> Filtros { get; set; } = new();
     public string Buscador { get; set; } = "Buscar…";
     public string Vacio { get; set; } = "Todavía no hay nada.";
     public string EncabezadoPrincipal { get; set; } = "Nombre";
     public string? Encabezado2 { get; set; }
     public string? Encabezado3 { get; set; }
     public List<FilaAdminVm> Filas { get; set; } = new();
+}
+
+/// <summary>
+/// Los textos editables de una página del sitio, agrupados como se ven en
+/// ella. Cada campo lleva su índice: el formulario los manda como arreglos
+/// alineados (clave[i], es[i], en[i], pt[i]).
+/// </summary>
+public class TextosPaginaVm
+{
+    public PasearPorPasear.Services.PaginaPanel Pagina { get; set; } = null!;
+    public List<GrupoTextosVm> Grupos { get; set; } = new();
+}
+
+public class GrupoTextosVm
+{
+    public string Nombre { get; set; } = string.Empty;
+    public List<CampoTextoVm> Campos { get; set; } = new();
+}
+
+public class CampoTextoVm
+{
+    public int Indice { get; set; }
+    public PasearPorPasear.Services.DefTexto Def { get; set; } = null!;
+    public string? Es { get; set; }
+    public string? En { get; set; }
+    public string? Pt { get; set; }
+}
+
+/// <summary>Cabecera de una página en el panel, con sus pestañas.</summary>
+public class CabeceraPaginaVm
+{
+    public PasearPorPasear.Services.PaginaPanel Pagina { get; set; } = null!;
+    /// <summary>«listado» o «textos».</summary>
+    public string Activa { get; set; } = "textos";
+    /// <summary>Cuántas entradas tiene el listado, para la pestaña.</summary>
+    public int? Cuenta { get; set; }
 }

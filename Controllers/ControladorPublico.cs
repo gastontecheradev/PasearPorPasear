@@ -2,20 +2,26 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 using System.Globalization;
 
 namespace PasearPorPasear.Controllers;
 
 /// <summary>
-/// Base de los controladores públicos: resuelve el idioma y carga el
-/// encabezado editable de cada sección.
+/// Base de los controladores públicos: resuelve el idioma y da acceso a los
+/// textos editables del sitio (las vistas los leen directo con @Textos).
 /// </summary>
 public abstract class ControladorPublico : Controller
 {
     protected readonly ApplicationDbContext Ctx;
+    protected readonly ITextos Textos;
 
-    protected ControladorPublico(ApplicationDbContext ctx) { Ctx = ctx; }
+    protected ControladorPublico(ApplicationDbContext ctx, ITextos textos)
+    {
+        Ctx = ctx;
+        Textos = textos;
+    }
 
     /// <summary>
     /// El middleware de localización ya dejó puesta la cultura actual;
@@ -28,32 +34,33 @@ public abstract class ControladorPublico : Controller
         _    => "es"
     };
 
-    /// <summary>Completa idioma y encabezado de sección en cualquier vista.</summary>
-    protected async Task<T> PrepararAsync<T>(T vm, string? claveEncabezado = null) where T : VistaBase
+    /// <summary>Completa el idioma en cualquier vista.</summary>
+    protected T Preparar<T>(T vm) where T : VistaBase
     {
         vm.Idioma = Idioma;
-        if (claveEncabezado is not null)
-            vm.Encabezado = await Ctx.EncabezadosSeccion
-                .AsNoTracking()
-                .FirstOrDefaultAsync(e => e.Clave == claveEncabezado);
         return vm;
     }
 
-    /// <summary>Valor de un ajuste, en el idioma actual.</summary>
-    protected async Task<string?> AjusteAsync(string clave)
-    {
-        var a = await Ctx.Ajustes.AsNoTracking().FirstOrDefaultAsync(x => x.Clave == clave);
-        if (a is null) return null;
-        var v = Traducir.Texto(Idioma, a.Valor, a.ValorEn, a.ValorPt);
-        return string.IsNullOrWhiteSpace(v) ? null : v;
-    }
-
-    /// <summary>Los afiches que se muestran en el muro, ya filtrados por vigencia.</summary>
-    protected IQueryable<CarteleraAfiche> AfichesVigentes() =>
+    /// <summary>
+    /// Los afiches que se muestran en el muro, ya filtrados por vigencia.
+    /// Sin los bytes de la imagen: el navegador la pide aparte por su URL.
+    /// </summary>
+    protected IQueryable<AficheVm> AfichesVigentes() =>
         Ctx.CarteleraAfiches
            .AsNoTracking()
            .Where(a => a.Estado == EstadoAfiche.Publicado &&
+                       a.ImagenDatos != null &&
                        (a.VigenteHasta == null || a.VigenteHasta >= DateTime.Today))
            .OrderBy(a => a.Orden)
-           .ThenByDescending(a => a.CreadoEn);
+           .ThenByDescending(a => a.CreadoEn)
+           .Select(a => new AficheVm
+           {
+               Id = a.Id,
+               Titulo = a.Titulo,
+               ImagenAlt = a.ImagenAlt,
+               TieneImagen = true,
+               Sello = a.ActualizadoEn ?? a.CreadoEn,
+               VigenteHasta = a.VigenteHasta,
+               Estado = a.Estado
+           });
 }

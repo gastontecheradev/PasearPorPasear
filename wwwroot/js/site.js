@@ -56,6 +56,37 @@
     form.submit();
   };
 
+  // ── Afiche en grande (cartelera) ──────────────────────────────
+  // El texto del afiche va dentro de la imagen y en el muro queda chico.
+  // Sin soporte de <dialog> se deja pasar el enlace y abre la imagen.
+  var grande = document.getElementById('afiche-grande');
+
+  if (grande && typeof grande.showModal === 'function') {
+    var imgGrande = grande.querySelector('img');
+
+    document.querySelectorAll('.muro a.afiche').forEach(function (enlace) {
+      enlace.addEventListener('click', function (e) {
+        var img = enlace.querySelector('img');
+        if (!img) return;
+        e.preventDefault();
+        imgGrande.src = enlace.href;
+        imgGrande.alt = img.alt;
+        grande.showModal();
+      });
+    });
+
+    // Cierra con el botón o tocando fuera de la imagen (el fondo es el propio dialog).
+    grande.addEventListener('click', function (e) {
+      if (e.target === grande || e.target.closest('[data-cerrar]')) grande.close();
+    });
+
+    // Al cerrar se vacía, para que el próximo no muestre un instante el anterior.
+    grande.addEventListener('close', function () {
+      imgGrande.removeAttribute('src');
+      imgGrande.alt = '';
+    });
+  }
+
   // ── Filtros por barrio (archivo y cartelera) ──────────────────
   // Sin recargar cuando el filtrado es sólo visual; si el grupo lleva
   // data-servidor, se deja pasar el enlace y filtra el controlador.

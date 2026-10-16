@@ -1,32 +1,29 @@
 @model SobreVm
 @{
-    var esIngles = Model.Idioma == "en";
-    var esPortugues = Model.Idioma == "pt";
 }
 
-<section class="banda banda--crema">
+<section class="banda banda--crema" aria-labelledby="sobre-proyecto">
     <div class="contenedor">
         <div class="duo">
             <div>
                 <div class="regla regla--izq"><partial name="_Flor" /></div>
-                <h1 class="titulo-seccion">@Model.Titulo</h1>
+                <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
                 <div class="texto" style="margin-top:20px">
                     @Html.Raw(Model.Contenido)
                 </div>
-                <p class="firma">@Model.Pagina.Firma</p>
                 <p class="atributos" style="color:var(--petroleo)">
-                    @(esPortugues ? "Movimento" : esIngles ? "Movement" : "Movimiento")
+                    @Textos["general.atributo-1"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Curiosidade" : esIngles ? "Curiosity" : "Curiosidad")
+                    @Textos["general.atributo-2"]
                     <partial name="_Flor" />
-                    @(esPortugues ? "Identidade" : esIngles ? "Identity" : "Identidad")
+                    @Textos["general.atributo-3"]
                 </p>
             </div>
-            @if (!string.IsNullOrEmpty(Model.ImagenSrc))
+            @if (!string.IsNullOrEmpty(Model.ProyectoImagenSrc))
             {
-                <div class="columna-retrato">
+                <div class="columna-retrato columna-retrato--der">
                     <div class="retrato">
-                        <img src="@Model.ImagenSrc" alt="@Model.Pagina.ImagenAlt" />
+                        <img src="@Model.ProyectoImagenSrc" alt="@Model.Pagina.ProyectoImagenAlt" />
                     </div>
                 </div>
             }
@@ -34,18 +31,47 @@
     </div>
 </section>
 
-<div class="transicion" style="background:var(--crema)"><partial name="_Onda" model="@("var(--petroleo)")" /></div>
+@if (!string.IsNullOrWhiteSpace(Model.ContenidoAutora))
+{
+    <section class="banda banda--crema2" aria-labelledby="sobre-autora">
+        <div class="contenedor">
+            <div class="duo">
+                @if (!string.IsNullOrEmpty(Model.ImagenSrc))
+                {
+                    <div class="columna-retrato">
+                        <div class="retrato">
+                            <img src="@Model.ImagenSrc" alt="@Model.Pagina.ImagenAlt" />
+                        </div>
+                    </div>
+                }
+                <div>
+                    <h2 class="titulo-seccion" id="sobre-autora">@Model.Pagina.Firma</h2>
+                    <div class="texto" style="margin-top:20px">
+                        @Html.Raw(Model.ContenidoAutora)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+}
+
+<div class="transicion" style="background:@(string.IsNullOrWhiteSpace(Model.ContenidoAutora) ? "var(--crema)" : "var(--crema-2)")"><partial name="_Onda" model="@("var(--petroleo)")" /></div>
 
 <section class="banda banda--petroleo banda--ajustada" style="padding-top:calc(var(--aire) * .35)">
     <div class="contenedor">
         <div class="suscripcion">
             <div>
-                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@(esPortugues ? "Caminhamos?" : esIngles ? "Shall we walk?" : "¿Caminamos?")</h2>
-                <p class="bajada">@(esPortugues ? "Se quiser propor um bairro, me contar algo que viu ou simplesmente escrever, a porta está aberta." : esIngles ? "If you want to suggest a neighbourhood, tell me something you saw, or just write, the door is open." : "Si querés proponer un barrio, contarme algo que viste o simplemente escribir, la puerta está abierta.")</p>
-                <div class="acciones">
-                    <a class="boton boton--claro" href="/Paseos">@(esPortugues ? "Ver os passeios" : esIngles ? "See the walks" : "Ver los paseos")</a>
-                    <a class="boton boton--borde-claro" href="/Contacto">@(esPortugues ? "Escreva-me" : esIngles ? "Write to me" : "Escribime")</a>
-                </div>
+                <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Textos["sobre.colaborar-titulo"]</h2>
+                @if (Textos["sobre.colaborar-texto"] is { Length: > 0 } colaborar)
+                {
+                    <p class="bajada">@colaborar</p>
+                }
+                @if (Textos.Enlace("sobre.colaborar-enlace") is string pago)
+                {
+                    <div class="acciones">
+                        <a class="boton boton--claro" href="@pago" target="_blank" rel="noopener">@Textos["sobre.colaborar-boton"]</a>
+                    </div>
+                }
             </div>
             <img class="kiosco" src="~/img/marca/kiosquito.webp" alt="" width="320" height="315" loading="lazy" />
         </div>

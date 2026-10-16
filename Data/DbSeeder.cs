@@ -36,13 +36,9 @@ public static class DbSeeder
         await SeedAdminAsync(userMgr, roleMgr, config, logger);
 
         SeedSobre(ctx);
-        SeedEncabezados(ctx);
         SeedPropuestas(ctx);
-        SeedClubcito(ctx);
         SeedFachadas(ctx);
         SeedProductos(ctx);
-        SeedCartelera(ctx);
-        SeedAjustes(ctx);
 
         await ctx.SaveChangesAsync();
     }
@@ -52,203 +48,138 @@ public static class DbSeeder
     // ══════════════════════════════════════════════════════════
     private static void SeedSobre(ApplicationDbContext ctx)
     {
-        if (ctx.PaginasSobre.Any()) return;
+        var existente = ctx.PaginasSobre.FirstOrDefault();
+        if (existente is not null)
+        {
+            SepararSobre(existente);
+
+            // La foto del proyecto llegó después: las páginas ya creadas arrancan con
+            // la demo.
+            if (existente.ProyectoImagenUrl is null && existente.ProyectoImagenDatos is null)
+            {
+                existente.ProyectoImagenUrl = ProyectoImagenDemo;
+                existente.ProyectoImagenAlt = ProyectoImagenAltDemo;
+            }
+
+            // «Por» pasó a ir con mayúscula. Sólo si sigue el título del seed.
+            if (existente.Titulo == "Sobre Pasear por Pasear") existente.Titulo = SobreTitulo;
+            if (existente.TituloPt == "Sobre Pasear por Pasear") existente.TituloPt = SobreTitulo;
+            return;
+        }
 
         ctx.PaginasSobre.Add(new PaginaSobre
         {
-            Titulo = "Sobre Pasear por Pasear",
+            Titulo = SobreTitulo,
             TituloEn = "About Pasear por Pasear",
-            TituloPt = "Sobre Pasear por Pasear",
-            Contenido =
-                "<p>Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
-                "Un día empecé a sacarle fotos a las casas que me gustaban —las bajas, las descascaradas, las " +
-                "que tienen una ventana con plantas— y las empecé a subir sin más plan que ese.</p>" +
-                "<p>Resultó que a mucha gente le pasaba lo mismo. Que hay una ciudad entera que vemos todos los " +
-                "días y no miramos nunca. Que el alma de Montevideo no está en el Centro ni en la rambla: está " +
-                "en el barrio, en la vereda rota y en el kiosco de la esquina.</p>" +
-                "<p>Pasear por Pasear es eso, un poco más ordenado. Un archivo de fachadas que crece cada semana, " +
-                "paseos para quien quiera venir, una cartelera para que el barrio publique lo suyo y una carta " +
-                "por mes para quien quiera recibirla.</p>",
-            ContenidoEn =
-                "<p>My name is Rosalía. I was born in Montevideo and spent half my life walking it without " +
-                "noticing. One day I started photographing the houses I liked —the low ones, the peeling ones, " +
-                "the ones with a plant in the window— and posting them with no plan beyond that.</p>" +
-                "<p>It turned out plenty of people felt the same. That there is a whole city we see every day and " +
-                "never look at. That the soul of Montevideo is not downtown or on the waterfront: it is in the " +
-                "neighbourhood, on the cracked pavement, at the corner kiosk.</p>" +
-                "<p>Pasear por Pasear is that, slightly better organised. A facade archive that grows every week, " +
-                "walks for anyone who wants to come along, a board for the neighbourhood to post on, and one " +
-                "letter a month for whoever wants it.</p>",
-            ContenidoPt =
-                "<p>Meu nome é Rosalía, nasci em Montevidéu e passei metade da vida caminhando por ela sem " +
-                "perceber. Um dia comecei a fotografar as casas de que gostava —as baixas, as descascadas, as " +
-                "que têm uma janela com plantas— e a publicá-las sem mais plano que esse.</p>" +
-                "<p>Descobri que muita gente sentia o mesmo. Que há uma cidade inteira que vemos todos os dias e " +
-                "nunca olhamos. Que a alma de Montevidéu não está no Centro nem na orla: está no bairro, na " +
-                "calçada quebrada e no quiosque da esquina.</p>" +
-                "<p>Pasear por Pasear é isso, um pouco mais organizado. Um arquivo de fachadas que cresce toda " +
-                "semana, passeios para quem quiser vir, um mural para o bairro publicar o seu e uma carta por " +
-                "mês para quem quiser recebê-la.</p>",
+            TituloPt = SobreTitulo,
+            Contenido = SobreProyectoEs,
+            ContenidoEn = SobreProyectoEn,
+            ContenidoPt = SobreProyectoPt,
+            ProyectoImagenUrl = ProyectoImagenDemo,
+            ProyectoImagenAlt = ProyectoImagenAltDemo,
             Firma = "Rosalía Souza",
+            ContenidoAutora = SobreAutoraEs,
+            ContenidoAutoraEn = SobreAutoraEn,
+            ContenidoAutoraPt = SobreAutoraPt,
             ImagenUrl = Demo + "rosalia.webp",
             ImagenAlt = "Rosalía caminando por la rambla de Montevideo al atardecer"
         });
     }
 
-    // ══════════════════════════════════════════════════════════
-    //  Encabezados de sección
-    // ══════════════════════════════════════════════════════════
-    private static void SeedEncabezados(ApplicationDbContext ctx)
+    private const string SobreTitulo = "Sobre Pasear Por Pasear";
+    private const string ProyectoImagenDemo = Demo + "fachada-2.webp";
+    private const string ProyectoImagenAltDemo = "Casa con buganvilla y techo rojo";
+
+    // La página pasó de un solo texto a dos secciones: el proyecto y Rosalía.
+    // Sólo se reparte el idioma que conserva el texto original del seed; si
+    // Rosalía ya lo editó desde el panel, no se toca.
+    private static void SepararSobre(PaginaSobre p)
     {
-        // Sin early-return: si el sitio ya está en producción con estas claves
-        // cargadas, igual tiene que poder sumarse una nueva sin tocar la base
-        // a mano. Se agrega sólo lo que falte, comparando por Clave.
-        var existentes = ctx.EncabezadosSeccion.Select(e => e.Clave).ToHashSet();
-
-        var candidatos = new List<EncabezadoSeccion>
+        var cambio = false;
+        if (p.ContenidoAutora.Length == 0 && p.Contenido == SobreOriginalEs)
         {
-            new EncabezadoSeccion
-            {
-                Clave = "portada",
-                Titulo = "Salir a caminar sin destino. Ese es todo el plan.",
-                TituloEn = "Going out to walk with nowhere to be. That is the whole plan.",
-                TituloPt = "Sair para caminhar sem destino. É esse o plano inteiro.",
-                Bajada = "Un recorrido a pie por los barrios de Montevideo: las casas bajas, las ventanas con plantas y todo lo que aparece cuando una va sin apuro.",
-                BajadaEn = "A walk through the neighbourhoods of Montevideo: the low houses, the windows full of plants and everything that shows up when you are in no hurry.",
-                BajadaPt = "Um percurso a pé pelos bairros de Montevidéu: as casas baixas, as janelas com plantas e tudo o que aparece quando se vai sem pressa."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "definicion",
-                Titulo = "Qué es Pasear por Pasear",
-                TituloEn = "What Pasear por Pasear is",
-                TituloPt = "O que é Pasear por Pasear",
-                Bajada = "<p>Esto empezó como una costumbre: salir a caminar sin rumbo por Montevideo y prestarle atención a lo que siempre estuvo ahí. Una fachada amarilla que aguanta desde hace ochenta años. Una ventana con geranios. Un gorrión metido en un nido arriba de un cable.</p><p>No es turismo y no hay que ir muy lejos. Es mirar el barrio de uno como si fuera la primera vez.</p>",
-                BajadaEn = "<p>This started as a habit: going out to walk Montevideo with nowhere to be and paying attention to what was always there. A yellow facade that has held up for eighty years. A window with geraniums. A sparrow tucked into a nest above a cable.</p><p>It is not tourism and you do not have to go far. It is looking at your own neighbourhood as if for the first time.</p>",
-                BajadaPt = "<p>Isto começou como um costume: sair para caminhar sem rumo por Montevidéu e prestar atenção ao que sempre esteve ali. Uma fachada amarela que aguenta há oitenta anos. Uma janela com gerânios. Um pardal metido num ninho em cima de um cabo.</p><p>Não é turismo e não é preciso ir longe. É olhar o próprio bairro como se fosse a primeira vez.</p>"
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "paseos",
-                Titulo = "¿Paseás conmigo?",
-                TituloEn = "Walk with me?",
-                TituloPt = "Passeia comigo?",
-                Bajada = "Caminar Montevideo acompañada. Hay cuatro maneras de hacerlo, según cuánto quieras comprometerte y con quién quieras ir.",
-                BajadaEn = "Walking Montevideo with company. There are four ways to do it, depending on how much you want to commit and who you want to go with.",
-                BajadaPt = "Caminhar Montevidéu acompanhada. Há quatro maneiras de fazê-lo, conforme o quanto queira se comprometer e com quem queira ir."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "clubcito",
-                Titulo = "El Clubcito",
-                TituloEn = "El Clubcito",
-                TituloPt = "El Clubcito",
-                Bajada = "Una vez por mes salimos a caminar un barrio. Es gratis, no hay que anotarse en ningún lado y no hace falta conocer a nadie. Se avisa por el buzón de la Casita y se aparece.",
-                BajadaEn = "Once a month we go out and walk a neighbourhood. It is free, there is no sign-up list and you do not need to know anyone. We announce it through the Casita mailbox and you just show up.",
-                BajadaPt = "Uma vez por mês saímos para caminhar um bairro. É grátis, não é preciso se inscrever em lugar nenhum nem conhecer ninguém. Avisamos pela caixa de correio da Casita e é só aparecer."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "archivo",
-                Titulo = "#ArchivoDeFachadas",
-                TituloEn = "#ArchivoDeFachadas",
-                TituloPt = "#ArchivoDeFachadas",
-                Bajada = "Cada casa de Montevideo que me hizo frenar en la vereda, con su calle, su barrio y la fecha en que la encontré. Se agrega algo nuevo todas las semanas.",
-                BajadaEn = "Every house in Montevideo that made me stop on the pavement, with its street, its neighbourhood and the date I found it. Something new is added every week.",
-                BajadaPt = "Cada casa de Montevidéu que me fez parar na calçada, com sua rua, seu bairro e a data em que a encontrei. Algo novo é acrescentado toda semana."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "productos",
-                Titulo = "Productos",
-                TituloEn = "Shop",
-                TituloPt = "Produtos",
-                Bajada = "Las ilustraciones de Pasear por Pasear, impresas en Montevideo en tiradas chicas. Todavía no están a la venta: esto es lo que se viene.",
-                BajadaEn = "The Pasear por Pasear illustrations, printed in Montevideo in small runs. Not on sale yet — this is what is coming.",
-                BajadaPt = "As ilustrações do Pasear por Pasear, impressas em Montevidéu em tiragens pequenas. Ainda não estão à venda: isto é o que vem por aí."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "cartelera",
-                Titulo = "La cartelera de barrio",
-                TituloEn = "The neighbourhood board",
-                TituloPt = "O mural do bairro",
-                Bajada = "Como la cartelera del almacén de la esquina, pero acá. Eventos, emprendimientos chicos y pedidos de ayuda del barrio.",
-                BajadaEn = "Like the board at the corner shop, but here. Events, small ventures and neighbours asking for a hand.",
-                BajadaPt = "Como o mural do armazém da esquina, mas aqui. Eventos, pequenos empreendimentos e pedidos de ajuda do bairro."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "contacto",
-                Titulo = "Contacto",
-                TituloEn = "Contact",
-                TituloPt = "Contato",
-                Bajada = "Para proponer un barrio, sumarte a una salida, hacer un pedido o mandar tu afiche a la cartelera.",
-                BajadaEn = "To suggest a neighbourhood, join a walk, place an order or send your poster to the board.",
-                BajadaPt = "Para propor um bairro, entrar num passeio, fazer um pedido ou enviar seu cartaz ao mural."
-            },
-
-            // ── Portada: intro de los cuatro pilares y cada tarjeta ──
-            // Antes eran texto fijo en Home/Index.cshtml; ahora se editan
-            // desde /Admin/Paginas/Encabezados igual que el resto.
-            new EncabezadoSeccion
-            {
-                Clave = "pilares",
-                Titulo = "¿Por dónde querés empezar?",
-                TituloEn = "Where do you want to start?",
-                TituloPt = "Por onde quer começar?",
-                Bajada = "Hay cuatro maneras de meterse en esto. Ninguna es mejor que otra.",
-                BajadaEn = "There are four ways into this. None is better than the others.",
-                BajadaPt = "Há quatro maneiras de entrar nisto. Nenhuma é melhor que outra."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "pilar-clubcito",
-                Titulo = "¿Paseás conmigo?",
-                TituloEn = "Walk with me?",
-                TituloPt = "Passeia comigo?",
-                Bajada = "El Clubcito, recorridos creativos y salidas armadas a pedido.",
-                BajadaEn = "El Clubcito, creative walks and outings built on request.",
-                BajadaPt = "El Clubcito, percursos criativos e saídas montadas sob encomenda."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "pilar-archivo",
-                Titulo = "#ArchivoDeFachadas",
-                TituloEn = "#ArchivoDeFachadas",
-                TituloPt = "#ArchivoDeFachadas",
-                Bajada = "El archivo de las casas de Montevideo, con su calle, su barrio y su fecha.",
-                BajadaEn = "The archive of Montevideo's houses, with street, neighbourhood and date.",
-                BajadaPt = "O arquivo das casas de Montevidéu, com sua rua, seu bairro e sua data."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "pilar-productos",
-                Titulo = "Productos",
-                TituloEn = "Shop",
-                TituloPt = "Produtos",
-                Bajada = "Las ilustraciones de la marca, impresas. Todavía no salieron a la venta.",
-                BajadaEn = "The brand illustrations, printed. Not on sale yet.",
-                BajadaPt = "As ilustrações da marca, impressas. Ainda não saíram à venda."
-            },
-            new EncabezadoSeccion
-            {
-                Clave = "pilar-cartelera",
-                Titulo = "Cartelera de barrio",
-                TituloEn = "Neighbourhood board",
-                TituloPt = "Mural do bairro",
-                Bajada = "Una pared para pegar tu afiche. Eventos, oficios y pedidos de ayuda.",
-                BajadaEn = "A wall to put your poster up. Events, trades and requests for help.",
-                BajadaPt = "Uma parede para colar seu cartaz. Eventos, ofícios e pedidos de ajuda."
-            }
-        };
-
-        var nuevos = candidatos.Where(c => !existentes.Contains(c.Clave)).ToList();
-        if (nuevos.Count > 0) ctx.EncabezadosSeccion.AddRange(nuevos);
+            p.Contenido = SobreProyectoEs; p.ContenidoAutora = SobreAutoraEs; cambio = true;
+        }
+        if (p.ContenidoAutoraEn.Length == 0 && p.ContenidoEn == SobreOriginalEn)
+        {
+            p.ContenidoEn = SobreProyectoEn; p.ContenidoAutoraEn = SobreAutoraEn; cambio = true;
+        }
+        if (p.ContenidoAutoraPt.Length == 0 && p.ContenidoPt == SobreOriginalPt)
+        {
+            p.ContenidoPt = SobreProyectoPt; p.ContenidoAutoraPt = SobreAutoraPt; cambio = true;
+        }
+        if (cambio) p.ActualizadaEn = DateTime.Now;
     }
 
+    private const string SobreProyectoEs =
+        "<p>Hay una ciudad entera que vemos todos los días y no miramos nunca. El alma de Montevideo no " +
+        "está en el Centro ni en la rambla: está en el barrio, en la vereda rota y en el kiosco de la esquina.</p>" +
+        "<p>Pasear por Pasear es un archivo de fachadas que crece cada semana, paseos para quien quiera venir, " +
+        "una cartelera para que el barrio publique lo suyo y una carta por mes para quien quiera recibirla.</p>";
+    private const string SobreProyectoEn =
+        "<p>There is a whole city we see every day and never look at. The soul of Montevideo is not downtown " +
+        "or on the waterfront: it is in the neighbourhood, on the cracked pavement, at the corner kiosk.</p>" +
+        "<p>Pasear por Pasear is a facade archive that grows every week, walks for anyone who wants to come " +
+        "along, a board for the neighbourhood to post on, and one letter a month for whoever wants it.</p>";
+    private const string SobreProyectoPt =
+        "<p>Há uma cidade inteira que vemos todos os dias e nunca olhamos. A alma de Montevidéu não está no " +
+        "Centro nem na orla: está no bairro, na calçada quebrada e no quiosque da esquina.</p>" +
+        "<p>Pasear por Pasear é um arquivo de fachadas que cresce toda semana, passeios para quem quiser vir, " +
+        "um mural para o bairro publicar o seu e uma carta por mês para quem quiser recebê-la.</p>";
+
+    private const string SobreAutoraEs =
+        "<p>Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
+        "Un día empecé a sacarle fotos a las casas que me gustaban —las bajas, las descascaradas, las " +
+        "que tienen una ventana con plantas— y las empecé a subir sin más plan que ese.</p>" +
+        "<p>Resultó que a mucha gente le pasaba lo mismo. De esas fotos, y de esa gente, salió Pasear por " +
+        "Pasear: lo mismo que hacía sola, un poco más ordenado.</p>";
+    private const string SobreAutoraEn =
+        "<p>My name is Rosalía. I was born in Montevideo and spent half my life walking it without " +
+        "noticing. One day I started photographing the houses I liked —the low ones, the peeling ones, " +
+        "the ones with a plant in the window— and posting them with no plan beyond that.</p>" +
+        "<p>It turned out plenty of people felt the same. Those photos, and those people, became Pasear " +
+        "por Pasear: what I used to do on my own, slightly better organised.</p>";
+    private const string SobreAutoraPt =
+        "<p>Meu nome é Rosalía, nasci em Montevidéu e passei metade da vida caminhando por ela sem " +
+        "perceber. Um dia comecei a fotografar as casas de que gostava —as baixas, as descascadas, as " +
+        "que têm uma janela com plantas— e a publicá-las sem mais plano que esse.</p>" +
+        "<p>Descobri que muita gente sentia o mesmo. Dessas fotos, e dessas pessoas, nasceu Pasear por " +
+        "Pasear: o que eu fazia sozinha, um pouco mais organizado.</p>";
+
+    // El texto único que traía el seed antes de separar la página en dos.
+    private const string SobreOriginalEs =
+        "<p>Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
+        "Un día empecé a sacarle fotos a las casas que me gustaban —las bajas, las descascaradas, las " +
+        "que tienen una ventana con plantas— y las empecé a subir sin más plan que ese.</p>" +
+        "<p>Resultó que a mucha gente le pasaba lo mismo. Que hay una ciudad entera que vemos todos los " +
+        "días y no miramos nunca. Que el alma de Montevideo no está en el Centro ni en la rambla: está " +
+        "en el barrio, en la vereda rota y en el kiosco de la esquina.</p>" +
+        "<p>Pasear por Pasear es eso, un poco más ordenado. Un archivo de fachadas que crece cada semana, " +
+        "paseos para quien quiera venir, una cartelera para que el barrio publique lo suyo y una carta " +
+        "por mes para quien quiera recibirla.</p>";
+    private const string SobreOriginalEn =
+        "<p>My name is Rosalía. I was born in Montevideo and spent half my life walking it without " +
+        "noticing. One day I started photographing the houses I liked —the low ones, the peeling ones, " +
+        "the ones with a plant in the window— and posting them with no plan beyond that.</p>" +
+        "<p>It turned out plenty of people felt the same. That there is a whole city we see every day and " +
+        "never look at. That the soul of Montevideo is not downtown or on the waterfront: it is in the " +
+        "neighbourhood, on the cracked pavement, at the corner kiosk.</p>" +
+        "<p>Pasear por Pasear is that, slightly better organised. A facade archive that grows every week, " +
+        "walks for anyone who wants to come along, a board for the neighbourhood to post on, and one " +
+        "letter a month for whoever wants it.</p>";
+    private const string SobreOriginalPt =
+        "<p>Meu nome é Rosalía, nasci em Montevidéu e passei metade da vida caminhando por ela sem " +
+        "perceber. Um dia comecei a fotografar as casas de que gostava —as baixas, as descascadas, as " +
+        "que têm uma janela com plantas— e a publicá-las sem mais plano que esse.</p>" +
+        "<p>Descobri que muita gente sentia o mesmo. Que há uma cidade inteira que vemos todos os dias e " +
+        "nunca olhamos. Que a alma de Montevidéu não está no Centro nem na orla: está no bairro, na " +
+        "calçada quebrada e no quiosque da esquina.</p>" +
+        "<p>Pasear por Pasear é isso, um pouco mais organizado. Um arquivo de fachadas que cresce toda " +
+        "semana, passeios para quem quiser vir, um mural para o bairro publicar o seu e uma carta por " +
+        "mês para quem quiser recebê-la.</p>";
+
     // ══════════════════════════════════════════════════════════
-    //  ¿Paseás conmigo? — las cuatro propuestas
+    //  ¿Paseamos? — las cuatro propuestas
     // ══════════════════════════════════════════════════════════
     private static void SeedPropuestas(ApplicationDbContext ctx)
     {
@@ -335,97 +266,6 @@ public static class DbSeeder
         };
 
         ctx.Propuestas.AddRange(clubcito, alSobre, creativos, personalizados);
-    }
-
-    // ══════════════════════════════════════════════════════════
-    //  El Clubcito
-    // ══════════════════════════════════════════════════════════
-    private static void SeedClubcito(ApplicationDbContext ctx)
-    {
-        if (ctx.ClubcitoEncuentros.Any()) return;
-
-        // Fechas relativas a hoy para que el seed no envejezca.
-        var hoy = DateTime.Today;
-
-        ctx.ClubcitoEncuentros.AddRange(
-            new ClubcitoEncuentro
-            {
-                Titulo = "Reus al Norte", TituloEn = "Reus al Norte", TituloPt = "Reus al Norte",
-                Slug = "reus-al-norte",
-                Fecha = hoy.AddDays(12),
-                Barrio = "Aguada",
-                PuntoEncuentro = "Nicaragua y Galicia",
-                PuntoEncuentroEn = "Nicaragua and Galicia", PuntoEncuentroPt = "Nicaragua e Galicia",
-                Extracto = "Las casas de colores, la historia de Emilio Reus y por qué las pintaron así.",
-                ExtractoEn = "The coloured houses, the story of Emilio Reus and why they were painted that way.",
-                ExtractoPt = "As casas coloridas, a história de Emilio Reus e por que as pintaram assim.",
-                Estado = EstadoEncuentro.Proximo
-            },
-            new ClubcitoEncuentro
-            {
-                Titulo = "Villa Muñoz y el Goes", TituloEn = "Villa Muñoz and Goes", TituloPt = "Villa Muñoz e o Goes",
-                Slug = "villa-munoz-y-el-goes",
-                Fecha = hoy.AddDays(40),
-                Barrio = "Villa Muñoz",
-                PuntoEncuentro = "Mercado Agrícola",
-                PuntoEncuentroEn = "Mercado Agrícola", PuntoEncuentroPt = "Mercado Agrícola",
-                Extracto = "Barrio de talleres, telas y ferias. Terminamos en el mercado, que es donde hay que terminar.",
-                ExtractoEn = "A neighbourhood of workshops, fabric shops and street markets. We finish at the market, which is where you finish.",
-                ExtractoPt = "Bairro de oficinas, tecidos e feiras. Terminamos no mercado, que é onde se deve terminar.",
-                Estado = EstadoEncuentro.Proximo
-            },
-            new ClubcitoEncuentro
-            {
-                Titulo = "Todavía sin definir", TituloEn = "Still to be decided", TituloPt = "Ainda por definir",
-                Slug = "sin-definir-" + hoy.AddDays(68).ToString("yyyy-MM"),
-                Fecha = hoy.AddDays(68),
-                Extracto = "El barrio lo elige el Clubcito. Se vota por el buzón unas semanas antes.",
-                ExtractoEn = "The Clubcito picks the neighbourhood. We vote through the mailbox a few weeks ahead.",
-                ExtractoPt = "O bairro é escolhido pelo Clubcito. Vota-se pela caixa de correio algumas semanas antes.",
-                Estado = EstadoEncuentro.SinDefinir
-            },
-            new ClubcitoEncuentro
-            {
-                Titulo = "Jardines de vereda", TituloEn = "Pavement gardens", TituloPt = "Jardins de calçada",
-                Slug = "jardines-de-vereda",
-                Fecha = hoy.AddDays(-26),
-                Barrio = "La Blanqueada",
-                Extracto = "Cuando el cantero de la vereda se convierte en jardín. Doce cuadras y ni un metro repetido.",
-                ExtractoEn = "When the strip of soil by the kerb turns into a garden. Twelve blocks and not one metre repeated.",
-                ExtractoPt = "Quando o canteiro da calçada vira jardim. Doze quarteirões e nem um metro repetido.",
-                ImagenUrl = Demo + "casa-arbol.webp",
-                ImagenAlt = "Casa con árbol podado y alambrado",
-                Asistentes = 22,
-                Estado = EstadoEncuentro.Realizado
-            },
-            new ClubcitoEncuentro
-            {
-                Titulo = "Techos de chapa", TituloEn = "Tin roofs", TituloPt = "Telhados de chapa",
-                Slug = "techos-de-chapa",
-                Fecha = hoy.AddDays(-54),
-                Barrio = "Malvín",
-                Extracto = "El barrio antes de que llegaran las torres. Todavía quedan cuadras enteras como eran.",
-                ExtractoEn = "The neighbourhood before the towers arrived. Whole blocks are still as they were.",
-                ExtractoPt = "O bairro antes de chegarem as torres. Ainda há quarteirões inteiros como eram.",
-                ImagenUrl = Demo + "casa-techo.webp",
-                ImagenAlt = "Cuadra con techos de chapa rojos",
-                Asistentes = 17,
-                Estado = EstadoEncuentro.Realizado
-            },
-            new ClubcitoEncuentro
-            {
-                Titulo = "De esquina a esquina", TituloEn = "Corner to corner", TituloPt = "De esquina a esquina",
-                Slug = "de-esquina-a-esquina",
-                Fecha = hoy.AddDays(-84),
-                Barrio = "Buceo",
-                Extracto = "Una vuelta corta con lluvia amenazando: seis esquinas y qué pasó en cada una.",
-                ExtractoEn = "A short loop with rain threatening: six corners and what happened at each one.",
-                ExtractoPt = "Uma volta curta com chuva ameaçando: seis esquinas e o que aconteceu em cada uma.",
-                ImagenUrl = Demo + "vereda-flores.webp",
-                ImagenAlt = "Cantero de vereda lleno de flores",
-                Asistentes = 31,
-                Estado = EstadoEncuentro.Realizado
-            });
     }
 
     // ══════════════════════════════════════════════════════════
@@ -542,92 +382,6 @@ public static class DbSeeder
     }
 
     // ══════════════════════════════════════════════════════════
-    //  Cartelera de barrio
-    // ══════════════════════════════════════════════════════════
-    private static void SeedCartelera(ApplicationDbContext ctx)
-    {
-        if (ctx.CarteleraAfiches.Any()) return;
-
-        var hoy = DateTime.Today;
-
-        ctx.CarteleraAfiches.AddRange(
-            new CarteleraAfiche
-            {
-                Titulo = "Feria de las artesanas", Barrio = "Parque Batlle",
-                Texto = "Cerámica, tejido y encuadernación. Con feria de plantas y algo para comer.",
-                Contacto = "Sáb 14 · Plaza de los Olímpicos · 10 a 18 h",
-                VigenteHasta = hoy.AddDays(20),
-                Color = ColorAfiche.Crema, Estado = EstadoAfiche.Publicado, Orden = 1
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Se busca gato atigrado", Barrio = "Punta Carretas",
-                Texto = "Se llama Nabo, es gris con rayas y bastante miedoso. Se perdió el domingo cerca de la rambla.",
-                Contacto = "099 000 000",
-                VigenteHasta = hoy.AddDays(30),
-                Color = ColorAfiche.Petroleo, Estado = EstadoAfiche.Publicado, Orden = 2
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Taller de cerámica", Barrio = "Parque Rodó",
-                Texto = "Ocho encuentros, materiales incluidos y horno propio. Quedan tres lugares.",
-                Contacto = "Miércoles 18 h",
-                VigenteHasta = hoy.AddDays(45),
-                Color = ColorAfiche.Coral, Estado = EstadoAfiche.Publicado, Orden = 3
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Arreglos de costura", Barrio = "Malvín",
-                Texto = "Ruedos, cierres, ajustes y ropa a medida. Trabajo en casa y entrego rápido.",
-                Contacto = "Marta",
-                Color = ColorAfiche.Rayas, Estado = EstadoAfiche.Publicado, Orden = 4
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Clases de guitarra", Barrio = "La Blanqueada",
-                Texto = "A domicilio o en mi casa. Para empezar de cero, sin saber leer música. La primera es gratis.",
-                Contacto = "Diego",
-                Color = ColorAfiche.Durazno, Estado = EstadoAfiche.Publicado, Orden = 5
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Merienda compartida", Barrio = "Buceo",
-                Texto = "Se junta el club de la esquina todos los últimos viernes. Cada uno lleva algo. Vengan.",
-                Contacto = "Club Atlético Buceo · 17 h",
-                VigenteHasta = hoy.AddDays(12),
-                Color = ColorAfiche.Mostaza, Estado = EstadoAfiche.Publicado, Orden = 6
-            },
-            new CarteleraAfiche
-            {
-                Titulo = "Coro de barrio abierto", Barrio = "Villa Dolores",
-                Texto = "Ensayamos los jueves en el salón de la parroquia. No hace falta saber cantar.",
-                Contacto = "coro.villadolores@ejemplo.com",
-                VigenteHasta = hoy.AddDays(50),
-                Color = ColorAfiche.Crema, Estado = EstadoAfiche.PorRevisar, Orden = 7
-            });
-    }
-
-    // ══════════════════════════════════════════════════════════
-    //  Ajustes
-    // ══════════════════════════════════════════════════════════
-    private static void SeedAjustes(ApplicationDbContext ctx)
-    {
-        if (ctx.Ajustes.Any()) return;
-
-        ctx.Ajustes.AddRange(
-            new Ajuste { Clave = "MailchimpFormUrl", Valor = "", ValorEn = "", ValorPt = "" },
-            new Ajuste { Clave = "EmailContacto", Valor = "pasearporpasear@gmail.com", ValorEn = "pasearporpasear@gmail.com", ValorPt = "pasearporpasear@gmail.com" },
-            new Ajuste { Clave = "CanalWhatsApp", Valor = "https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08", ValorEn = "https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08", ValorPt = "https://www.whatsapp.com/channel/0029Va9ciekKWEKxelyurH08" },
-            new Ajuste
-            {
-                Clave = "BuzonTexto",
-                Valor = "Una carta por mes: la próxima salida del Clubcito, tres fachadas nuevas del archivo y alguna recomendación suelta.",
-                ValorEn = "One letter a month: the next Clubcito walk, three new facades from the archive and the odd recommendation.",
-                ValorPt = "Uma carta por mês: a próxima saída do Clubcito, três fachadas novas do arquivo e alguma recomendação solta."
-            });
-    }
-
-    // ══════════════════════════════════════════════════════════
     //  Usuario administrador
     //  Sin cambios respecto de la versión anterior: las credenciales
     //  vienen de configuración y nunca del código fuente.
@@ -661,6 +415,9 @@ public static class DbSeeder
             // Sólo se verifica que siga teniendo el rol.
             if (!await userMgr.IsInRoleAsync(existing, AdminRole))
                 await userMgr.AddToRoleAsync(existing, AdminRole);
+            // Cuentas creadas antes de activar el bloqueo por intentos fallidos.
+            if (!await userMgr.GetLockoutEnabledAsync(existing))
+                await userMgr.SetLockoutEnabledAsync(existing, true);
             return;
         }
 

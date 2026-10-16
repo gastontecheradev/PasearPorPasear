@@ -1,0 +1,14 @@
+@*
+    Un solo control para los tres idiomas de toda la pantalla: cambia todos
+    los campos a la vez y cuenta las traducciones que faltan (admin.js).
+    Va una vez por página, arriba de los campos.
+*@
+<div class="idioma-global" data-selector-idioma>
+    <p class="idioma-global-texto" id="idioma-global-etiqueta">Escribiendo en</p>
+    <div class="idioma-opciones" role="group" aria-labelledby="idioma-global-etiqueta">
+        <button type="button" data-idioma="es" aria-pressed="true">Español</button>
+        <button type="button" data-idioma="en" aria-pressed="false">Inglés <span class="idioma-faltan" data-faltan="en" hidden></span></button>
+        <button type="button" data-idioma="pt" aria-pressed="false">Portugués <span class="idioma-faltan" data-faltan="pt" hidden></span></button>
+    </div>
+    <p class="idioma-global-nota" data-nota-idioma aria-live="polite">El español es obligatorio. Lo que quede sin traducir se muestra en español.</p>
+</div>

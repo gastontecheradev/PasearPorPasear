@@ -3,11 +3,12 @@ using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
 using PasearPorPasear.Services;
+using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers.Admin;
 
 /// <summary>
-/// Las cuatro propuestas de ¿Paseás conmigo? Son fijas: se editan, no se
+/// Las cuatro propuestas de ¿Paseamos? Son fijas: se editan, no se
 /// crean ni se borran, porque la portada y el menú cuentan con que estén.
 /// </summary>
 [Route("Admin/Propuestas")]
@@ -22,11 +23,46 @@ public class PropuestasController : ControladorAdmin
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        ViewData["Title"] = "Propuestas";
-        return View(await Ctx.Propuestas.AsNoTracking()
-            .Include(p => p.Datos)
+        // Sin ImagenDatos: la miniatura la pide el navegador por su URL.
+        var filas = await Ctx.Propuestas.AsNoTracking()
             .OrderBy(p => p.Orden)
-            .ToListAsync());
+            .Select(p => new
+            {
+                p.Id, p.Titulo, p.Etiqueta, p.Orden, p.Activa, p.PendienteDeDefinir,
+                Casilleros = p.Datos.Count,
+                TieneImagen = p.ImagenDatos != null,
+                p.ImagenUrl, p.ActualizadaEn, p.CreadaEn
+            })
+            .ToListAsync();
+
+        var vm = filas.Select(p => new FilaAdminVm
+        {
+            Id = p.Id,
+            Titulo = p.Titulo,
+            Detalle = p.Etiqueta,
+            ImagenSrc = Imagen.Src("Propuesta", p.Id, p.TieneImagen, p.ImagenUrl, p.ActualizadaEn ?? p.CreadaEn),
+            Columna2 = p.Orden.ToString(),
+            Columna3 = p.Casilleros == 1 ? "1 casillero" : $"{p.Casilleros} casilleros",
+            Estado = !p.Activa ? "Oculta" : p.PendienteDeDefinir ? "Falta definir" : "Activa",
+            ClaseEstado = !p.Activa ? "pastilla--vencido" : p.PendienteDeDefinir ? "pastilla--espera" : "pastilla--activo",
+            Filtro = !p.Activa ? "oculta" : p.PendienteDeDefinir ? "pendiente" : "activa"
+        }).ToList();
+
+        ViewData["Title"] = "¿Paseamos?";
+        return View("ListadoAdmin", new ListadoAdminVm
+        {
+            Pagina = "paseos",
+            Titulo = "¿Paseamos?",
+            Subtitulo = "Las cuatro propuestas son fijas: se editan, no se crean ni se borran.",
+            UrlBase = "/Admin/Propuestas",
+            Filtros = { new("activa", "Activas"), new("pendiente", "Falta definir"), new("oculta", "Ocultas") },
+            Buscador = "Buscar por nombre…",
+            Vacio = "No hay propuestas cargadas.",
+            EncabezadoPrincipal = "Propuesta",
+            Encabezado2 = "Orden",
+            Encabezado3 = "Datos",
+            Filas = vm
+        });
     }
 
     [HttpGet("Editar/{id:int}")]

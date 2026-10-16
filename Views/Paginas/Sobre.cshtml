@@ -12,55 +12,77 @@
     {
         Nombre = "Contenido", Etiqueta = "Texto", Largo = true,
         Es = Model.Contenido, En = Model.ContenidoEn, Pt = Model.ContenidoPt,
-        Pista = "Admite HTML: cada párrafo entre etiquetas p."
+        Pista = "Admite HTML: cada párrafo entre <p> y </p>."
+    };
+    var campoAutora = new CamposIdiomaVm
+    {
+        Nombre = "ContenidoAutora", Etiqueta = "Texto", Largo = true,
+        Es = Model.ContenidoAutora, En = Model.ContenidoAutoraEn, Pt = Model.ContenidoAutoraPt,
+        Pista = "Admite HTML: cada párrafo entre <p> y </p>."
     };
     var campoImagen = new CampoImagenVm
     {
         Src = cargada ? $"/Imagenes/Sobre/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ImagenUrl,
         Alt = Model.ImagenAlt,
-        EsCargada = cargada
+        EsCargada = cargada,
+        Titulo = "Tu retrato"
+    };
+    var proyectoCargada = Model.ProyectoImagenDatos is { Length: > 0 };
+    var campoImagenProyecto = new CampoImagenVm
+    {
+        Src = proyectoCargada ? $"/Imagenes/SobreProyecto/{Model.Id}?v={Model.ActualizadaEn.Ticks}" : Model.ProyectoImagenUrl,
+        Alt = Model.ProyectoImagenAlt,
+        EsCargada = proyectoCargada,
+        Titulo = "Foto del proyecto",
+        CampoArchivo = "imagenProyecto",
+        CampoAlt = "ProyectoImagenAlt",
+        CampoBorrar = "borrarImagenProyecto"
+    };
+    var textos = (TextosPaginaVm)ViewData["Textos"]!;
+    var cabecera = new CabeceraPaginaVm { Pagina = textos.Pagina };
+    var barra = new BarraGuardarVm
+    {
+        EstadoInicial = $"Última modificación: {Model.ActualizadaEn:dd/MM/yyyy HH:mm}."
     };
 }
 
-<div class="admin-titulo">
-    <div>
-        <h1>Sobre PPP</h1>
-        <p>La página donde contás de qué se trata. <a href="/Sobre" target="_blank" rel="noopener">Ver en el sitio</a></p>
-    </div>
-    <div class="admin-acciones">
-        <a class="boton boton--borde" href="/Admin/Paginas/Encabezados">Títulos de sección</a>
-        <a class="boton boton--borde" href="/Admin/Paginas/Ajustes">Ajustes</a>
-    </div>
-</div>
+<partial name="_CabeceraPagina" model="cabecera" />
 
-<form method="post" action="/Admin/Paginas/Sobre" enctype="multipart/form-data">
+<form method="post" action="/Admin/Paginas/Sobre" enctype="multipart/form-data" data-editor>
     @Html.AntiForgeryToken()
 
     <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
 
+    <partial name="_SelectorIdioma" />
+
     <div class="admin-form">
-        <div>
-            <div class="admin-panel">
-                <h2>La página</h2>
-                <p>Es también el bloque «atrás de todo esto hay una persona» de la portada.</p>
+        <div class="admin-principal">
+            <section class="admin-seccion">
+                <h2>Sobre el proyecto</h2>
+                <p>La primera parte de la página: qué es Pasear por Pasear, con la foto del proyecto al lado.</p>
                 <partial name="_CamposIdioma" model="campoTitulo" />
                 <partial name="_CamposIdioma" model="campoContenido" />
+            </section>
 
+            <section class="admin-seccion">
+                <h2>Sobre vos</h2>
+                <p>La segunda parte, con tu retrato al lado.</p>
                 <div class="campo">
-                    <label for="Firma">Firma</label>
+                    <label for="Firma">Nombre</label>
                     <input id="Firma" name="Firma" type="text" value="@Model.Firma" maxlength="120" />
+                    <p class="pista">Es el título de esta parte.</p>
                 </div>
-            </div>
+                <partial name="_CamposIdioma" model="campoAutora" />
+            </section>
+
+            <partial name="_CamposTextos" model="textos" />
         </div>
 
-        <div>
-            <div class="admin-panel admin-panel--lateral">
-                <h2>Guardar</h2>
-                <p>Última modificación: @Model.ActualizadaEn.ToString("dd/MM/yyyy HH:mm").</p>
-                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">Guardar cambios</button>
-            </div>
-
+        <div class="admin-lado">
+            <partial name="_CampoImagen" model="campoImagenProyecto" />
             <partial name="_CampoImagen" model="campoImagen" />
         </div>
     </div>
+
+    <partial name="_BarraGuardar" model="barra" />
 </form>

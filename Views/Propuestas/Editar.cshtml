@@ -7,146 +7,135 @@
 
     var campoTitulo = new CamposIdiomaVm
     {
-        Nombre = "Titulo", Etiqueta = "Título",
+        Nombre = "Titulo", Etiqueta = "Título", Maximo = 200,
         Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt
     };
     var campoEtiqueta = new CamposIdiomaVm
     {
-        Nombre = "Etiqueta", Etiqueta = "Pastilla",
+        Nombre = "Etiqueta", Etiqueta = "Pastilla", Maximo = 80,
         Es = Model.Etiqueta, En = Model.EtiquetaEn, Pt = Model.EtiquetaPt,
-        Pista = "El rótulo chico de arriba: «Todos los meses», «A pedido»."
+        Pista = "El rótulo chico de arriba de la tarjeta: «Todos los meses», «A pedido»."
     };
     var campoDescripcion = new CamposIdiomaVm
     {
         Nombre = "Descripcion", Etiqueta = "Descripción", Largo = true,
         Es = Model.Descripcion, En = Model.DescripcionEn, Pt = Model.DescripcionPt,
-        Pista = "Admite HTML: los párrafos van entre etiquetas p."
+        Pista = "Admite HTML: cada párrafo entre <p> y </p>."
     };
     var campoImagen = new CampoImagenVm
     {
         Src = cargada ? $"/Imagenes/Propuesta/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
         Alt = Model.ImagenAlt,
-        EsCargada = cargada
+        EsCargada = cargada,
+        Titulo = "Foto de la tarjeta"
     };
+    var barra = new BarraGuardarVm { UrlVolver = "/Admin/Propuestas" };
 
     // Cuatro casilleros fijos: el diseño de la tabla no aguanta más.
     // Los que sobran salen vacíos y el controlador los descarta al guardar.
     Func<int, PropuestaDato> casillero = i => i < datos.Count ? datos[i] : new PropuestaDato();
+
+    // Una celda de casillero en los tres idiomas. Los nombres de los campos
+    // se repiten a propósito: el controlador los recibe como arreglos, en orden.
+    void Celda(int i, string campo, string que, string? es, string? en, string? pt, string? ejemplo)
+    {
+        <div class="idioma-campo" data-campo>
+            <div class="idioma-panel" data-idioma="es">
+                <label class="oculto-visual" for="@($"{campo}{i}")">Casillero @(i + 1), @que</label>
+                <input id="@($"{campo}{i}")" name="@campo" type="text" value="@es" maxlength="80" placeholder="@ejemplo" />
+            </div>
+            <div class="idioma-panel" data-idioma="en" hidden>
+                <label class="oculto-visual" for="@($"{campo}En{i}")">Casillero @(i + 1), @que en inglés</label>
+                <input id="@($"{campo}En{i}")" name="@(campo)En" type="text" value="@en" maxlength="80" placeholder="@es" />
+            </div>
+            <div class="idioma-panel" data-idioma="pt" hidden>
+                <label class="oculto-visual" for="@($"{campo}Pt{i}")">Casillero @(i + 1), @que en portugués</label>
+                <input id="@($"{campo}Pt{i}")" name="@(campo)Pt" type="text" value="@pt" maxlength="80" placeholder="@es" />
+            </div>
+        </div>
+    }
 }
 
-<div class="admin-titulo">
+<header class="admin-titulo">
     <div>
+        <nav class="admin-miga" aria-label="Estás en">
+            <a href="/Admin/Propuestas">¿Paseamos?</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@Model.Titulo</span>
+        </nav>
         <h1>@Model.Titulo</h1>
-        <p>Propuesta de ¿Paseás conmigo?</p>
+        <p><a href="/Paseos" target="_blank" rel="noopener">Ver ¿Paseamos? en el sitio<span class="oculto-visual"> (se abre en otra pestaña)</span></a></p>
     </div>
-    <div class="admin-acciones">
-        <a class="boton boton--borde" href="/Admin/Propuestas">Volver al listado</a>
-    </div>
-</div>
+</header>
 
-<form method="post" action="/Admin/Propuestas/Guardar" enctype="multipart/form-data">
+<form method="post" action="/Admin/Propuestas/Guardar" enctype="multipart/form-data" data-editor>
     @Html.AntiForgeryToken()
     <input type="hidden" name="Id" value="@Model.Id" />
 
     <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
 
+    <partial name="_SelectorIdioma" />
+
     <div class="admin-form">
-        <div>
-            <div class="admin-panel">
+        <div class="admin-principal">
+            <section class="admin-seccion">
                 <h2>La propuesta</h2>
                 <p>Lo que se lee en la tarjeta.</p>
                 <partial name="_CamposIdioma" model="campoTitulo" />
                 <partial name="_CamposIdioma" model="campoEtiqueta" />
                 <partial name="_CamposIdioma" model="campoDescripcion" />
-            </div>
+            </section>
 
-            <div class="admin-panel">
+            <section class="admin-seccion">
                 <h2>Casilleros de datos</h2>
-                <p>La tabla chica de la tarjeta: valor arriba, etiqueta abajo. Un casillero con el valor o la etiqueta vacíos no se guarda.</p>
+                <p>La tabla chica de la tarjeta: el valor va arriba y la etiqueta abajo. Un casillero al que le falte el valor o la etiqueta no se guarda.</p>
 
-                <div class="idioma-pestanas" role="tablist" aria-label="Idioma de los casilleros">
-                    <button type="button" data-idioma="es" aria-selected="true">ES</button>
-                    <button type="button" data-idioma="en" aria-selected="false">EN</button>
-                    <button type="button" data-idioma="pt" aria-selected="false">PT</button>
-                </div>
-
-                <div class="idioma-panel" data-idioma="es">
+                <div class="casilleros">
+                    <div class="casilleros-cabeza" aria-hidden="true">
+                        <span></span><span>Valor</span><span>Etiqueta</span>
+                    </div>
                     @for (var i = 0; i < 4; i++)
                     {
                         var d = casillero(i);
-                        <div class="admin-fila">
-                            <div class="campo">
-                                <label>Valor @(i + 1)</label>
-                                <input name="datoValor" type="text" value="@d.Valor" maxlength="80" placeholder="1 vez al mes" />
-                            </div>
-                            <div class="campo">
-                                <label>Etiqueta @(i + 1)</label>
-                                <input name="datoEtiqueta" type="text" value="@d.Etiqueta" maxlength="80" placeholder="frecuencia" />
-                            </div>
+                        <div class="casillero">
+                            <span class="casillero-numero" aria-hidden="true">@(i + 1)</span>
+                            @{ Celda(i, "datoValor", "valor", d.Valor, d.ValorEn, d.ValorPt, i == 0 ? "1 vez al mes" : null); }
+                            @{ Celda(i, "datoEtiqueta", "etiqueta", d.Etiqueta, d.EtiquetaEn, d.EtiquetaPt, i == 0 ? "frecuencia" : null); }
                         </div>
                     }
                 </div>
-
-                <div class="idioma-panel" data-idioma="en" hidden>
-                    @for (var i = 0; i < 4; i++)
-                    {
-                        var d = casillero(i);
-                        <div class="admin-fila">
-                            <div class="campo">
-                                <label>Valor @(i + 1) — inglés</label>
-                                <input name="datoValorEn" type="text" value="@d.ValorEn" maxlength="80" />
-                            </div>
-                            <div class="campo">
-                                <label>Etiqueta @(i + 1) — inglés</label>
-                                <input name="datoEtiquetaEn" type="text" value="@d.EtiquetaEn" maxlength="80" />
-                            </div>
-                        </div>
-                    }
-                </div>
-
-                <div class="idioma-panel" data-idioma="pt" hidden>
-                    @for (var i = 0; i < 4; i++)
-                    {
-                        var d = casillero(i);
-                        <div class="admin-fila">
-                            <div class="campo">
-                                <label>Valor @(i + 1) — portugués</label>
-                                <input name="datoValorPt" type="text" value="@d.ValorPt" maxlength="80" />
-                            </div>
-                            <div class="campo">
-                                <label>Etiqueta @(i + 1) — portugués</label>
-                                <input name="datoEtiquetaPt" type="text" value="@d.EtiquetaPt" maxlength="80" />
-                            </div>
-                        </div>
-                    }
-                </div>
-            </div>
+                <p class="pista">En inglés y portugués, el texto gris dentro de cada casillero es el original en español.</p>
+            </section>
         </div>
 
-        <div>
-            <div class="admin-panel admin-panel--lateral">
+        <div class="admin-lado">
+            <section class="admin-panel">
                 <h2>Estado</h2>
-                <p>Mientras esté pendiente de definir, la tarjeta muestra el aviso en vez de los datos.</p>
+                <p>Mientras falte definirla, la tarjeta muestra el aviso en lugar de los datos.</p>
 
-                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:14px">
-                    <input type="checkbox" name="PendienteDeDefinir" value="true" style="width:auto" @(Model.PendienteDeDefinir ? "checked" : "") />
-                    Falta definir el contenido
-                </label>
+                <fieldset class="conmutador">
+                    <legend>¿Se ve en el sitio?</legend>
+                    <div class="conmutador-opciones">
+                        <label><input type="radio" name="Activa" value="false" checked="@(!Model.Activa)" /> Oculta</label>
+                        <label><input type="radio" name="Activa" value="true" checked="@Model.Activa" /> Activa</label>
+                    </div>
+                </fieldset>
 
-                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
-                    <input type="checkbox" name="Activa" value="true" style="width:auto" @(Model.Activa ? "checked" : "") />
-                    Activa en el sitio
+                <label class="casilla">
+                    <input type="checkbox" name="PendienteDeDefinir" value="true" checked="@Model.PendienteDeDefinir" />
+                    <span>Falta definir el contenido<small>Muestra el aviso «falta definir» en la tarjeta.</small></span>
                 </label>
 
                 <div class="campo">
                     <label for="Orden">Orden</label>
                     <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                    <p class="pista">Más chico, más arriba.</p>
                 </div>
-
-                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">Guardar cambios</button>
-            </div>
+            </section>
 
             <partial name="_CampoImagen" model="campoImagen" />
         </div>
     </div>
+
+    <partial name="_BarraGuardar" model="barra" />
 </form>

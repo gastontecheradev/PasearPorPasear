@@ -37,11 +37,6 @@ public class ImagenesController : Controller
                 .Select(x => new Contenido(x.ImagenDatos, x.ImagenTipo))
                 .FirstOrDefaultAsync(ct),
 
-            "encuentro" => await _ctx.ClubcitoEncuentros
-                .Where(x => x.Id == id)
-                .Select(x => new Contenido(x.ImagenDatos, x.ImagenTipo))
-                .FirstOrDefaultAsync(ct),
-
             "afiche" => await _ctx.CarteleraAfiches
                 .Where(x => x.Id == id)
                 .Select(x => new Contenido(x.ImagenDatos, x.ImagenTipo))
@@ -55,6 +50,11 @@ public class ImagenesController : Controller
             "sobre" => await _ctx.PaginasSobre
                 .Where(x => x.Id == id)
                 .Select(x => new Contenido(x.ImagenDatos, x.ImagenTipo))
+                .FirstOrDefaultAsync(ct),
+
+            "sobreproyecto" => await _ctx.PaginasSobre
+                .Where(x => x.Id == id)
+                .Select(x => new Contenido(x.ProyectoImagenDatos, x.ProyectoImagenTipo))
                 .FirstOrDefaultAsync(ct),
 
             _ => null

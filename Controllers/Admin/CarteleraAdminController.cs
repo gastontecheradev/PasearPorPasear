@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
 using PasearPorPasear.Services;
+using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers.Admin;
 
@@ -20,11 +21,22 @@ public class CarteleraAdminController : ControladorAdmin
     [HttpGet("")]
     public async Task<IActionResult> Index()
     {
-        // Primero lo que espera revisión, después lo vigente, al final lo vencido.
+        // Primero lo pegado, después lo archivado. Sin los bytes de la imagen:
+        // la miniatura la pide el navegador por su URL.
         var afiches = await Ctx.CarteleraAfiches.AsNoTracking()
-            .OrderBy(a => a.Estado == EstadoAfiche.PorRevisar ? 0 : 1)
+            .OrderBy(a => a.Estado == EstadoAfiche.Publicado ? 0 : 1)
             .ThenBy(a => a.Orden)
             .ThenByDescending(a => a.CreadoEn)
+            .Select(a => new AficheVm
+            {
+                Id = a.Id,
+                Titulo = a.Titulo,
+                ImagenAlt = a.ImagenAlt,
+                TieneImagen = a.ImagenDatos != null,
+                Sello = a.ActualizadoEn ?? a.CreadoEn,
+                VigenteHasta = a.VigenteHasta,
+                Estado = a.Estado
+            })
             .ToListAsync();
 
         ViewData["Title"] = "Cartelera";
@@ -50,36 +62,33 @@ public class CarteleraAdminController : ControladorAdmin
     [HttpPost("Guardar")]
     [ValidateAntiForgeryToken]
     [RequestSizeLimit(8 * 1024 * 1024)]
-    public async Task<IActionResult> Guardar(CarteleraAfiche entrada, IFormFile? imagen, bool borrarImagen = false)
+    public async Task<IActionResult> Guardar(
+        [Bind(nameof(CarteleraAfiche.Id), nameof(CarteleraAfiche.Titulo), nameof(CarteleraAfiche.ImagenAlt),
+              nameof(CarteleraAfiche.VigenteHasta), nameof(CarteleraAfiche.Estado), nameof(CarteleraAfiche.Orden))]
+        CarteleraAfiche entrada,
+        IFormFile? imagen)
     {
         var esNuevo = entrada.Id == 0;
         var a = esNuevo ? new CarteleraAfiche() : await Ctx.CarteleraAfiches.FindAsync(entrada.Id);
         if (a is null) return NotFound();
 
         a.Titulo = entrada.Titulo?.Trim() ?? string.Empty;
-        a.Barrio = entrada.Barrio?.Trim();
-        a.Texto = entrada.Texto?.Trim() ?? string.Empty;
-        a.Contacto = entrada.Contacto?.Trim();
-        a.VigenteHasta = entrada.VigenteHasta;
-        a.Color = entrada.Color;
-        a.Estado = entrada.Estado;
-        a.Orden = entrada.Orden;
-        a.EmailRemitente = entrada.EmailRemitente?.Trim();
         a.ImagenAlt = entrada.ImagenAlt?.Trim();
+        a.VigenteHasta = entrada.VigenteHasta;
+        a.Estado = Enum.IsDefined(entrada.Estado) ? entrada.Estado : EstadoAfiche.Publicado;
+        a.Orden = entrada.Orden;
 
-        if (!await AplicarImagenAsync(a, imagen, borrarImagen))
+        ViewData["Title"] = esNuevo ? "Afiche nuevo" : a.Titulo;
+
+        // La imagen no se puede quitar, sólo reemplazar: es el afiche.
+        if (!await AplicarImagenAsync(a, imagen, borrarImagen: false))
             return View("Editar", a);
 
-        if (string.IsNullOrWhiteSpace(a.Titulo))
-            ModelState.AddModelError(nameof(CarteleraAfiche.Titulo), "El título es obligatorio.");
-        if (string.IsNullOrWhiteSpace(a.Texto))
-            ModelState.AddModelError(nameof(CarteleraAfiche.Texto), "El texto del afiche es obligatorio.");
+        if (a.ImagenDatos is not { Length: > 0 })
+            ModelState.AddModelError("imagen", "Falta la imagen del afiche. Subí la plantilla ya terminada.");
 
         if (!ModelState.IsValid)
-        {
-            ViewData["Title"] = esNuevo ? "Afiche nuevo" : a.Titulo;
             return View("Editar", a);
-        }
 
         if (esNuevo)
         {
@@ -92,15 +101,19 @@ public class CarteleraAdminController : ControladorAdmin
         }
 
         await Ctx.SaveChangesAsync();
-        TempData["Success"] = esNuevo ? "Afiche pegado." : "Cambios guardados.";
+        TempData["Success"] = esNuevo
+            ? (a.Estado == EstadoAfiche.Publicado ? $"«{a.Titulo}» quedó pegado en la cartelera." : $"«{a.Titulo}» quedó guardado, archivado.")
+            : "Cambios guardados.";
         return RedirectToAction(nameof(Index));
     }
 
-    /// <summary>Publicar o archivar de un clic, desde el listado.</summary>
+    /// <summary>Pegar o archivar de un clic, desde el listado.</summary>
     [HttpPost("Estado/{id:int}")]
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> CambiarEstado(int id, EstadoAfiche estado)
     {
+        if (!Enum.IsDefined(estado)) return BadRequest();
+
         var a = await Ctx.CarteleraAfiches.FindAsync(id);
         if (a is null) return NotFound();
 
@@ -108,12 +121,9 @@ public class CarteleraAdminController : ControladorAdmin
         a.ActualizadoEn = DateTime.Now;
         await Ctx.SaveChangesAsync();
 
-        TempData["Success"] = estado switch
-        {
-            EstadoAfiche.Publicado => $"«{a.Titulo}» quedó pegado en la cartelera.",
-            EstadoAfiche.Archivado => $"«{a.Titulo}» se archivó.",
-            _ => "Estado actualizado."
-        };
+        TempData["Success"] = estado == EstadoAfiche.Publicado
+            ? $"«{a.Titulo}» quedó pegado en la cartelera."
+            : $"«{a.Titulo}» se archivó: ya no se ve en el sitio.";
         return RedirectToAction(nameof(Index));
     }
 

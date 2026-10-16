@@ -7,12 +7,12 @@
 
     var campoTitulo = new CamposIdiomaVm
     {
-        Nombre = "Titulo", Etiqueta = "Nombre",
+        Nombre = "Titulo", Etiqueta = "Nombre", Maximo = 160,
         Es = Model.Titulo, En = Model.TituloEn, Pt = Model.TituloPt
     };
     var campoDescripcion = new CamposIdiomaVm
     {
-        Nombre = "Descripcion", Etiqueta = "Descripción", Largo = true,
+        Nombre = "Descripcion", Etiqueta = "Descripción", Largo = true, Maximo = 600,
         Es = Model.Descripcion, En = Model.DescripcionEn, Pt = Model.DescripcionPt,
         Pista = "Dos o tres líneas. Hasta 600 caracteres."
     };
@@ -20,58 +20,101 @@
     {
         Src = cargada ? $"/Imagenes/Producto/{Model.Id}?v={sello.Ticks}" : Model.ImagenUrl,
         Alt = Model.ImagenAlt,
-        EsCargada = cargada
+        EsCargada = cargada,
+        Titulo = "Ilustración"
     };
-    var colores = new (ColorAfiche Valor, string Nombre)[]
+    // Las muestras usan los mismos colores que el fondo de la tarjeta pública
+    // (.producto--*). «Rayas» es un nombre viejo del enum: se ve piedra.
+    var colores = new (ColorAfiche Valor, string Nombre, string Muestra)[]
     {
-        (ColorAfiche.Mostaza, "Mostaza"),
-        (ColorAfiche.Durazno, "Durazno"),
-        (ColorAfiche.Rayas, "Piedra"),
-        (ColorAfiche.Petroleo, "Petróleo"),
-        (ColorAfiche.Crema, "Crema")
+        (ColorAfiche.Mostaza, "Mostaza", "var(--mostaza)"),
+        (ColorAfiche.Durazno, "Durazno", "var(--durazno)"),
+        (ColorAfiche.Rayas, "Piedra", "var(--piedra)"),
+        (ColorAfiche.Petroleo, "Petróleo", "var(--petroleo)"),
+        (ColorAfiche.Crema, "Crema", "var(--crema-2)")
+    };
+    var barra = new BarraGuardarVm
+    {
+        TextoGuardar = esNuevo ? "Crear el producto" : "Guardar cambios",
+        UrlVolver = "/Admin/Productos"
+    };
+    var borrar = new ZonaBorrarVm
+    {
+        Url = $"/Admin/Productos/Borrar/{Model.Id}",
+        Nombre = Model.Titulo,
+        Texto = "Borrar el producto",
+        Explicacion = "Sale del catálogo y de la base. No se puede deshacer; para sacarlo un tiempo, ocultalo."
     };
 }
 
-<div class="admin-titulo">
+<header class="admin-titulo">
     <div>
+        <nav class="admin-miga" aria-label="Estás en">
+            <a href="/Admin/Productos">Productos</a>
+            <span aria-hidden="true">/</span>
+            <span aria-current="page">@(esNuevo ? "Nuevo" : Model.Titulo)</span>
+        </nav>
         <h1>@(esNuevo ? "Producto nuevo" : Model.Titulo)</h1>
-        <p>El panel de color es el fondo detrás de la ilustración.</p>
+        <p><a href="/Productos" target="_blank" rel="noopener">Ver el catálogo en el sitio<span class="oculto-visual"> (se abre en otra pestaña)</span></a></p>
     </div>
-    <div class="admin-acciones">
-        <a class="boton boton--borde" href="/Admin/Productos">Volver al listado</a>
-    </div>
-</div>
+</header>
 
-<form method="post" action="/Admin/Productos/Guardar" enctype="multipart/form-data">
+<form method="post" action="/Admin/Productos/Guardar" enctype="multipart/form-data" data-editor>
     @Html.AntiForgeryToken()
     <input type="hidden" name="Id" value="@Model.Id" />
 
     <div asp-validation-summary="All" class="aviso aviso--error" role="alert"></div>
 
+    <partial name="_SelectorIdioma" />
+
     <div class="admin-form">
-        <div>
-            <div class="admin-panel">
+        <div class="admin-principal">
+            <section class="admin-seccion">
                 <h2>El producto</h2>
-                <p>Lo que se lee en la tarjeta.</p>
+                <p>Lo que se lee en la tarjeta del catálogo.</p>
                 <partial name="_CamposIdioma" model="campoTitulo" />
                 <partial name="_CamposIdioma" model="campoDescripcion" />
-            </div>
+            </section>
 
-            <div class="admin-panel">
+            <section class="admin-seccion">
+                <h2>Color de fondo</h2>
+                <p>El panel de color que va detrás de la ilustración.</p>
+                <fieldset class="muestras">
+                    <legend class="oculto-visual">Color del panel</legend>
+                    @foreach (var c in colores)
+                    {
+                        <label>
+                            <input type="radio" name="ColorPanel" value="@((int)c.Valor)" checked="@(Model.ColorPanel == c.Valor)" />
+                            <span class="muestra" style="background:@c.Muestra"></span>
+                            @c.Nombre
+                        </label>
+                    }
+                </fieldset>
+            </section>
+
+            <section class="admin-seccion">
                 <h2>Descarga</h2>
                 <p>Sólo para los productos gratis, como la cartelera imprimible.</p>
                 <div class="campo">
                     <label for="ArchivoUrl">Dirección del archivo</label>
                     <input id="ArchivoUrl" name="ArchivoUrl" type="text" value="@Model.ArchivoUrl" maxlength="500" />
-                    <p class="pista">Por ejemplo /descargas/cartelera-a5.pdf, con el PDF en wwwroot.</p>
+                    <p class="pista">Por ejemplo /descargas/cartelera-a5.pdf, con el PDF dentro de wwwroot.</p>
                 </div>
-            </div>
+            </section>
         </div>
 
-        <div>
-            <div class="admin-panel admin-panel--lateral">
-                <h2>Venta y orden</h2>
+        <div class="admin-lado">
+            <section class="admin-panel">
+                <h2>Venta</h2>
                 <p>Mientras esté en preparación no se muestra precio.</p>
+
+                <fieldset class="conmutador">
+                    <legend>¿Se ve en el catálogo?</legend>
+                    <div class="conmutador-opciones">
+                        <label><input type="radio" name="Visible" value="false" checked="@(!Model.Visible)" /> Oculto</label>
+                        <label><input type="radio" name="Visible" value="true" checked="@Model.Visible" /> Visible</label>
+                    </div>
+                </fieldset>
 
                 <div class="campo">
                     <label for="Estado">Estado</label>
@@ -83,39 +126,27 @@
                 </div>
 
                 <div class="campo">
-                    <label for="Precio">Precio</label>
+                    <label for="Precio">Precio en pesos</label>
                     <input id="Precio" name="Precio" type="number" step="1" min="0"
                            value="@(Model.Precio?.ToString("0"))" />
-                    <p class="pista">En pesos. Sólo si está a la venta.</p>
+                    <p class="pista">Obligatorio si está a la venta.</p>
                 </div>
 
-                <div class="admin-fila">
-                    <div class="campo">
-                        <label for="ColorPanel">Panel de color</label>
-                        <select id="ColorPanel" name="ColorPanel">
-                            @foreach (var c in colores)
-                            {
-                                <option value="@((int)c.Valor)" selected="@(Model.ColorPanel == c.Valor)">@c.Nombre</option>
-                            }
-                        </select>
-                    </div>
-                    <div class="campo">
-                        <label for="Orden">Orden</label>
-                        <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
-                    </div>
+                <div class="campo">
+                    <label for="Orden">Orden en el catálogo</label>
+                    <input id="Orden" name="Orden" type="number" value="@Model.Orden" />
+                    <p class="pista">Más chico, más arriba.</p>
                 </div>
-
-                <label style="display:flex;gap:8px;align-items:center;font-size:var(--t-sm);font-weight:600;margin-bottom:18px">
-                    <input type="checkbox" name="Visible" value="true" style="width:auto" @(Model.Visible ? "checked" : "") />
-                    Visible en el sitio
-                </label>
-
-                <button class="boton boton--principal" type="submit" style="width:100%;justify-content:center">
-                    @(esNuevo ? "Crear el producto" : "Guardar cambios")
-                </button>
-            </div>
+            </section>
 
             <partial name="_CampoImagen" model="campoImagen" />
+
+            @if (!esNuevo)
+            {
+                <partial name="_ZonaBorrar" model="borrar" />
+            }
         </div>
     </div>
+
+    <partial name="_BarraGuardar" model="barra" />
 </form>

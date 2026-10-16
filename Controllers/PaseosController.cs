@@ -2,40 +2,18 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using PasearPorPasear.Data;
 using PasearPorPasear.Models;
+using PasearPorPasear.Services;
 using PasearPorPasear.ViewModels;
 
 namespace PasearPorPasear.Controllers;
 
 public class PaseosController : ControladorPublico
 {
-    public PaseosController(ApplicationDbContext ctx) : base(ctx) { }
+    public PaseosController(ApplicationDbContext ctx, ITextos textos) : base(ctx, textos) { }
 
-    public async Task<IActionResult> Index() => View(await ArmarAsync(new ConsultaPaseo()));
-
-    [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Consulta(ConsultaPaseo consulta)
+    public async Task<IActionResult> Index()
     {
-        if (!ModelState.IsValid)
-            return View(nameof(Index), await ArmarAsync(consulta));
-
-        consulta.CreadaEn = DateTime.Now;
-        consulta.Estado = EstadoConsulta.Pendiente;
-        Ctx.ConsultasPaseo.Add(consulta);
-        await Ctx.SaveChangesAsync();
-
-        TempData["Success"] = Idioma switch
-        {
-            "en" => "Consultation sent. I'll reply with the available dates.",
-            "pt" => "Consulta enviada. Respondo com as datas disponíveis.",
-            _    => "Consulta enviada. Te contesto con las fechas disponibles."
-        };
-        return RedirectToAction(nameof(Index));
-    }
-
-    private async Task<PaseosVm> ArmarAsync(ConsultaPaseo consulta)
-    {
-        var vm = await PrepararAsync(new PaseosVm { Consulta = consulta }, "paseos");
+        var vm = Preparar(new PaseosVm());
 
         var filas = await Ctx.Propuestas.AsNoTracking()
             .Where(p => p.Activa)
@@ -69,14 +47,23 @@ public class PaseosController : ControladorPublico
                 Valor = vm.T(d.Valor, d.ValorEn, d.ValorPt),
                 Etiqueta = vm.T(d.Etiqueta, d.EtiquetaEn, d.EtiquetaPt)
             }).ToList(),
-            // El Clubcito tiene página propia; el resto lleva al formulario de consulta.
-            Enlace = p.Clave == ClavePropuesta.Clubcito ? "/Clubcito" : "#consulta",
+            // El Clubcito lleva al formulario de novedades (MailerLite); el resto, a la página de contacto.
+            Enlace = p.Clave == ClavePropuesta.Clubcito
+                ? Textos.Enlace("paseos.enlace-clubcito") ?? "/Contacto"
+                : "/Contacto",
             TextoEnlace = p.Clave == ClavePropuesta.Clubcito
-                ? vm.T("Conocer El Clubcito", "Meet El Clubcito", "Conhecer El Clubcito")
-                : vm.T("Consultar", "Get in touch", "Consultar")
+                ? Textos["paseos.boton-clubcito"]
+                : Textos["paseos.boton-consultar"]
         }).ToList();
 
-        ViewData["Title"] = vm.TituloSeccion;
-        return vm;
+        ViewData["Title"] = Textos["paseos.titulo"];
+        return View(vm);
     }
+
+    /// <summary>
+    /// El Clubcito ya no tiene página propia: sigue como propuesta de
+    /// ¿Paseamos?. Las direcciones viejas (y sus encuentros) llevan ahí.
+    /// </summary>
+    [HttpGet("Clubcito/{**resto}")]
+    public IActionResult ClubcitoViejo() => RedirectPermanent("/Paseos");
 }

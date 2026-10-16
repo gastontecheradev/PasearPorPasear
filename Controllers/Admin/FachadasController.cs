@@ -33,17 +33,20 @@ public class FachadasController : ControladorAdmin
             Titulo = f.Titulo,
             Detalle = f.Calle,
             ImagenSrc = Imagen.Src("Fachada", f.Id, f.TieneImagen, f.ImagenUrl, f.ActualizadaEn ?? f.CreadaEn),
-            Columna2 = $"N.º {f.Numero}",
-            Columna3 = f.Barrio + " · " + f.FechaEncontrada.ToString("dd/MM/yyyy"),
+            Columna2 = f.Numero.ToString(),
+            Columna3 = $"{f.Barrio}, {f.FechaEncontrada:dd/MM/yyyy}",
             Estado = f.Publicada ? "Publicada" : "Borrador",
-            ClaseEstado = f.Publicada ? "pastilla--activo" : "pastilla--espera"
+            ClaseEstado = f.Publicada ? "pastilla--activo" : "pastilla--espera",
+            Filtro = f.Publicada ? "publicada" : "borrador"
         }).ToList();
 
         ViewData["Title"] = "Fachadas";
         return View("ListadoAdmin", new ListadoAdminVm
         {
+            Pagina = "archivo",
             Titulo = "Fachadas",
-            Subtitulo = $"{vm.Count} ficha(s) en el archivo.",
+            Subtitulo = vm.Count == 1 ? "1 ficha en el archivo." : $"{vm.Count} fichas en el archivo.",
+            Filtros = { new("publicada", "Publicadas"), new("borrador", "En borrador") },
             UrlBase = "/Admin/Fachadas",
             UrlNueva = "/Admin/Fachadas/Nueva",
             TextoNueva = "Fachada nueva",

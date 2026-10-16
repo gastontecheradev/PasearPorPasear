@@ -1,0 +1,35 @@
+@model CabeceraPaginaVm
+@*
+    Cabecera de cada página del sitio en el panel. Si la página tiene
+    entradas (fichas, propuestas, productos, afiches), lleva dos pestañas:
+    las entradas y los textos fijos de la página.
+*@
+@{
+    var p = Model.Pagina;
+}
+<header class="admin-titulo admin-titulo--pagina">
+    <div>
+        <h1>@p.Nombre</h1>
+        <p>
+            @p.Descripcion
+            @if (p.UrlPublica is not null)
+            {
+                <a href="@p.UrlPublica" target="_blank" rel="noopener">Ver la página en el sitio<span class="oculto-visual"> (se abre en otra pestaña)</span></a>
+            }
+        </p>
+    </div>
+</header>
+
+@if (p.UrlListado is not null)
+{
+    <nav class="admin-pestanas" aria-label="@p.Nombre">
+        <a href="@p.UrlListado" aria-current="@(Model.Activa == "listado" ? "page" : null)">
+            @p.TextoListado
+            @if (Model.Cuenta is int n)
+            {
+                <span class="cuenta">@n</span>
+            }
+        </a>
+        <a href="@p.UrlTextos" aria-current="@(Model.Activa == "textos" ? "page" : null)">Textos de la página</a>
+    </nav>
+}

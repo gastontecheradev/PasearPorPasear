@@ -100,7 +100,7 @@ public class Fachada : ITieneImagen
 }
 
 // ──────────────────────────────────────────────────────────────
-//  ¿Paseás conmigo? — las cuatro propuestas
+//  ¿Paseamos? — las cuatro propuestas
 // ──────────────────────────────────────────────────────────────
 public enum ClavePropuesta { Clubcito, AlSobre, RecorridosCreativos, Personalizados }
 
@@ -149,7 +149,6 @@ public class Propuesta : ITieneImagen
     public DateTime? ActualizadaEn { get; set; }
 
     public ICollection<PropuestaDato> Datos { get; set; } = new List<PropuestaDato>();
-    public ICollection<ConsultaPaseo> Consultas { get; set; } = new List<ConsultaPaseo>();
 }
 
 /// <summary>
@@ -174,111 +173,49 @@ public class PropuestaDato
 }
 
 // ──────────────────────────────────────────────────────────────
-//  El Clubcito — la salida mensual
-// ──────────────────────────────────────────────────────────────
-public enum EstadoEncuentro { Proximo, Realizado, SinDefinir }
-
-public class ClubcitoEncuentro : ITieneImagen
-{
-    public int Id { get; set; }
-
-    [Required(ErrorMessage = "El título es obligatorio")]
-    [StringLength(200)]
-    public string Titulo { get; set; } = string.Empty;
-    [StringLength(200)] public string TituloEn { get; set; } = string.Empty;
-    [StringLength(200)] public string TituloPt { get; set; } = string.Empty;
-
-    [StringLength(220)] public string Slug { get; set; } = string.Empty;
-
-    /// <summary>Fecha de la salida: ordena la lista y decide el estado.</summary>
-    public DateTime Fecha { get; set; }
-
-    [StringLength(120)] public string? Barrio { get; set; }
-
-    [StringLength(200)] public string? PuntoEncuentro { get; set; }
-    [StringLength(200)] public string? PuntoEncuentroEn { get; set; }
-    [StringLength(200)] public string? PuntoEncuentroPt { get; set; }
-
-    [StringLength(600)] public string? Extracto { get; set; }
-    [StringLength(600)] public string? ExtractoEn { get; set; }
-    [StringLength(600)] public string? ExtractoPt { get; set; }
-
-    /// <summary>La crónica, que se escribe después de la salida.</summary>
-    public string Contenido { get; set; } = string.Empty;
-    public string ContenidoEn { get; set; } = string.Empty;
-    public string ContenidoPt { get; set; } = string.Empty;
-
-    public byte[]? ImagenDatos { get; set; }
-    [StringLength(100)] public string? ImagenTipo { get; set; }
-    [StringLength(500)] public string? ImagenUrl { get; set; }
-    [StringLength(300)] public string? ImagenAlt { get; set; }
-
-    /// <summary>Imagen cargada si la hay; si no, la ruta estática del seed.</summary>
-    [NotMapped]
-    public string? ImagenSrc => ImagenDatos is { Length: > 0 }
-        ? $"/Imagenes/Encuentro/{Id}?v={(ActualizadoEn ?? CreadoEn).Ticks}"
-        : ImagenUrl;
-
-    [StringLength(600)] public string? MapaEmbedUrl { get; set; }
-
-    /// <summary>Cuánta gente fue. Se carga después y se muestra en la tarjeta.</summary>
-    public int? Asistentes { get; set; }
-
-    public EstadoEncuentro Estado { get; set; } = EstadoEncuentro.Proximo;
-    public bool Publicado { get; set; } = true;
-    public DateTime CreadoEn { get; set; } = DateTime.Now;
-    public DateTime? ActualizadoEn { get; set; }
-}
-
-// ──────────────────────────────────────────────────────────────
 //  Cartelera de barrio
 // ──────────────────────────────────────────────────────────────
 /// <summary>Los seis diseños de afiche del manual de marca.</summary>
 public enum ColorAfiche { Crema, Mostaza, Petroleo, Coral, Durazno, Rayas }
 
-public enum EstadoAfiche { PorRevisar, Publicado, Archivado }
+/// <summary>
+/// Los valores van explícitos porque se guardan como entero: antes existía
+/// «PorRevisar» (0) y los números de los demás no pueden moverse.
+/// </summary>
+public enum EstadoAfiche { Publicado = 1, Archivado = 2 }
 
 /// <summary>
-/// Los afiches los manda el barrio por correo y son avisos locales, así que
-/// van en un solo idioma a propósito: nadie traduce el aviso del gato perdido
-/// de la esquina. Si algún día hace falta, se agregan los sufijos.
+/// Rosalía arma cada afiche aparte, sobre la plantilla de la cartelera, y lo
+/// sube ya terminado como imagen: todo lo que dice el afiche va dentro de la
+/// imagen. Por eso acá sólo queda un nombre para reconocerlo en el panel y el
+/// texto alternativo para quien no puede ver la imagen.
 /// </summary>
 public class CarteleraAfiche : ITieneImagen
 {
     public int Id { get; set; }
 
-    [Required(ErrorMessage = "El título es obligatorio")]
+    /// <summary>Nombre para reconocerlo en el panel. Si no hay texto alternativo, se usa como tal.</summary>
+    [Required(ErrorMessage = "Poné un nombre para reconocer el afiche en el listado")]
     [StringLength(120)]
     public string Titulo { get; set; } = string.Empty;
-
-    [StringLength(120)] public string? Barrio { get; set; }
-
-    [Required(ErrorMessage = "El texto del afiche es obligatorio")]
-    [StringLength(400, ErrorMessage = "Cuatro o cinco líneas como máximo, para que entre en el afiche")]
-    public string Texto { get; set; } = string.Empty;
-
-    /// <summary>Teléfono, correo o lo que haya mandado quien publica.</summary>
-    [StringLength(200)] public string? Contacto { get; set; }
 
     /// <summary>Null = sin vencimiento, como un oficio.</summary>
     public DateTime? VigenteHasta { get; set; }
 
-    public ColorAfiche Color { get; set; } = ColorAfiche.Crema;
-    public EstadoAfiche Estado { get; set; } = EstadoAfiche.PorRevisar;
+    public EstadoAfiche Estado { get; set; } = EstadoAfiche.Publicado;
 
+    /// <summary>El afiche en sí. Obligatoria: un afiche sin imagen no se puede mostrar.</summary>
     public byte[]? ImagenDatos { get; set; }
     [StringLength(100)] public string? ImagenTipo { get; set; }
     [StringLength(500)] public string? ImagenUrl { get; set; }
+
+    /// <summary>Lo que dice el afiche, para los lectores de pantalla.</summary>
     [StringLength(300)] public string? ImagenAlt { get; set; }
 
-    /// <summary>Imagen cargada si la hay; si no, la ruta estática del seed.</summary>
     [NotMapped]
     public string? ImagenSrc => ImagenDatos is { Length: > 0 }
         ? $"/Imagenes/Afiche/{Id}?v={(ActualizadoEn ?? CreadoEn).Ticks}"
         : ImagenUrl;
-
-    /// <summary>De qué correo llegó, para poder contestarle a quien lo mandó.</summary>
-    [EmailAddress][StringLength(200)] public string? EmailRemitente { get; set; }
 
     public int Orden { get; set; }
     public DateTime CreadoEn { get; set; } = DateTime.Now;
@@ -345,15 +282,27 @@ public class PaginaSobre : ITieneImagen
 {
     public int Id { get; set; }
 
-    [Required] public string Titulo { get; set; } = "Sobre Pasear por Pasear";
+    [Required] public string Titulo { get; set; } = "Sobre Pasear Por Pasear";
     [Required] public string TituloEn { get; set; } = "About Pasear por Pasear";
-    public string TituloPt { get; set; } = "Sobre Pasear por Pasear";
+    public string TituloPt { get; set; } = "Sobre Pasear Por Pasear";
 
     public string Contenido { get; set; } = string.Empty;
     public string ContenidoEn { get; set; } = string.Empty;
     public string ContenidoPt { get; set; } = string.Empty;
 
+    /// <summary>La foto de la sección del proyecto, a la derecha del texto.</summary>
+    public byte[]? ProyectoImagenDatos { get; set; }
+    [StringLength(100)] public string? ProyectoImagenTipo { get; set; }
+    [StringLength(500)] public string? ProyectoImagenUrl { get; set; }
+    [StringLength(300)] public string? ProyectoImagenAlt { get; set; }
+
+    /// <summary>El nombre de Rosalía: es el título de la segunda sección de la página.</summary>
     [StringLength(120)] public string Firma { get; set; } = "Rosalía Souza";
+
+    /// <summary>La sección sobre Rosalía, debajo de la del proyecto.</summary>
+    public string ContenidoAutora { get; set; } = string.Empty;
+    public string ContenidoAutoraEn { get; set; } = string.Empty;
+    public string ContenidoAutoraPt { get; set; } = string.Empty;
 
     /// <summary>El retrato. Rosalía lo cambia desde el panel.</summary>
     public byte[]? ImagenDatos { get; set; }
@@ -370,122 +319,27 @@ public class PaginaSobre : ITieneImagen
     public DateTime ActualizadaEn { get; set; } = DateTime.Now;
 }
 
+// ──────────────────────────────────────────────────────────────
+//  Textos del sitio
+// ──────────────────────────────────────────────────────────────
 /// <summary>
-/// Título y bajada de cada sección, editables desde el panel sin tocar vistas.
-/// Una sola tabla buscada por Clave (archivo, paseos, clubcito, cartelera,
-/// productos, contacto) en vez de una tabla por página.
+/// Cualquier texto o enlace fijo del sitio que no es una entrada: títulos y
+/// bajadas de cada página, botones, el pie, el menú, los datos de contacto.
+/// Qué claves existen, en qué página van y su valor de arranque está en
+/// Services/CatalogoTextos.cs; acá sólo se guarda lo que Rosalía cambió.
 /// </summary>
-public class EncabezadoSeccion
+public class TextoSitio
 {
     public int Id { get; set; }
 
-    [Required][StringLength(60)] public string Clave { get; set; } = string.Empty;
-
-    [Required][StringLength(200)] public string Titulo { get; set; } = string.Empty;
-    [StringLength(200)] public string TituloEn { get; set; } = string.Empty;
-    [StringLength(200)] public string TituloPt { get; set; } = string.Empty;
-
-    /// <summary>Admite HTML: la portada la usa para el texto de «Qué es Pasear por Pasear».</summary>
-    [StringLength(2000)] public string? Bajada { get; set; }
-    [StringLength(2000)] public string? BajadaEn { get; set; }
-    [StringLength(2000)] public string? BajadaPt { get; set; }
-
-    public DateTime ActualizadoEn { get; set; } = DateTime.Now;
-}
-
-// ──────────────────────────────────────────────────────────────
-//  El buzón de la Casita  (antes NewsletterSubscriber)
-// ──────────────────────────────────────────────────────────────
-public class SuscriptorBuzon
-{
-    public int Id { get; set; }
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(120)] public string? Nombre { get; set; }
-
-    /// <summary>Desde qué formulario llegó: portada, clubcito, productos, contacto.</summary>
-    [StringLength(40)] public string? Origen { get; set; }
-
-    public DateTime SuscritoEn { get; set; } = DateTime.Now;
-    public bool Activo { get; set; } = true;
-}
-
-// ──────────────────────────────────────────────────────────────
-//  Consultas y mensajes
-// ──────────────────────────────────────────────────────────────
-public enum EstadoConsulta { Pendiente, Contestada, Confirmada, Cancelada }
-
-public class ConsultaPaseo
-{
-    public int Id { get; set; }
-
-    /// <summary>Null si la propuesta se borró: la consulta se conserva igual.</summary>
-    public int? PropuestaId { get; set; }
-
-    [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(150)]
-    public string Nombre { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(50)] public string? Telefono { get; set; }
-
-    public DateTime? FechaDeseada { get; set; }
-
-    [Range(1, 40, ErrorMessage = "Entre 1 y 40 personas")]
-    public int CantidadPersonas { get; set; } = 2;
-
-    [StringLength(1000)] public string? Notas { get; set; }
-
-    public EstadoConsulta Estado { get; set; } = EstadoConsulta.Pendiente;
-    public DateTime CreadaEn { get; set; } = DateTime.Now;
-
-    public Propuesta? Propuesta { get; set; }
-}
-
-public class MensajeContacto
-{
-    public int Id { get; set; }
-
-    [Required(ErrorMessage = "El nombre es obligatorio")]
-    [StringLength(150)]
-    public string Nombre { get; set; } = string.Empty;
-
-    [Required(ErrorMessage = "El correo es obligatorio")]
-    [EmailAddress(ErrorMessage = "Ese correo no parece válido")]
-    [StringLength(200)]
-    public string Email { get; set; } = string.Empty;
-
-    [StringLength(200)] public string? Asunto { get; set; }
-
-    [Required(ErrorMessage = "El mensaje es obligatorio")]
-    [StringLength(2000)]
-    public string Mensaje { get; set; } = string.Empty;
-
-    public DateTime EnviadoEn { get; set; } = DateTime.Now;
-    public bool Leido { get; set; }
-}
-
-// ──────────────────────────────────────────────────────────────
-//  Ajustes del sitio
-// ──────────────────────────────────────────────────────────────
-public class Ajuste
-{
-    public int Id { get; set; }
-
-    [Required][StringLength(100)]
-    public string Clave { get; set; } = string.Empty;
+    /// <summary>«pagina.nombre», por ejemplo «portada.frase».</summary>
+    [Required][StringLength(80)] public string Clave { get; set; } = string.Empty;
 
     public string Valor { get; set; } = string.Empty;
     public string ValorEn { get; set; } = string.Empty;
     public string ValorPt { get; set; } = string.Empty;
+
+    public DateTime ActualizadoEn { get; set; } = DateTime.Now;
 }
 
 // ──────────────────────────────────────────────────────────────

@@ -224,39 +224,6 @@ namespace PasearPorPasear.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("PasearPorPasear.Models.Ajuste", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Clave")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("Valor")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ValorEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ValorPt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Clave")
-                        .IsUnique();
-
-                    b.ToTable("Ajustes");
-                });
-
             modelBuilder.Entity("PasearPorPasear.Models.CarteleraAfiche", b =>
                 {
                     b.Property<int>("Id")
@@ -268,23 +235,8 @@ namespace PasearPorPasear.Migrations
                     b.Property<DateTime?>("ActualizadoEn")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Barrio")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<int>("Color")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Contacto")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
                     b.Property<DateTime>("CreadoEn")
                         .HasColumnType("datetime2");
-
-                    b.Property<string>("EmailRemitente")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
 
                     b.Property<int>("Estado")
                         .HasColumnType("int");
@@ -307,11 +259,6 @@ namespace PasearPorPasear.Migrations
                     b.Property<int>("Orden")
                         .HasColumnType("int");
 
-                    b.Property<string>("Texto")
-                        .IsRequired()
-                        .HasMaxLength(400)
-                        .HasColumnType("nvarchar(400)");
-
                     b.Property<string>("Titulo")
                         .IsRequired()
                         .HasMaxLength(120)
@@ -325,222 +272,6 @@ namespace PasearPorPasear.Migrations
                     b.HasIndex("Estado", "VigenteHasta");
 
                     b.ToTable("CarteleraAfiches");
-                });
-
-            modelBuilder.Entity("PasearPorPasear.Models.ClubcitoEncuentro", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime?>("ActualizadoEn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int?>("Asistentes")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Barrio")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Contenido")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContenidoEn")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("ContenidoPt")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime>("CreadoEn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Extracto")
-                        .HasMaxLength(600)
-                        .HasColumnType("nvarchar(600)");
-
-                    b.Property<string>("ExtractoEn")
-                        .HasMaxLength(600)
-                        .HasColumnType("nvarchar(600)");
-
-                    b.Property<string>("ExtractoPt")
-                        .HasMaxLength(600)
-                        .HasColumnType("nvarchar(600)");
-
-                    b.Property<DateTime>("Fecha")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("ImagenAlt")
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
-
-                    b.Property<byte[]>("ImagenDatos")
-                        .HasColumnType("varbinary(max)");
-
-                    b.Property<string>("ImagenTipo")
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("ImagenUrl")
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
-
-                    b.Property<string>("MapaEmbedUrl")
-                        .HasMaxLength(600)
-                        .HasColumnType("nvarchar(600)");
-
-                    b.Property<bool>("Publicado")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("PuntoEncuentro")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PuntoEncuentroEn")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("PuntoEncuentroPt")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Slug")
-                        .IsRequired()
-                        .HasMaxLength(220)
-                        .HasColumnType("nvarchar(220)");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TituloEn")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TituloPt")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Fecha");
-
-                    b.HasIndex("Slug")
-                        .IsUnique();
-
-                    b.ToTable("ClubcitoEncuentros");
-                });
-
-            modelBuilder.Entity("PasearPorPasear.Models.ConsultaPaseo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("CantidadPersonas")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime>("CreadaEn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<int>("Estado")
-                        .HasColumnType("int");
-
-                    b.Property<DateTime?>("FechaDeseada")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.Property<string>("Notas")
-                        .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
-
-                    b.Property<int?>("PropuestaId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Telefono")
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("CreadaEn");
-
-                    b.HasIndex("PropuestaId");
-
-                    b.ToTable("ConsultasPaseo");
-                });
-
-            modelBuilder.Entity("PasearPorPasear.Models.EncabezadoSeccion", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("ActualizadoEn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("Bajada")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("BajadaEn")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("BajadaPt")
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("Clave")
-                        .IsRequired()
-                        .HasMaxLength(60)
-                        .HasColumnType("nvarchar(60)");
-
-                    b.Property<string>("Titulo")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TituloEn")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("TituloPt")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Clave")
-                        .IsUnique();
-
-                    b.ToTable("EncabezadosSeccion");
                 });
 
             modelBuilder.Entity("PasearPorPasear.Models.Fachada", b =>
@@ -659,46 +390,6 @@ namespace PasearPorPasear.Migrations
                     b.ToTable("Fachadas");
                 });
 
-            modelBuilder.Entity("PasearPorPasear.Models.MensajeContacto", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Asunto")
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<DateTime>("EnviadoEn")
-                        .HasColumnType("datetime2");
-
-                    b.Property<bool>("Leido")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Mensaje")
-                        .IsRequired()
-                        .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
-
-                    b.Property<string>("Nombre")
-                        .IsRequired()
-                        .HasMaxLength(150)
-                        .HasColumnType("nvarchar(150)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Leido", "EnviadoEn");
-
-                    b.ToTable("MensajesContacto");
-                });
-
             modelBuilder.Entity("PasearPorPasear.Models.PaginaSobre", b =>
                 {
                     b.Property<int>("Id")
@@ -711,6 +402,18 @@ namespace PasearPorPasear.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Contenido")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContenidoAutora")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContenidoAutoraEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ContenidoAutoraPt")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -739,6 +442,21 @@ namespace PasearPorPasear.Migrations
                         .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ImagenUrl")
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("ProyectoImagenAlt")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<byte[]>("ProyectoImagenDatos")
+                        .HasColumnType("varbinary(max)");
+
+                    b.Property<string>("ProyectoImagenTipo")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ProyectoImagenUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -994,7 +712,7 @@ namespace PasearPorPasear.Migrations
                     b.ToTable("PropuestaDatos");
                 });
 
-            modelBuilder.Entity("PasearPorPasear.Models.SuscriptorBuzon", b =>
+            modelBuilder.Entity("PasearPorPasear.Models.TextoSitio", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -1002,31 +720,32 @@ namespace PasearPorPasear.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<bool>("Activo")
-                        .HasColumnType("bit");
-
-                    b.Property<string>("Email")
-                        .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
-
-                    b.Property<string>("Nombre")
-                        .HasMaxLength(120)
-                        .HasColumnType("nvarchar(120)");
-
-                    b.Property<string>("Origen")
-                        .HasMaxLength(40)
-                        .HasColumnType("nvarchar(40)");
-
-                    b.Property<DateTime>("SuscritoEn")
+                    b.Property<DateTime>("ActualizadoEn")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("Clave")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
+
+                    b.Property<string>("Valor")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValorEn")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ValorPt")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("Email")
+                    b.HasIndex("Clave")
                         .IsUnique();
 
-                    b.ToTable("SuscriptoresBuzon");
+                    b.ToTable("TextosSitio");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -1080,16 +799,6 @@ namespace PasearPorPasear.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("PasearPorPasear.Models.ConsultaPaseo", b =>
-                {
-                    b.HasOne("PasearPorPasear.Models.Propuesta", "Propuesta")
-                        .WithMany("Consultas")
-                        .HasForeignKey("PropuestaId")
-                        .OnDelete(DeleteBehavior.SetNull);
-
-                    b.Navigation("Propuesta");
-                });
-
             modelBuilder.Entity("PasearPorPasear.Models.PropuestaDato", b =>
                 {
                     b.HasOne("PasearPorPasear.Models.Propuesta", "Propuesta")
@@ -1103,8 +812,6 @@ namespace PasearPorPasear.Migrations
 
             modelBuilder.Entity("PasearPorPasear.Models.Propuesta", b =>
                 {
-                    b.Navigation("Consultas");
-
                     b.Navigation("Datos");
                 });
 #pragma warning restore 612, 618

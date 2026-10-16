@@ -1,0 +1,76 @@
+@model TextosPaginaVm
+@using PasearPorPasear.Services
+@*
+    Los textos fijos de una página, un bloque por grupo. Cada campo manda
+    clave[i], es[i], en[i] y pt[i], siempre los cuatro, para que los
+    arreglos lleguen alineados al controlador. Va dentro de un <form>.
+*@
+@foreach (var g in Model.Grupos)
+{
+    <section class="admin-seccion">
+        <h2>@g.Nombre</h2>
+
+        @foreach (var c in g.Campos)
+        {
+            var i = c.Indice;
+            var id = $"t{i}";
+            var def = c.Def;
+            var error = ViewData.ModelState.TryGetValue(def.Clave, out var estado) && estado.Errors.Count > 0
+                ? estado.Errors[0].ErrorMessage : null;
+
+            <input type="hidden" name="clave[@i]" value="@def.Clave" />
+
+            if (def.Traducible)
+            {
+                var pista = def.Tipo == TipoTexto.Html
+                    ? string.Join(" ", new[] { def.Pista, "Admite HTML: cada párrafo entre <p> y </p>." }.Where(x => !string.IsNullOrEmpty(x)).Distinct())
+                    : def.Pista;
+                var campo = new CamposIdiomaVm
+                {
+                    Nombre = $"es[{i}]", NombreEn = $"en[{i}]", NombrePt = $"pt[{i}]", IdBase = id,
+                    Etiqueta = def.Nombre, Largo = def.Tipo != TipoTexto.Linea,
+                    ClaseLargo = def.Tipo == TipoTexto.Html ? "campo-largo" : "campo-medio",
+                    Maximo = def.Tipo == TipoTexto.Linea ? 300 : null,
+                    Es = c.Es, En = c.En, Pt = c.Pt, Pista = pista
+                };
+                <partial name="_CamposIdioma" model="campo" />
+            }
+            else if (def.Tipo == TipoTexto.Interruptor)
+            {
+                <fieldset class="conmutador conmutador--texto">
+                    <legend>@def.Nombre</legend>
+                    <div class="conmutador-opciones">
+                        <label><input type="radio" name="es[@i]" value="no" checked="@(c.Es != "si")" /> No</label>
+                        <label><input type="radio" name="es[@i]" value="si" checked="@(c.Es == "si")" /> Sí</label>
+                    </div>
+                    @if (!string.IsNullOrEmpty(def.Pista))
+                    {
+                        <p class="pista">@def.Pista</p>
+                    }
+                </fieldset>
+                <input type="hidden" name="en[@i]" value="" />
+                <input type="hidden" name="pt[@i]" value="" />
+            }
+            else
+            {
+                var tipo = def.Tipo switch { TipoTexto.Enlace => "url", TipoTexto.Correo => "email", _ => "text" };
+                <div class="campo">
+                    <label for="@id">@def.Nombre</label>
+                    <input id="@id" name="es[@i]" type="@tipo" value="@c.Es" maxlength="@(def.Tipo == TipoTexto.Enlace ? 500 : 300)"
+                           placeholder="@(def.Tipo == TipoTexto.Enlace ? "https://…" : null)" />
+                    @if (!string.IsNullOrEmpty(def.Pista))
+                    {
+                        <p class="pista">@def.Pista</p>
+                    }
+                </div>
+                <input type="hidden" name="en[@i]" value="" />
+                <input type="hidden" name="pt[@i]" value="" />
+            }
+
+            if (error is not null)
+            {
+                <p class="campo-error" role="alert">@error</p>
+            }
+        }
+    </section>
+}

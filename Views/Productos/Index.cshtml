@@ -13,7 +13,7 @@
         <h1 class="titulo-seccion">@Textos["productos.titulo"]</h1>
         @if (!enConstruccion && !string.IsNullOrEmpty(bajada))
         {
-            <p class="bajada">@bajada</p>
+            <p class="bajada">@Textos.ConEnlaces("productos.bajada")</p>
         }
     </div>
 </section>
@@ -24,7 +24,7 @@
         {
             <div class="en-construccion">
                 <h2>@Textos["productos.construccion-titulo"]</h2>
-                <p>@Textos["productos.construccion-texto"]</p>
+                <p>@Textos.ConEnlaces("productos.construccion-texto")</p>
             </div>
         }
         else
@@ -40,7 +40,7 @@
                         <h2>@p.Titulo</h2>
                         @if (!string.IsNullOrEmpty(p.Descripcion))
                         {
-                            <p>@p.Descripcion</p>
+                            <p>@Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(p.Descripcion))</p>
                         }
                         <div class="precio">
                             @if (p.Estado == EstadoProducto.DescargaGratis)

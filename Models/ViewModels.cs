@@ -276,6 +276,8 @@ public class CamposIdiomaVm
     public string ClaseLargo { get; set; } = "campo-largo";
     public string? Pista { get; set; }
     public int? Maximo { get; set; }
+    /// <summary>Muestra la ayuda y el botón para agregar [texto](dirección). Sólo con Largo.</summary>
+    public bool Enlaces { get; set; }
 
     /// <summary>
     /// Prefijo del id HTML. Hace falta cuando una misma página repite el

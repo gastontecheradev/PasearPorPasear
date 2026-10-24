@@ -31,6 +31,13 @@ public sealed record DefTexto(
 {
     public string Pagina => Clave[..Clave.IndexOf('.')];
     public bool Traducible => Tipo is TipoTexto.Linea or TipoTexto.Parrafo or TipoTexto.Html;
+
+    /// <summary>
+    /// Los párrafos que se muestran como texto en la página. Quedan afuera los que
+    /// se usan como título, en la descripción para buscadores o en un texto alternativo.
+    /// </summary>
+    public bool AdmiteEnlaces => Tipo is TipoTexto.Parrafo or TipoTexto.Html
+        && Clave is not ("sobre.colaborar-titulo" or "general.descripcion" or "cartelera.vacia");
 }
 
 /// <summary>Una pantalla del panel: una página del sitio, o lo común a todas.</summary>

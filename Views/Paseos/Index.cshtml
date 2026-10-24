@@ -5,9 +5,9 @@
         <img class="adorno" src="~/img/marca/ventana-1.webp" alt="" width="280" height="474" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Textos["paseos.titulo"]</h1>
-        @if (Textos["paseos.bajada"] is { Length: > 0 } bajada)
+        @if (Textos["paseos.bajada"] is { Length: > 0 })
         {
-            <p class="bajada">@bajada</p>
+            <p class="bajada">@Textos.ConEnlaces("paseos.bajada")</p>
         }
     </div>
 </section>
@@ -31,7 +31,7 @@
                         }
                         <h2>@p.Titulo</h2>
                         <div class="@(p.PendienteDeDefinir ? "por-definir" : "")">
-                            @Html.Raw(p.DescripcionHtml)
+                            @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(p.DescripcionHtml, esHtml: true))
                         </div>
 
                         @if (p.PendienteDeDefinir)

@@ -9,9 +9,9 @@
         <img class="adorno" src="~/img/marca/ventana-3.webp" alt="" width="300" height="417" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Textos["archivo.titulo"]</h1>
-        @if (Textos["archivo.bajada"] is { Length: > 0 } bajada)
+        @if (Textos["archivo.bajada"] is { Length: > 0 })
         {
-            <p class="bajada">@bajada</p>
+            <p class="bajada">@Textos.ConEnlaces("archivo.bajada")</p>
         }
     </div>
 </section>
@@ -28,7 +28,7 @@
 
         @if (Model.Fichas.Count == 0)
         {
-            <p class="bajada">@Textos["archivo.vacio"]</p>
+            <p class="bajada">@Textos.ConEnlaces("archivo.vacio")</p>
         }
         else
         {
@@ -68,9 +68,9 @@
     <section class="banda banda--crema2" aria-labelledby="titulo-mapa">
         <div class="contenedor">
             <h2 class="titulo-seccion" id="titulo-mapa">@Textos["archivo.mapa-titulo"]</h2>
-            @if (Textos["archivo.mapa-bajada"] is { Length: > 0 } mapaBajada)
+            @if (Textos["archivo.mapa-bajada"] is { Length: > 0 })
             {
-                <p class="bajada">@mapaBajada</p>
+                <p class="bajada">@Textos.ConEnlaces("archivo.mapa-bajada")</p>
             }
             <div class="mapa mapa--archivo">
                 <iframe src="@mapa" loading="lazy" referrerpolicy="no-referrer-when-downgrade"

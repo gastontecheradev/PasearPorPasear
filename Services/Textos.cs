@@ -20,6 +20,9 @@ public interface ITextos
     /// <summary>Para los textos con HTML. Sólo los carga Rosalía desde el panel.</summary>
     IHtmlContent Html(string clave);
 
+    /// <summary>Un texto común, escapado, con los [texto](dirección) convertidos en enlaces.</summary>
+    IHtmlContent ConEnlaces(string clave);
+
     /// <summary>Un texto con {correo} reemplazado, en negrita y con el resto escapado.</summary>
     IHtmlContent ConCorreo(string clave);
 
@@ -96,13 +99,15 @@ public sealed class Textos : ITextos
         }
     }
 
-    public IHtmlContent Html(string clave) => new HtmlString(this[clave]);
+    public IHtmlContent Html(string clave) => new HtmlString(EnlaceHelper.ConEnlaces(this[clave], esHtml: true));
+
+    public IHtmlContent ConEnlaces(string clave) => new HtmlString(EnlaceHelper.ConEnlaces(this[clave]));
 
     public IHtmlContent ConCorreo(string clave)
     {
         var correo = WebUtility.HtmlEncode(this["general.correo"]);
         var partes = this[clave].Split("{correo}");
-        return new HtmlString(string.Join($"<strong>{correo}</strong>", partes.Select(WebUtility.HtmlEncode)));
+        return new HtmlString(string.Join($"<strong>{correo}</strong>", partes.Select(p => EnlaceHelper.ConEnlaces(p))));
     }
 
     public string? Enlace(string clave) => EnlaceHelper.SoloHttps(this[clave]);

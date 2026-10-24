@@ -9,10 +9,10 @@
         <h1 class="oculto-visual">Pasear por Pasear</h1>
         <img class="lettering-grande" src="~/img/marca/wordmark-petroleo.webp"
              alt="Pasear por Pasear" width="720" height="307" />
-        <p class="frase">@Textos["portada.frase"]</p>
+        <p class="frase">@Textos.ConEnlaces("portada.frase")</p>
         @if (!string.IsNullOrEmpty(entrada))
         {
-            <p class="entrada">@entrada</p>
+            <p class="entrada">@Textos.ConEnlaces("portada.entrada")</p>
         }
         <div class="acciones">
             <a class="boton boton--principal" href="/Paseos">@Textos["portada.boton-paseos"]</a>

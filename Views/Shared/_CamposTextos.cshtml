@@ -30,7 +30,7 @@
                     Nombre = $"es[{i}]", NombreEn = $"en[{i}]", NombrePt = $"pt[{i}]", IdBase = id,
                     Etiqueta = def.Nombre, Largo = def.Tipo != TipoTexto.Linea,
                     ClaseLargo = def.Tipo == TipoTexto.Html ? "campo-largo" : "campo-medio",
-                    Maximo = def.Tipo == TipoTexto.Linea ? 300 : null,
+                    Maximo = def.Tipo == TipoTexto.Linea ? 300 : null, Enlaces = def.AdmiteEnlaces,
                     Es = c.Es, En = c.En, Pt = c.Pt, Pista = pista
                 };
                 <partial name="_CamposIdioma" model="campo" />

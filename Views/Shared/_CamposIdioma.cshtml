@@ -25,6 +25,30 @@
             @if (Model.Largo)
             {
                 <textarea id="@id" name="@nombre" maxlength="@Model.Maximo" class="@Model.ClaseLargo">@valor</textarea>
+                if (Model.Enlaces)
+                {
+                    @* Sin JavaScript queda la explicación; con JavaScript, además el botón. *@
+                    <div class="enlace-ayuda" data-enlace>
+                        <p class="pista">Para poner un enlace escribí <code>[el texto](https://la-direccion)</code>, o <code>[el texto](/Paseos)</code> para una página del sitio. En la página se ve en negrita.</p>
+                        <button type="button" class="boton-texto" data-enlace-abrir aria-expanded="false" aria-controls="@(id)-enlace" hidden>Agregar un enlace</button>
+                        <div class="enlace-form" id="@(id)-enlace" data-enlace-form hidden>
+                            <div class="campo">
+                                <label for="@(id)-enlace-texto">Texto que se ve</label>
+                                <input id="@(id)-enlace-texto" type="text" autocomplete="off" data-enlace-texto />
+                            </div>
+                            <div class="campo">
+                                <label for="@(id)-enlace-dir">A dónde lleva</label>
+                                <input id="@(id)-enlace-dir" type="text" inputmode="url" autocomplete="off"
+                                       placeholder="https://… o /Paseos" data-enlace-dir />
+                            </div>
+                            <p class="campo-error" role="alert" data-enlace-error hidden></p>
+                            <div class="enlace-acciones">
+                                <button type="button" class="boton boton--principal boton--chico" data-enlace-insertar>Insertar el enlace</button>
+                                <button type="button" class="boton-texto" data-enlace-cancelar>Cancelar</button>
+                            </div>
+                        </div>
+                    </div>
+                }
             }
             else
             {

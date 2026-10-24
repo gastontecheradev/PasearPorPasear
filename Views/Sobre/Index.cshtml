@@ -9,7 +9,7 @@
                 <div class="regla regla--izq"><partial name="_Flor" /></div>
                 <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
                 <div class="texto" style="margin-top:20px">
-                    @Html.Raw(Model.Contenido)
+                    @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.Contenido, esHtml: true))
                 </div>
                 <p class="atributos" style="color:var(--petroleo)">
                     @Textos["general.atributo-1"]
@@ -47,7 +47,7 @@
                 <div>
                     <h2 class="titulo-seccion" id="sobre-autora">@Model.Pagina.Firma</h2>
                     <div class="texto" style="margin-top:20px">
-                        @Html.Raw(Model.ContenidoAutora)
+                        @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.ContenidoAutora, esHtml: true))
                     </div>
                 </div>
             </div>
@@ -62,9 +62,9 @@
         <div class="suscripcion">
             <div>
                 <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Textos["sobre.colaborar-titulo"]</h2>
-                @if (Textos["sobre.colaborar-texto"] is { Length: > 0 } colaborar)
+                @if (Textos["sobre.colaborar-texto"] is { Length: > 0 })
                 {
-                    <p class="bajada">@colaborar</p>
+                    <p class="bajada">@Textos.ConEnlaces("sobre.colaborar-texto")</p>
                 }
                 @if (Textos.Enlace("sobre.colaborar-enlace") is string pago)
                 {

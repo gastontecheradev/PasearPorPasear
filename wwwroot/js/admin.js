@@ -109,6 +109,86 @@
     if (panel && panel.hidden) mostrarIdioma(panel.dataset.idioma);
   }, true);
 
+  // ── Enlaces dentro de los textos ──────────────────────────────
+  // Arma la marca [texto](dirección) y la pone donde estaba el cursor.
+  // Si había texto seleccionado, ése pasa a ser el texto del enlace.
+  var DIRECCION = /^(https:\/\/[^\s()]+|\/(?![\/\\])[^\s()\\]*)$/i;
+
+  document.querySelectorAll('[data-enlace]').forEach(function (ayuda) {
+    var panel = ayuda.closest('.idioma-panel');
+    var area = panel && panel.querySelector('textarea');
+    var abrir = ayuda.querySelector('[data-enlace-abrir]');
+    var caja = ayuda.querySelector('[data-enlace-form]');
+    if (!area || !abrir || !caja) return;
+    var texto = caja.querySelector('[data-enlace-texto]');
+    var dir = caja.querySelector('[data-enlace-dir]');
+    var error = caja.querySelector('[data-enlace-error]');
+    var inicio = 0;
+    var fin = 0;
+
+    abrir.hidden = false;
+
+    // Estos casilleros no se guardan: escribir en ellos no es un cambio del formulario.
+    ['input', 'change'].forEach(function (tipo) {
+      caja.addEventListener(tipo, function (e) { e.stopPropagation(); });
+    });
+
+    var cerrar = function () {
+      caja.hidden = true;
+      error.hidden = true;
+      texto.value = '';
+      dir.value = '';
+      abrir.setAttribute('aria-expanded', 'false');
+    };
+
+    abrir.addEventListener('click', function () {
+      inicio = area.selectionStart;
+      fin = area.selectionEnd;
+      texto.value = area.value.slice(inicio, fin).trim();
+      caja.hidden = false;
+      abrir.setAttribute('aria-expanded', 'true');
+      (texto.value ? dir : texto).focus();
+    });
+
+    var insertar = function () {
+      var t = texto.value.replace(/[\[\]\r\n]+/g, ' ').trim();
+      var d = dir.value.trim();
+      if (/^www\./i.test(d)) d = 'https://' + d;
+
+      var falla = '';
+      if (!t) falla = 'Falta el texto que se va a ver como enlace.';
+      else if (!DIRECCION.test(d)) falla = 'La dirección tiene que empezar con https:// (o con / si es una página del sitio) y no llevar espacios ni paréntesis.';
+      if (falla) {
+        error.textContent = falla;
+        error.hidden = false;
+        (t ? dir : texto).focus();
+        return;
+      }
+
+      area.setRangeText('[' + t + '](' + d + ')', inicio, fin, 'end');
+      area.dispatchEvent(new Event('input', { bubbles: true }));
+      cerrar();
+      area.focus();
+    };
+
+    caja.querySelector('[data-enlace-insertar]').addEventListener('click', insertar);
+    caja.querySelector('[data-enlace-cancelar]').addEventListener('click', function () {
+      cerrar();
+      abrir.focus();
+    });
+
+    // Enter no debe enviar el formulario de la página.
+    caja.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' && e.target.tagName === 'INPUT') {
+        e.preventDefault();
+        insertar();
+      } else if (e.key === 'Escape') {
+        cerrar();
+        abrir.focus();
+      }
+    });
+  });
+
   // ── Listados: filtros y buscador ──────────────────────────────
   var listado = document.querySelector('[data-listado]');
 

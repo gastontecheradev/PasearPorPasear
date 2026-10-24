@@ -9,9 +9,9 @@
         <img class="adorno" src="~/img/marca/gorrion.webp" alt="" width="380" height="307" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Textos["cartelera.titulo"]</h1>
-        @if (Textos["cartelera.bajada"] is { Length: > 0 } bajada)
+        @if (Textos["cartelera.bajada"] is { Length: > 0 })
         {
-            <p class="bajada">@bajada</p>
+            <p class="bajada">@Textos.ConEnlaces("cartelera.bajada")</p>
         }
     </div>
 </section>
@@ -26,11 +26,11 @@
             </li>
             <li>
                 <h3>@Textos["cartelera.paso2-titulo"]</h3>
-                <p>@Textos["cartelera.paso2-texto"]</p>
+                <p>@Textos.ConEnlaces("cartelera.paso2-texto")</p>
             </li>
             <li>
                 <h3>@Textos["cartelera.paso3-titulo"]</h3>
-                <p>@Textos["cartelera.paso3-texto"]</p>
+                <p>@Textos.ConEnlaces("cartelera.paso3-texto")</p>
             </li>
         </ol>
     </div>
@@ -61,7 +61,7 @@
         }
         else if (Model.Afiches.Count == 0)
         {
-            <p class="bajada">@Textos["cartelera.vacia-categoria"]</p>
+            <p class="bajada">@Textos.ConEnlaces("cartelera.vacia-categoria")</p>
         }
         else
         {

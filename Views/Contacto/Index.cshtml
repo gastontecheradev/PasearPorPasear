@@ -11,9 +11,9 @@
         <img class="adorno" src="~/img/marca/ventana-3.webp" alt="" width="300" height="417" />
         <div class="regla regla--izq"><partial name="_Flor" /></div>
         <h1 class="titulo-seccion">@Textos["contacto.titulo"]</h1>
-        @if (Textos["contacto.bajada"] is { Length: > 0 } bajada)
+        @if (Textos["contacto.bajada"] is { Length: > 0 })
         {
-            <p class="bajada">@bajada</p>
+            <p class="bajada">@Textos.ConEnlaces("contacto.bajada")</p>
         }
     </div>
 </section>

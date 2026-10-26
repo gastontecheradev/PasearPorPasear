@@ -7,7 +7,7 @@
     <h2 class="titulo-seccion" style="font-size:var(--t-xl)">@Model.Titulo</h2>
     @if (!string.IsNullOrEmpty(Model.Texto))
     {
-        <p style="max-width:46ch;margin-top:12px">@Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.Texto))</p>
+        <p style="max-width:46ch;margin-top:12px">@Html.Raw(PasearPorPasear.Services.TextoConFormato.EnUnParrafo(Model.Texto))</p>
     }
     <div class="acciones" style="margin-top:22px">
         @if (Model.Enlace.StartsWith("http"))
@@ -21,6 +21,6 @@
     </div>
     @if (!string.IsNullOrEmpty(Model.Nota))
     {
-        <p class="nota">@Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.Nota))</p>
+        <p class="nota">@Html.Raw(PasearPorPasear.Services.TextoConFormato.EnUnParrafo(Model.Nota))</p>
     }
 </div>

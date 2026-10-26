@@ -15,7 +15,7 @@
         var id = Model.Id + sufijo;
         var nombre = Model.NombreDe(sufijo);
         <div class="idioma-panel campo" data-idioma="@idioma" hidden="@(idioma != "es")">
-            <label for="@id">
+            <label for="@id" id="@(id)-etiqueta">
                 @Model.Etiqueta
                 @if (enIdioma is not null)
                 {
@@ -24,30 +24,17 @@
             </label>
             @if (Model.Largo)
             {
-                <textarea id="@id" name="@nombre" maxlength="@Model.Maximo" class="@Model.ClaseLargo">@valor</textarea>
+                @* Con data-editor, admin.js lo cambia a la vista por el editor de texto
+                   y lo deja oculto: sigue siendo lo que se envía. *@
+                <textarea id="@id" name="@nombre" maxlength="@Model.Maximo" class="@Model.ClaseLargo"
+                          data-editor="@(Model.Enlaces ? (Model.Parrafos ? "parrafos" : "renglones") : null)">@valor</textarea>
                 if (Model.Enlaces)
                 {
-                    @* Sin JavaScript queda la explicación; con JavaScript, además el botón. *@
-                    <div class="enlace-ayuda" data-enlace>
-                        <p class="pista">Para poner un enlace escribí <code>[el texto](https://la-direccion)</code>, o <code>[el texto](/Paseos)</code> para una página del sitio. En la página se ve en negrita.</p>
-                        <button type="button" class="boton-texto" data-enlace-abrir aria-expanded="false" aria-controls="@(id)-enlace" hidden>Agregar un enlace</button>
-                        <div class="enlace-form" id="@(id)-enlace" data-enlace-form hidden>
-                            <div class="campo">
-                                <label for="@(id)-enlace-texto">Texto que se ve</label>
-                                <input id="@(id)-enlace-texto" type="text" autocomplete="off" data-enlace-texto />
-                            </div>
-                            <div class="campo">
-                                <label for="@(id)-enlace-dir">A dónde lleva</label>
-                                <input id="@(id)-enlace-dir" type="text" inputmode="url" autocomplete="off"
-                                       placeholder="https://… o /Paseos" data-enlace-dir />
-                            </div>
-                            <p class="campo-error" role="alert" data-enlace-error hidden></p>
-                            <div class="enlace-acciones">
-                                <button type="button" class="boton boton--principal boton--chico" data-enlace-insertar>Insertar el enlace</button>
-                                <button type="button" class="boton-texto" data-enlace-cancelar>Cancelar</button>
-                            </div>
-                        </div>
-                    </div>
+                    @* Sin JavaScript se explica el formato; admin.js cambia este texto por el del editor. *@
+                    <p class="pista" data-editor-ayuda>
+                        @(Model.Parrafos ? "Cada renglón es un párrafo, y los renglones en blanco también se ven." : "Los renglones, también los que quedan en blanco, se ven igual en la página.")
+                        Para un enlace: [el texto](https://la-direccion), o [el texto](/Paseos) para una página del sitio.
+                    </p>
                 }
             }
             else

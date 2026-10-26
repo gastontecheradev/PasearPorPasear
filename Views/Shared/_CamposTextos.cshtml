@@ -22,16 +22,14 @@
 
             if (def.Traducible)
             {
-                var pista = def.Tipo == TipoTexto.Html
-                    ? string.Join(" ", new[] { def.Pista, "Admite HTML: cada párrafo entre <p> y </p>." }.Where(x => !string.IsNullOrEmpty(x)).Distinct())
-                    : def.Pista;
                 var campo = new CamposIdiomaVm
                 {
                     Nombre = $"es[{i}]", NombreEn = $"en[{i}]", NombrePt = $"pt[{i}]", IdBase = id,
                     Etiqueta = def.Nombre, Largo = def.Tipo != TipoTexto.Linea,
-                    ClaseLargo = def.Tipo == TipoTexto.Html ? "campo-largo" : "campo-medio",
-                    Maximo = def.Tipo == TipoTexto.Linea ? 300 : null, Enlaces = def.AdmiteEnlaces,
-                    Es = c.Es, En = c.En, Pt = c.Pt, Pista = pista
+                    ClaseLargo = def.Tipo == TipoTexto.Parrafos ? "campo-largo" : "campo-medio",
+                    Maximo = def.Tipo == TipoTexto.Linea ? 300 : null,
+                    Enlaces = def.AdmiteEnlaces, Parrafos = def.Tipo == TipoTexto.Parrafos,
+                    Es = c.Es, En = c.En, Pt = c.Pt, Pista = def.Pista
                 };
                 <partial name="_CamposIdioma" model="campo" />
             }

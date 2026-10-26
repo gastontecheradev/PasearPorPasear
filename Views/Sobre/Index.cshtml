@@ -9,7 +9,7 @@
                 <div class="regla regla--izq"><partial name="_Flor" /></div>
                 <h1 class="titulo-seccion" id="sobre-proyecto">@Model.Titulo</h1>
                 <div class="texto" style="margin-top:20px">
-                    @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.Contenido, esHtml: true))
+                    @Html.Raw(PasearPorPasear.Services.TextoConFormato.Parrafos(Model.Contenido))
                 </div>
                 <p class="atributos" style="color:var(--petroleo)">
                     @Textos["general.atributo-1"]
@@ -47,7 +47,7 @@
                 <div>
                     <h2 class="titulo-seccion" id="sobre-autora">@Model.Pagina.Firma</h2>
                     <div class="texto" style="margin-top:20px">
-                        @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.ContenidoAutora, esHtml: true))
+                        @Html.Raw(PasearPorPasear.Services.TextoConFormato.Parrafos(Model.ContenidoAutora))
                     </div>
                 </div>
             </div>

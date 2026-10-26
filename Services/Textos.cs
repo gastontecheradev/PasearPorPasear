@@ -17,10 +17,10 @@ public interface ITextos
     /// <summary>El texto en el idioma actual. Si no se tradujo, en español.</summary>
     string this[string clave] { get; }
 
-    /// <summary>Para los textos con HTML. Sólo los carga Rosalía desde el panel.</summary>
-    IHtmlContent Html(string clave);
+    /// <summary>Un texto de varios párrafos: cada renglón, un &lt;p&gt;, con sus enlaces.</summary>
+    IHtmlContent Parrafos(string clave);
 
-    /// <summary>Un texto común, escapado, con los [texto](dirección) convertidos en enlaces.</summary>
+    /// <summary>Un texto que va dentro de un párrafo: escapado, con sus enlaces y saltos de renglón.</summary>
     IHtmlContent ConEnlaces(string clave);
 
     /// <summary>Un texto con {correo} reemplazado, en negrita y con el resto escapado.</summary>
@@ -99,15 +99,16 @@ public sealed class Textos : ITextos
         }
     }
 
-    public IHtmlContent Html(string clave) => new HtmlString(EnlaceHelper.ConEnlaces(this[clave], esHtml: true));
+    public IHtmlContent Parrafos(string clave) => new HtmlString(TextoConFormato.Parrafos(this[clave]));
 
-    public IHtmlContent ConEnlaces(string clave) => new HtmlString(EnlaceHelper.ConEnlaces(this[clave]));
+    public IHtmlContent ConEnlaces(string clave) => new HtmlString(TextoConFormato.EnUnParrafo(this[clave]));
 
     public IHtmlContent ConCorreo(string clave)
     {
         var correo = WebUtility.HtmlEncode(this["general.correo"]);
-        var partes = this[clave].Split("{correo}");
-        return new HtmlString(string.Join($"<strong>{correo}</strong>", partes.Select(p => EnlaceHelper.ConEnlaces(p))));
+        // Se da formato al texto entero y después se pone el correo: así los
+        // renglones en blanco alrededor de {correo} no se pierden.
+        return new HtmlString(TextoConFormato.EnUnParrafo(this[clave]).Replace("{correo}", $"<strong>{correo}</strong>"));
     }
 
     public string? Enlace(string clave) => EnlaceHelper.SoloHttps(this[clave]);

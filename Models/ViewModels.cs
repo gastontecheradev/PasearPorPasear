@@ -276,8 +276,13 @@ public class CamposIdiomaVm
     public string ClaseLargo { get; set; } = "campo-largo";
     public string? Pista { get; set; }
     public int? Maximo { get; set; }
-    /// <summary>Muestra la ayuda y el botón para agregar [texto](dirección). Sólo con Largo.</summary>
+    /// <summary>
+    /// Se edita con el editor de texto: Enter para bajar de renglón y enlaces
+    /// sobre el texto seleccionado. Sólo con Largo.
+    /// </summary>
     public bool Enlaces { get; set; }
+    /// <summary>Con Enlaces: true si cada renglón es un párrafo aparte; false si van dentro de uno solo.</summary>
+    public bool Parrafos { get; set; }
 
     /// <summary>
     /// Prefijo del id HTML. Hace falta cuando una misma página repite el

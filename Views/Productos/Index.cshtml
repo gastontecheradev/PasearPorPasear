@@ -40,7 +40,7 @@
                         <h2>@p.Titulo</h2>
                         @if (!string.IsNullOrEmpty(p.Descripcion))
                         {
-                            <p>@Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(p.Descripcion))</p>
+                            <p>@Html.Raw(PasearPorPasear.Services.TextoConFormato.EnUnParrafo(p.Descripcion))</p>
                         }
                         <div class="precio">
                             @if (p.Estado == EstadoProducto.DescargaGratis)

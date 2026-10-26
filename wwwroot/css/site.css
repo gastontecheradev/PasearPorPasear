@@ -66,8 +66,8 @@ h1,h2,h3,h4{line-height:1.12;letter-spacing:-.022em;font-weight:800}
 .banda--petroleo .bajada{color:var(--tinta-clara)}
 p+p{margin-top:1.05em}
 .texto{max-width:62ch}
-/* Los enlaces dentro de los textos van en negrita, los cargue Rosalía como [texto](dirección) o con HTML */
-.texto a,.enlace-texto{color:inherit;font-weight:700;text-decoration:underline;text-decoration-color:var(--coral);text-decoration-thickness:2px;text-underline-offset:3px}
+/* Los enlaces dentro de los textos van en negrita; en el editor del panel se ven igual */
+.texto a,.enlace-texto,.editor-texto a{color:inherit;font-weight:700;text-decoration:underline;text-decoration-color:var(--coral);text-decoration-thickness:2px;text-underline-offset:3px}
 
 /* ── Bandas de color a sangre ───────────────────────────────── */
 .banda{padding-block:var(--aire);position:relative}
@@ -663,6 +663,8 @@ p+p{margin-top:1.05em}
   --admin-ancho:1120px;
   --admin-barra-movil:60px;
   --admin-curva-chica:6px;
+  /* Sólo para lo que flota sobre el contenido (la barra del editor) */
+  --admin-sombra-flotante:0 10px 28px rgba(43,62,73,.28);
 }
 
 .admin-marco{display:grid;grid-template-columns:var(--admin-lateral) minmax(0,1fr);min-height:100vh}
@@ -890,14 +892,85 @@ p+p{margin-top:1.05em}
 .campo textarea.campo-largo{min-height:180px}
 .campo textarea.campo-medio{min-height:110px}
 
-/* Ayuda para agregar enlaces debajo de los textos largos */
-.enlace-ayuda{margin-top:8px}
-.enlace-ayuda code{font-size:.95em;background:var(--crema-2);padding:1px 5px;border-radius:4px;color:var(--petroleo)}
-.enlace-ayuda .boton-texto{margin-top:8px}
-.enlace-form{margin-top:12px;padding:16px;border-left:3px solid var(--coral);background:var(--crema-2)}
-.enlace-form .campo{margin-bottom:12px}
-.enlace-form .campo-error{margin:0 0 12px}
-.enlace-acciones{display:flex;gap:18px;align-items:center;flex-wrap:wrap}
+/* ── Editor de textos ───────────────────────────────────────── */
+/* Se ve como los demás campos, pero el texto adentro se ve como en el sitio:
+   los párrafos separados y los enlaces en negrita. */
+.editor-texto{
+  width:100%;font-size:var(--t-sm);line-height:1.6;padding:12px 16px;
+  border:2px solid var(--crema-3);border-radius:var(--curva);
+  background:var(--crema);color:var(--petroleo);
+  min-height:132px;overflow-wrap:anywhere;cursor:text;
+}
+.editor-texto:focus{border-color:var(--petroleo);outline:none}
+.editor-texto.campo-largo{min-height:180px}
+.editor-texto.campo-medio{min-height:110px}
+.editor-texto p + p{margin-top:0}
+.editor-texto[data-modo="parrafos"] p + p{margin-top:.8em}
+.editor-texto a{cursor:text}
+::highlight(editor-enlace){background-color:var(--mostaza);color:var(--petroleo)}
+
+.editor-contador{font-size:var(--t-xs);color:var(--tinta-2);margin-top:6px;text-align:right}
+.editor-contador.excedido{
+  text-align:left;font-weight:700;color:var(--petroleo);
+  padding-left:10px;border-left:3px solid var(--coral);
+}
+
+/* La barra que aparece sobre el texto seleccionado. Petróleo, como el menú
+   del panel, para que se lea como herramienta y no como parte del texto. */
+.editor-flotante{
+  position:absolute;z-index:90;
+  display:flex;align-items:center;flex-wrap:wrap;gap:2px;
+  max-width:calc(100vw - 16px);padding:5px;
+  background:var(--petroleo);color:var(--crema);
+  border-radius:var(--curva);box-shadow:var(--admin-sombra-flotante);
+  font-size:var(--t-xs);line-height:1.4;
+}
+.editor-flotante[hidden]{display:none}
+.editor-flotante button{
+  display:inline-flex;align-items:center;gap:7px;
+  font:inherit;font-weight:700;color:var(--crema);
+  background:none;border:0;padding:8px 11px;border-radius:var(--admin-curva-chica);cursor:pointer;
+}
+.editor-flotante button:hover{background:rgba(255,245,230,.12)}
+.editor-flotante button:active{background:rgba(255,245,230,.2)}
+.editor-flotante :focus-visible{outline:2px solid var(--mostaza);outline-offset:1px}
+.editor-flotante svg{width:16px;height:16px;flex:none}
+.editor-flotante-etiqueta{color:var(--tinta-clara);padding-left:9px}
+.editor-flotante-destino{
+  max-width:26ch;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  padding:8px 6px;font-weight:700;color:var(--crema);
+  text-decoration:underline;text-decoration-color:var(--coral);text-decoration-thickness:2px;text-underline-offset:3px;
+}
+.editor-flotante-separador{width:1px;align-self:stretch;margin:5px 3px;background:rgba(255,245,230,.2)}
+.editor-flotante-aviso{padding:7px 10px;font-weight:600}
+
+.editor-flotante--formulario{display:block;width:min(380px,calc(100vw - 16px));padding:10px}
+.editor-flotante-campo{
+  width:100%;font:inherit;font-size:var(--t-sm);padding:10px 12px;
+  border:2px solid transparent;border-radius:var(--admin-curva-chica);
+  background:var(--crema);color:var(--petroleo);
+}
+.editor-flotante-campo:focus{outline:none;border-color:var(--mostaza)}
+.editor-flotante-titulo{color:var(--tinta-clara);font-weight:700;padding:12px 10px 4px}
+.editor-flotante-paginas{list-style:none;max-height:236px;overflow-y:auto}
+.editor-flotante-paginas li{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  padding:8px 10px;border-radius:var(--admin-curva-chica);cursor:pointer;
+}
+.editor-flotante-paginas li span{color:var(--tinta-clara);font-weight:400}
+.editor-flotante-paginas li:hover{background:rgba(255,245,230,.12)}
+.editor-flotante-paginas li[aria-selected="true"]{background:var(--mostaza);color:var(--petroleo)}
+.editor-flotante-paginas li[aria-selected="true"] span{color:var(--petroleo)}
+.editor-flotante-titulo[hidden],.editor-flotante-paginas[hidden],.editor-flotante-error[hidden]{display:none}
+.editor-flotante-error{margin-top:10px;padding-left:10px;border-left:3px solid var(--coral);font-weight:600}
+.editor-flotante-acciones{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:4px;margin-top:10px}
+.editor-flotante .editor-flotante-aplicar{background:var(--mostaza);color:var(--petroleo)}
+.editor-flotante .editor-flotante-aplicar:hover{background:var(--crema)}
+
+@media (prefers-reduced-motion:no-preference){
+  .editor-flotante{animation:editor-aparece .12s ease-out}
+  @keyframes editor-aparece{from{opacity:0}}
+}
 .campo-error{margin-top:8px;padding-left:10px;border-left:3px solid var(--coral);font-size:var(--t-xs);font-weight:700;color:var(--petroleo)}
 .campo-error[hidden]{display:none}
 

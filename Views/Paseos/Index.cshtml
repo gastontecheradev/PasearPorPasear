@@ -31,7 +31,7 @@
                         }
                         <h2>@p.Titulo</h2>
                         <div class="@(p.PendienteDeDefinir ? "por-definir" : "")">
-                            @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(p.DescripcionHtml, esHtml: true))
+                            @Html.Raw(PasearPorPasear.Services.TextoConFormato.Parrafos(p.DescripcionHtml))
                         </div>
 
                         @if (p.PendienteDeDefinir)

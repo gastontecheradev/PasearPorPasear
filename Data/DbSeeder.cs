@@ -39,8 +39,48 @@ public static class DbSeeder
         SeedPropuestas(ctx);
         SeedFachadas(ctx);
         SeedProductos(ctx);
+        PasarTextosAFormatoSimple(ctx);
 
         await ctx.SaveChangesAsync();
+    }
+
+    // ══════════════════════════════════════════════════════════
+    //  Textos largos: de HTML a un párrafo por renglón
+    // ══════════════════════════════════════════════════════════
+    // Antes se escribían con <p> y </p>; ahora cada Enter del editor es un
+    // párrafo. Lo guardado con el formato anterior se convierte una sola vez:
+    // ya convertido no tiene etiquetas y no se vuelve a tocar.
+    private static void PasarTextosAFormatoSimple(ApplicationDbContext ctx)
+    {
+        static string C(string v) => TextoConFormato.TieneHtmlViejo(v) ? TextoConFormato.DesdeHtml(v) : v;
+
+        // Se filtra por «<» para no traer de la base las filas (con sus imágenes) que no hace falta tocar.
+        foreach (var p in ctx.PaginasSobre.Where(p =>
+                     p.Contenido.Contains("<") || p.ContenidoEn.Contains("<") || p.ContenidoPt.Contains("<") ||
+                     p.ContenidoAutora.Contains("<") || p.ContenidoAutoraEn.Contains("<") || p.ContenidoAutoraPt.Contains("<")))
+        {
+            p.Contenido = C(p.Contenido); p.ContenidoEn = C(p.ContenidoEn); p.ContenidoPt = C(p.ContenidoPt);
+            p.ContenidoAutora = C(p.ContenidoAutora); p.ContenidoAutoraEn = C(p.ContenidoAutoraEn);
+            p.ContenidoAutoraPt = C(p.ContenidoAutoraPt);
+        }
+
+        foreach (var p in ctx.Propuestas.Where(p =>
+                     p.Descripcion.Contains("<") || p.DescripcionEn.Contains("<") || p.DescripcionPt.Contains("<")))
+        {
+            p.Descripcion = C(p.Descripcion); p.DescripcionEn = C(p.DescripcionEn); p.DescripcionPt = C(p.DescripcionPt);
+        }
+
+        foreach (var f in ctx.Fachadas.Where(f =>
+                     f.Contenido.Contains("<") || f.ContenidoEn.Contains("<") || f.ContenidoPt.Contains("<")))
+        {
+            f.Contenido = C(f.Contenido); f.ContenidoEn = C(f.ContenidoEn); f.ContenidoPt = C(f.ContenidoPt);
+        }
+
+        var claves = CatalogoTextos.Todos.Where(d => d.Tipo == TipoTexto.Parrafos).Select(d => d.Clave).ToList();
+        foreach (var t in ctx.TextosSitio.Where(t => claves.Contains(t.Clave)))
+        {
+            t.Valor = C(t.Valor); t.ValorEn = C(t.ValorEn); t.ValorPt = C(t.ValorPt);
+        }
     }
 
     // ══════════════════════════════════════════════════════════
@@ -111,42 +151,44 @@ public static class DbSeeder
         if (cambio) p.ActualizadaEn = DateTime.Now;
     }
 
+    // Los textos largos se guardan con un párrafo por renglón (ver TextoConFormato).
     private const string SobreProyectoEs =
-        "<p>Hay una ciudad entera que vemos todos los días y no miramos nunca. El alma de Montevideo no " +
-        "está en el Centro ni en la rambla: está en el barrio, en la vereda rota y en el kiosco de la esquina.</p>" +
-        "<p>Pasear por Pasear es un archivo de fachadas que crece cada semana, paseos para quien quiera venir, " +
-        "una cartelera para que el barrio publique lo suyo y una carta por mes para quien quiera recibirla.</p>";
+        "Hay una ciudad entera que vemos todos los días y no miramos nunca. El alma de Montevideo no " +
+        "está en el Centro ni en la rambla: está en el barrio, en la vereda rota y en el kiosco de la esquina.\n" +
+        "Pasear por Pasear es un archivo de fachadas que crece cada semana, paseos para quien quiera venir, " +
+        "una cartelera para que el barrio publique lo suyo y una carta por mes para quien quiera recibirla.";
     private const string SobreProyectoEn =
-        "<p>There is a whole city we see every day and never look at. The soul of Montevideo is not downtown " +
-        "or on the waterfront: it is in the neighbourhood, on the cracked pavement, at the corner kiosk.</p>" +
-        "<p>Pasear por Pasear is a facade archive that grows every week, walks for anyone who wants to come " +
-        "along, a board for the neighbourhood to post on, and one letter a month for whoever wants it.</p>";
+        "There is a whole city we see every day and never look at. The soul of Montevideo is not downtown " +
+        "or on the waterfront: it is in the neighbourhood, on the cracked pavement, at the corner kiosk.\n" +
+        "Pasear por Pasear is a facade archive that grows every week, walks for anyone who wants to come " +
+        "along, a board for the neighbourhood to post on, and one letter a month for whoever wants it.";
     private const string SobreProyectoPt =
-        "<p>Há uma cidade inteira que vemos todos os dias e nunca olhamos. A alma de Montevidéu não está no " +
-        "Centro nem na orla: está no bairro, na calçada quebrada e no quiosque da esquina.</p>" +
-        "<p>Pasear por Pasear é um arquivo de fachadas que cresce toda semana, passeios para quem quiser vir, " +
-        "um mural para o bairro publicar o seu e uma carta por mês para quem quiser recebê-la.</p>";
+        "Há uma cidade inteira que vemos todos os dias e nunca olhamos. A alma de Montevidéu não está no " +
+        "Centro nem na orla: está no bairro, na calçada quebrada e no quiosque da esquina.\n" +
+        "Pasear por Pasear é um arquivo de fachadas que cresce toda semana, passeios para quem quiser vir, " +
+        "um mural para o bairro publicar o seu e uma carta por mês para quem quiser recebê-la.";
 
     private const string SobreAutoraEs =
-        "<p>Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
+        "Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
         "Un día empecé a sacarle fotos a las casas que me gustaban —las bajas, las descascaradas, las " +
-        "que tienen una ventana con plantas— y las empecé a subir sin más plan que ese.</p>" +
-        "<p>Resultó que a mucha gente le pasaba lo mismo. De esas fotos, y de esa gente, salió Pasear por " +
-        "Pasear: lo mismo que hacía sola, un poco más ordenado.</p>";
+        "que tienen una ventana con plantas— y las empecé a subir sin más plan que ese.\n" +
+        "Resultó que a mucha gente le pasaba lo mismo. De esas fotos, y de esa gente, salió Pasear por " +
+        "Pasear: lo mismo que hacía sola, un poco más ordenado.";
     private const string SobreAutoraEn =
-        "<p>My name is Rosalía. I was born in Montevideo and spent half my life walking it without " +
+        "My name is Rosalía. I was born in Montevideo and spent half my life walking it without " +
         "noticing. One day I started photographing the houses I liked —the low ones, the peeling ones, " +
-        "the ones with a plant in the window— and posting them with no plan beyond that.</p>" +
-        "<p>It turned out plenty of people felt the same. Those photos, and those people, became Pasear " +
-        "por Pasear: what I used to do on my own, slightly better organised.</p>";
+        "the ones with a plant in the window— and posting them with no plan beyond that.\n" +
+        "It turned out plenty of people felt the same. Those photos, and those people, became Pasear " +
+        "por Pasear: what I used to do on my own, slightly better organised.";
     private const string SobreAutoraPt =
-        "<p>Meu nome é Rosalía, nasci em Montevidéu e passei metade da vida caminhando por ela sem " +
+        "Meu nome é Rosalía, nasci em Montevidéu e passei metade da vida caminhando por ela sem " +
         "perceber. Um dia comecei a fotografar as casas de que gostava —as baixas, as descascadas, as " +
-        "que têm uma janela com plantas— e a publicá-las sem mais plano que esse.</p>" +
-        "<p>Descobri que muita gente sentia o mesmo. Dessas fotos, e dessas pessoas, nasceu Pasear por " +
-        "Pasear: o que eu fazia sozinha, um pouco mais organizado.</p>";
+        "que têm uma janela com plantas— e a publicá-las sem mais plano que esse.\n" +
+        "Descobri que muita gente sentia o mesmo. Dessas fotos, e dessas pessoas, nasceu Pasear por " +
+        "Pasear: o que eu fazia sozinha, um pouco mais organizado.";
 
     // El texto único que traía el seed antes de separar la página en dos.
+    // Queda en HTML porque así está guardado en las bases de esa época.
     private const string SobreOriginalEs =
         "<p>Me llamo Rosalía, nací en Montevideo y me pasé media vida caminándola sin darme cuenta. " +
         "Un día empecé a sacarle fotos a las casas que me gustaban —las bajas, las descascaradas, las " +
@@ -192,14 +234,14 @@ public static class DbSeeder
             Slug = "el-clubcito",
             Etiqueta = "Todos los meses", EtiquetaEn = "Every month", EtiquetaPt = "Todos os meses",
             Descripcion =
-                "<p>El grupo que sale a caminar una vez por mes. Se avisa por el buzón de la Casita, se anota " +
-                "quien quiere y cada vez se camina un barrio distinto. No hay que saber nada ni traer nada.</p>",
+                "El grupo que sale a caminar una vez por mes. Se avisa por el buzón de la Casita, se anota " +
+                "quien quiere y cada vez se camina un barrio distinto. No hay que saber nada ni traer nada.",
             DescripcionEn =
-                "<p>The group that goes out walking once a month. We announce it through the Casita mailbox, " +
-                "whoever wants signs up, and each time we walk a different neighbourhood. No knowledge or gear required.</p>",
+                "The group that goes out walking once a month. We announce it through the Casita mailbox, " +
+                "whoever wants signs up, and each time we walk a different neighbourhood. No knowledge or gear required.",
             DescripcionPt =
-                "<p>O grupo que sai para caminhar uma vez por mês. Avisamos pela caixa de correio da Casita, " +
-                "inscreve-se quem quiser e a cada vez caminhamos um bairro diferente. Não é preciso saber nada nem levar nada.</p>",
+                "O grupo que sai para caminhar uma vez por mês. Avisamos pela caixa de correio da Casita, " +
+                "inscreve-se quem quiser e a cada vez caminhamos um bairro diferente. Não é preciso saber nada nem levar nada.",
             ImagenUrl = Demo + "casa-amarilla.webp",
             ImagenAlt = "Grupo caminando por una calle de casas bajas",
             Orden = 1,
@@ -219,7 +261,7 @@ public static class DbSeeder
             Titulo = "Al sobre", TituloEn = "Al sobre", TituloPt = "Al sobre",
             Slug = "al-sobre",
             Etiqueta = "Propuesta", EtiquetaEn = "Offering", EtiquetaPt = "Proposta",
-            Descripcion = "<p>Acá va la descripción de esta propuesta: qué es, cómo se accede y qué recibe la persona.</p>",
+            Descripcion = "Acá va la descripción de esta propuesta: qué es, cómo se accede y qué recibe la persona.",
             ImagenUrl = Demo + "casa-flores.webp",
             ImagenAlt = "Fachada con enredadera y flores",
             PendienteDeDefinir = true,
@@ -232,7 +274,7 @@ public static class DbSeeder
             Titulo = "Recorridos creativos", TituloEn = "Creative walks", TituloPt = "Percursos criativos",
             Slug = "recorridos-creativos",
             Etiqueta = "Propuesta", EtiquetaEn = "Offering", EtiquetaPt = "Proposta",
-            Descripcion = "<p>Acá va la descripción de esta propuesta: qué se hace durante el recorrido, cuánto dura y qué hay que llevar.</p>",
+            Descripcion = "Acá va la descripción de esta propuesta: qué se hace durante el recorrido, cuánto dura y qué hay que llevar.",
             ImagenUrl = Demo + "kiosco-plaza.webp",
             ImagenAlt = "Kiosco de fundición en una plaza",
             PendienteDeDefinir = true,
@@ -246,14 +288,14 @@ public static class DbSeeder
             Slug = "personalizados",
             Etiqueta = "A pedido", EtiquetaEn = "On request", EtiquetaPt = "Sob encomenda",
             Descripcion =
-                "<p>Un recorrido armado para tu grupo, en el barrio que quieran y el día que les sirva. Sirve " +
-                "para cumpleaños, para visitas de afuera o para una salida de la oficina que no sea otra vez un bar.</p>",
+                "Un recorrido armado para tu grupo, en el barrio que quieran y el día que les sirva. Sirve " +
+                "para cumpleaños, para visitas de afuera o para una salida de la oficina que no sea otra vez un bar.",
             DescripcionEn =
-                "<p>A walk built for your group, in the neighbourhood you choose and on the day that suits you. " +
-                "Good for birthdays, for visitors from out of town, or for a work outing that is not another bar.</p>",
+                "A walk built for your group, in the neighbourhood you choose and on the day that suits you. " +
+                "Good for birthdays, for visitors from out of town, or for a work outing that is not another bar.",
             DescripcionPt =
-                "<p>Um percurso montado para o seu grupo, no bairro que quiserem e no dia que servir. Serve para " +
-                "aniversários, para visitas de fora ou para uma saída do escritório que não seja outro bar.</p>",
+                "Um percurso montado para o seu grupo, no bairro que quiserem e no dia que servir. Serve para " +
+                "aniversários, para visitas de fora ou para uma saída do escritório que não seja outro bar.",
             ImagenUrl = Demo + "esquina.webp",
             ImagenAlt = "Casa de esquina en Malvín",
             Orden = 4,
@@ -301,7 +343,7 @@ public static class DbSeeder
                 Barrio = f.Barrio,
                 Calle = f.Titulo,
                 Extracto = "Ficha del archivo. El texto largo se escribe desde el panel.",
-                Contenido = "<p>Acá va la ficha completa de esta fachada.</p>",
+                Contenido = "Acá va la ficha completa de esta fachada.",
                 ImagenUrl = Demo + f.Foto + ".webp",
                 ImagenAlt = f.Alt,
                 FechaEncontrada = fecha,

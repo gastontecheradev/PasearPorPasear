@@ -35,7 +35,7 @@
         }
 
         <div class="texto">
-            @Html.Raw(PasearPorPasear.Services.EnlaceHelper.ConEnlaces(Model.ContenidoHtml, esHtml: true))
+            @Html.Raw(PasearPorPasear.Services.TextoConFormato.Parrafos(Model.ContenidoHtml))
         </div>
 
         @if (!string.IsNullOrEmpty(Model.MapaEmbedUrl))

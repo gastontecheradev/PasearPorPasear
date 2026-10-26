@@ -5,10 +5,10 @@ public enum TipoTexto
 {
     /// <summary>Una línea, en los tres idiomas.</summary>
     Linea,
-    /// <summary>Un párrafo, en los tres idiomas.</summary>
+    /// <summary>Un párrafo, en los tres idiomas. Cada Enter, un salto de renglón.</summary>
     Parrafo,
-    /// <summary>Varios párrafos con HTML, en los tres idiomas.</summary>
-    Html,
+    /// <summary>Varios párrafos, en los tres idiomas. Cada Enter, un párrafo nuevo.</summary>
+    Parrafos,
     /// <summary>Una línea que no se traduce (un nombre de usuario, una ciudad).</summary>
     Dato,
     /// <summary>Dirección https://, igual en los tres idiomas.</summary>
@@ -30,13 +30,14 @@ public sealed record DefTexto(
     string? Pista = null, bool Opcional = false)
 {
     public string Pagina => Clave[..Clave.IndexOf('.')];
-    public bool Traducible => Tipo is TipoTexto.Linea or TipoTexto.Parrafo or TipoTexto.Html;
+    public bool Traducible => Tipo is TipoTexto.Linea or TipoTexto.Parrafo or TipoTexto.Parrafos;
 
     /// <summary>
-    /// Los párrafos que se muestran como texto en la página. Quedan afuera los que
-    /// se usan como título, en la descripción para buscadores o en un texto alternativo.
+    /// Los párrafos que se muestran como texto en la página: se editan con el
+    /// editor de enlaces. Quedan afuera los que se usan como título, en la
+    /// descripción para buscadores o en un texto alternativo.
     /// </summary>
-    public bool AdmiteEnlaces => Tipo is TipoTexto.Parrafo or TipoTexto.Html
+    public bool AdmiteEnlaces => Tipo is TipoTexto.Parrafo or TipoTexto.Parrafos
         && Clave is not ("sobre.colaborar-titulo" or "general.descripcion" or "cartelera.vacia");
 }
 
@@ -76,8 +77,6 @@ public static class CatalogoTextos
         new PaginaPanel("general", "Menú, pie y enlaces", "Lo que se repite en todas las páginas: el menú, el pie, el correo y las redes.", null)
     };
 
-    private const string Html = "Admite HTML: cada párrafo entre <p> y </p>.";
-
     public static readonly IReadOnlyList<DefTexto> Todos = new[]
     {
         // ── Portada ───────────────────────────────────────────
@@ -98,11 +97,11 @@ public static class CatalogoTextos
 
         new DefTexto("portada.definicion-titulo", "Qué es Pasear por Pasear", "Título", TipoTexto.Linea,
             "Qué es Pasear por Pasear", "What Pasear por Pasear is", "O que é Pasear por Pasear"),
-        new DefTexto("portada.definicion-texto", "Qué es Pasear por Pasear", "Texto", TipoTexto.Html,
-            "<p>Esto empezó como una costumbre: salir a caminar sin rumbo por Montevideo y prestarle atención a lo que siempre estuvo ahí. Una fachada amarilla que aguanta desde hace ochenta años. Una ventana con geranios. Un gorrión metido en un nido arriba de un cable.</p><p>No es turismo y no hay que ir muy lejos. Es mirar el barrio de uno como si fuera la primera vez.</p>",
-            "<p>This started as a habit: going out to walk Montevideo with nowhere to be and paying attention to what was always there. A yellow facade that has held up for eighty years. A window with geraniums. A sparrow tucked into a nest above a cable.</p><p>It is not tourism and you do not have to go far. It is looking at your own neighbourhood as if for the first time.</p>",
-            "<p>Isto começou como um costume: sair para caminhar sem rumo por Montevidéu e prestar atenção ao que sempre esteve ali. Uma fachada amarela que aguenta há oitenta anos. Uma janela com gerânios. Um pardal metido num ninho em cima de um cabo.</p><p>Não é turismo e não é preciso ir longe. É olhar o próprio bairro como se fosse a primeira vez.</p>",
-            Html, Opcional: true),
+        new DefTexto("portada.definicion-texto", "Qué es Pasear por Pasear", "Texto", TipoTexto.Parrafos,
+            "Esto empezó como una costumbre: salir a caminar sin rumbo por Montevideo y prestarle atención a lo que siempre estuvo ahí. Una fachada amarilla que aguanta desde hace ochenta años. Una ventana con geranios. Un gorrión metido en un nido arriba de un cable.\nNo es turismo y no hay que ir muy lejos. Es mirar el barrio de uno como si fuera la primera vez.",
+            "This started as a habit: going out to walk Montevideo with nowhere to be and paying attention to what was always there. A yellow facade that has held up for eighty years. A window with geraniums. A sparrow tucked into a nest above a cable.\nIt is not tourism and you do not have to go far. It is looking at your own neighbourhood as if for the first time.",
+            "Isto começou como um costume: sair para caminhar sem rumo por Montevidéu e prestar atenção ao que sempre esteve ali. Uma fachada amarela que aguenta há oitenta anos. Uma janela com gerânios. Um pardal metido num ninho em cima de um cabo.\nNão é turismo e não é preciso ir longe. É olhar o próprio bairro como se fosse a primeira vez.",
+            Opcional: true),
         new DefTexto("portada.boton-sobre", "Qué es Pasear por Pasear", "Botón a Sobre PPP", TipoTexto.Linea,
             "Sobre PPP", "About PPP", "Sobre PPP"),
 

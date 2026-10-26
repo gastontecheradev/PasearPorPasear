@@ -81,6 +81,10 @@
     </main>
 </div>
 
+@* Las páginas del sitio, para elegirlas al poner un enlace en un texto. *@
+<script type="application/json" id="paginas-del-sitio">@Json.Serialize(CatalogoTextos.Paginas
+    .Where(p => p.UrlPublica is not null)
+    .Select(p => new { nombre = p.Nombre, dir = p.UrlPublica }))</script>
 <script src="~/js/admin.js" asp-append-version="true"></script>
 @await RenderSectionAsync("Scripts", required: false)
 </body>
